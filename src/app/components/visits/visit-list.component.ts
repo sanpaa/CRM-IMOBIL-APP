@@ -81,30 +81,199 @@ import { Visit } from '../../models/visit.model';
     </div>
   `,
   styles: [`
-    .page-container { padding: 2rem; }
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    .page-header h1 { margin: 0; color: #2c3e50; }
-    .btn-primary { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; }
-    .btn-primary:hover { background: #5568d3; }
-    .form-card, .table-card { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem; }
-    .form-card h2 { margin-top: 0; color: #2c3e50; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; margin-bottom: 0.5rem; color: #555; font-weight: 500; }
-    .form-control { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-    .data-table { width: 100%; border-collapse: collapse; }
-    .data-table th { background: #f8f9fa; padding: 1rem; text-align: left; font-weight: 600; color: #2c3e50; border-bottom: 2px solid #dee2e6; }
-    .data-table td { padding: 1rem; border-bottom: 1px solid #dee2e6; }
-    .badge { padding: 0.25rem 0.75rem; background: #667eea; color: white; border-radius: 12px; font-size: 0.85rem; }
-    .badge-agendada { background: #17a2b8; }
-    .badge-confirmada { background: #28a745; }
-    .badge-realizada { background: #6c757d; }
-    .badge-cancelada { background: #dc3545; }
-    .btn-sm { padding: 0.35rem 0.75rem; margin-right: 0.5rem; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
-    .btn-sm:hover { background: #5a6268; }
-    .btn-danger { background: #dc3545; }
-    .btn-danger:hover { background: #c82333; }
-    .text-center { text-align: center; }
+    .page-container {
+      min-height: 100vh;
+      background: #f8f9fa;
+    }
+
+    .page-header {
+      background: white;
+      padding: 2rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .page-header h1 {
+      margin: 0;
+      color: #1e293b;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .btn-primary {
+      padding: 0.875rem 1.75rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .form-card, .table-card {
+      background: white;
+      margin: 2rem 2.5rem;
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      border: 1px solid #e5e7eb;
+    }
+
+    .form-card h2 {
+      margin: 0 0 2rem 0;
+      color: #1e293b;
+      font-size: 1.5rem;
+      font-weight: 700;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      margin-bottom: 0.5rem;
+      color: #475569;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.875rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    select.form-control {
+      cursor: pointer;
+      background-color: white;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      background: #f8f9fa;
+      padding: 1rem 1.25rem;
+      text-align: left;
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .data-table td {
+      padding: 1.25rem;
+      border-bottom: 1px solid #e5e7eb;
+      color: #475569;
+    }
+
+    .data-table tbody tr {
+      transition: background 0.2s ease;
+    }
+
+    .data-table tbody tr:hover {
+      background: #f8f9fa;
+    }
+
+    .badge {
+      padding: 0.35rem 0.85rem;
+      color: white;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      display: inline-block;
+    }
+
+    .badge-agendada { background: #06b6d4; }
+    .badge-confirmada { background: #10b981; }
+    .badge-realizada { background: #64748b; }
+    .badge-cancelada { background: #ef4444; }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      margin-right: 0.5rem;
+      background: #64748b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-sm:hover {
+      background: #475569;
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: #ef4444;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .text-center {
+      text-align: center;
+      padding: 2rem;
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .page-header, .form-card, .table-card {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+
+      .data-table {
+        font-size: 0.85rem;
+      }
+    }
   `]
 })
 export class VisitListComponent implements OnInit {

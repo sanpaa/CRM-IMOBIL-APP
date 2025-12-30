@@ -65,36 +65,234 @@ import { Deal } from '../../models/deal.model';
     </div>
   `,
   styles: [`
-    .page-container { padding: 2rem; }
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    .page-header h1 { margin: 0; color: #2c3e50; }
-    .btn-primary { padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; }
-    .btn-primary:hover { background: #5568d3; }
-    .form-card { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem; }
-    .form-card h2 { margin-top: 0; color: #2c3e50; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; margin-bottom: 0.5rem; color: #555; font-weight: 500; }
-    .form-control { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-    
-    .deals-kanban { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
-    .kanban-column { background: #f8f9fa; border-radius: 10px; padding: 1rem; }
-    .column-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #dee2e6; }
-    .column-header h3 { margin: 0; color: #2c3e50; font-size: 1rem; }
-    .count { background: #667eea; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.85rem; }
-    
-    .deal-cards { display: flex; flex-direction: column; gap: 0.75rem; }
-    .deal-card { background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .deal-value { font-size: 1.2rem; font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem; }
-    .deal-status { font-size: 0.85rem; color: #6c757d; margin-bottom: 0.75rem; text-transform: capitalize; }
-    .deal-actions { display: flex; gap: 0.5rem; }
-    
-    .empty-column { text-align: center; padding: 2rem 1rem; color: #6c757d; font-size: 0.9rem; }
-    
-    .btn-sm { padding: 0.35rem 0.75rem; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
-    .btn-sm:hover { background: #5a6268; }
-    .btn-danger { background: #dc3545; }
-    .btn-danger:hover { background: #c82333; }
+    .page-container {
+      min-height: 100vh;
+      background: #f8f9fa;
+    }
+
+    .page-header {
+      background: white;
+      padding: 2rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .page-header h1 {
+      margin: 0;
+      color: #1e293b;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .btn-primary {
+      padding: 0.875rem 1.75rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    .form-card {
+      background: white;
+      margin: 2rem 2.5rem;
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      border: 1px solid #e5e7eb;
+    }
+
+    .form-card h2 {
+      margin: 0 0 2rem 0;
+      color: #1e293b;
+      font-size: 1.5rem;
+      font-weight: 700;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      margin-bottom: 0.5rem;
+      color: #475569;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.875rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    select.form-control {
+      cursor: pointer;
+      background-color: white;
+    }
+
+    .deals-kanban {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem 2.5rem;
+    }
+
+    .kanban-column {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      border: 1px solid #e5e7eb;
+    }
+
+    .column-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .column-header h3 {
+      margin: 0;
+      color: #1e293b;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .count {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .deal-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-height: 200px;
+    }
+
+    .deal-card {
+      background: #f8f9fa;
+      padding: 1.25rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border-left: 4px solid #667eea;
+      transition: all 0.2s ease;
+    }
+
+    .deal-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .deal-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+
+    .deal-status {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 1rem;
+      text-transform: capitalize;
+      font-weight: 500;
+    }
+
+    .deal-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .empty-column {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      background: #64748b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-sm:hover {
+      background: #475569;
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: #ef4444;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .deals-kanban {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+      }
+
+      .page-header, .form-card {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+    }
   `]
 })
 export class DealListComponent implements OnInit {
