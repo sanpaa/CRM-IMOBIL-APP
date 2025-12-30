@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -318,7 +318,7 @@ Chart.register(...registerables);
     }
   `]
 })
-export class DashboardComponent implements OnInit, AfterViewInit {
+export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('clientsChart') clientsChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('dealsChart') dealsChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('monthlyChart') monthlyChartRef!: ElementRef<HTMLCanvasElement>;
