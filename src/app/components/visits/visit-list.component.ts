@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { VisitService } from '../../services/visit.service';
 import { Visit } from '../../models/visit.model';
+import { VisitCalendarComponent } from './visit-calendar.component';
+import { VisitStatisticsComponent } from './visit-statistics.component';
 
 @Component({
   selector: 'app-visit-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, VisitCalendarComponent, VisitStatisticsComponent],
   template: `
     <div class="page-container">
       <div class="page-header">
@@ -18,7 +20,23 @@ import { Visit } from '../../models/visit.model';
         </button>
       </div>
 
-      <div class="form-card" *ngIf="showForm">
+      <div class="content-wrapper">
+        <!-- Statistics Section -->
+        <app-visit-statistics
+          [visits]="visits"
+          [filterView]="currentView"
+          [currentDate]="currentDate">
+        </app-visit-statistics>
+
+        <!-- Calendar Section -->
+        <app-visit-calendar
+          #calendar
+          [visits]="visits"
+          (viewChange)="onViewChange($event)"
+          (dateChange)="onDateChange($event)">
+        </app-visit-calendar>
+
+        <div class="form-card" *ngIf="showForm">
         <h2>{{ editingVisit ? 'Editar Visita' : 'Nova Visita' }}</h2>
         <form (ngSubmit)="saveVisit()">
           <div class="form-row">
@@ -78,6 +96,7 @@ import { Visit } from '../../models/visit.model';
           </tbody>
         </table>
       </div>
+      </div>
     </div>
   `,
   styles: [`
@@ -103,6 +122,10 @@ import { Visit } from '../../models/visit.model';
       font-weight: 700;
     }
 
+    .content-wrapper {
+      margin: 2rem 2.5rem;
+    }
+
     .btn-primary {
       padding: 0.875rem 1.75rem;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -123,7 +146,7 @@ import { Visit } from '../../models/visit.model';
 
     .form-card, .table-card {
       background: white;
-      margin: 2rem 2.5rem;
+      margin-bottom: 2rem;
       padding: 2.5rem;
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
@@ -265,8 +288,12 @@ import { Visit } from '../../models/visit.model';
         grid-template-columns: 1fr;
       }
 
-      .page-header, .form-card, .table-card {
+      .page-header, .content-wrapper {
         margin: 1rem;
+        padding: 1.5rem;
+      }
+
+      .form-card, .table-card {
         padding: 1.5rem;
       }
 
@@ -281,6 +308,8 @@ export class VisitListComponent implements OnInit {
   showForm = false;
   editingVisit: Visit | null = null;
   formData: any = {};
+  currentView: 'day' | 'week' | 'month' = 'month';
+  currentDate: Date = new Date();
 
   constructor(private visitService: VisitService) {
     this.resetForm();
@@ -338,5 +367,13 @@ export class VisitListComponent implements OnInit {
         console.error('Error deleting visit:', error);
       }
     }
+  }
+
+  onViewChange(view: 'day' | 'week' | 'month') {
+    this.currentView = view;
+  }
+
+  onDateChange(date: Date) {
+    this.currentDate = date;
   }
 }

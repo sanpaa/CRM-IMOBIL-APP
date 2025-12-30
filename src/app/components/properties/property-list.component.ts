@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PropertyService } from '../../services/property.service';
 import { Property } from '../../models/property.model';
+import { PropertyFormComponent } from './property-form.component';
 
 @Component({
   selector: 'app-property-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, PropertyFormComponent],
   template: `
     <div class="page-container">
       <div class="page-header">
@@ -18,79 +19,12 @@ import { Property } from '../../models/property.model';
         </button>
       </div>
 
-      <div class="form-card" *ngIf="showForm">
-        <h2>{{ editingProperty ? 'Editar Imóvel' : 'Novo Imóvel' }}</h2>
-        <form (ngSubmit)="saveProperty()">
-          <div class="form-group">
-            <label>Título</label>
-            <input type="text" [(ngModel)]="formData.title" name="title" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label>Descrição</label>
-            <textarea [(ngModel)]="formData.description" name="description" class="form-control" rows="3" required></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Tipo</label>
-              <select [(ngModel)]="formData.type" name="type" class="form-control">
-                <option value="apartamento">Apartamento</option>
-                <option value="casa">Casa</option>
-                <option value="terreno">Terreno</option>
-                <option value="comercial">Comercial</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Preço</label>
-              <input type="number" [(ngModel)]="formData.price" name="price" class="form-control" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Quartos</label>
-              <input type="number" [(ngModel)]="formData.bedrooms" name="bedrooms" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Banheiros</label>
-              <input type="number" [(ngModel)]="formData.bathrooms" name="bathrooms" class="form-control">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Área (m²)</label>
-              <input type="number" [(ngModel)]="formData.area" name="area" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Vagas</label>
-              <input type="number" [(ngModel)]="formData.parking" name="parking" class="form-control">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Rua</label>
-              <input type="text" [(ngModel)]="formData.street" name="street" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Bairro</label>
-              <input type="text" [(ngModel)]="formData.neighborhood" name="neighborhood" class="form-control">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Cidade</label>
-              <input type="text" [(ngModel)]="formData.city" name="city" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Estado</label>
-              <input type="text" [(ngModel)]="formData.state" name="state" class="form-control">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Contato</label>
-            <input type="text" [(ngModel)]="formData.contact" name="contact" class="form-control" required>
-          </div>
-          <button type="submit" class="btn-primary">Salvar</button>
-        </form>
-      </div>
+      <app-property-form
+        *ngIf="showForm"
+        [editingProperty]="editingProperty"
+        (save)="saveProperty($event)"
+        (cancel)="cancelForm()">
+      </app-property-form>
 
       <div class="table-card">
         <table class="data-table">
@@ -313,11 +247,8 @@ export class PropertyListComponent implements OnInit {
   properties: Property[] = [];
   showForm = false;
   editingProperty: Property | null = null;
-  formData: any = {};
 
-  constructor(private propertyService: PropertyService) {
-    this.resetForm();
-  }
+  constructor(private propertyService: PropertyService) {}
 
   async ngOnInit() {
     await this.loadProperties();
@@ -331,44 +262,29 @@ export class PropertyListComponent implements OnInit {
     }
   }
 
-  resetForm() {
-    this.formData = {
-      title: '',
-      description: '',
-      type: 'apartamento',
-      price: 0,
-      bedrooms: 0,
-      bathrooms: 0,
-      area: 0,
-      parking: 0,
-      street: '',
-      neighborhood: '',
-      city: '',
-      state: '',
-      contact: ''
-    };
-  }
-
   editProperty(property: Property) {
     this.editingProperty = property;
-    this.formData = { ...property };
     this.showForm = true;
   }
 
-  async saveProperty() {
+  async saveProperty(formData: any) {
     try {
       if (this.editingProperty) {
-        await this.propertyService.update(this.editingProperty.id, this.formData);
+        await this.propertyService.update(this.editingProperty.id, formData);
       } else {
-        await this.propertyService.create(this.formData);
+        await this.propertyService.create(formData);
       }
       this.showForm = false;
       this.editingProperty = null;
-      this.resetForm();
       await this.loadProperties();
     } catch (error) {
       console.error('Error saving property:', error);
     }
+  }
+
+  cancelForm() {
+    this.showForm = false;
+    this.editingProperty = null;
   }
 
   async deleteProperty(id: string) {
