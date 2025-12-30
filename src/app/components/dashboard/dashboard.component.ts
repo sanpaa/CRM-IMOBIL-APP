@@ -122,26 +122,26 @@ Chart.register(...registerables);
   styles: [`
     .dashboard-wrapper {
       min-height: 100vh;
-      background: #f8f9fa;
+      background: #F5F7FA;
     }
 
     .page-header {
-      background: white;
+      background: #FFFFFF;
       padding: 2rem 2.5rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      border-bottom: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border-bottom: 1px solid #E5E7EB;
     }
 
     .header-content h1 {
       margin: 0;
-      color: #1e293b;
+      color: #1F2933;
       font-size: 2rem;
       font-weight: 700;
     }
 
     .header-subtitle {
       margin: 0.25rem 0 0 0;
-      color: #64748b;
+      color: #6B7280;
       font-size: 0.95rem;
     }
 
@@ -157,26 +157,26 @@ Chart.register(...registerables);
     }
 
     .stat-card {
-      background: white;
+      background: #FFFFFF;
       padding: 1.75rem;
       border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       display: flex;
       align-items: center;
       gap: 1.25rem;
       transition: all 0.3s ease;
-      border: 1px solid #e5e7eb;
+      border: 1px solid #E5E7EB;
     }
 
     .stat-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
-    .stat-card-primary { border-left: 4px solid #3b82f6; }
-    .stat-card-success { border-left: 4px solid #10b981; }
-    .stat-card-warning { border-left: 4px solid #f59e0b; }
-    .stat-card-info { border-left: 4px solid #8b5cf6; }
+    .stat-card-primary { border-left: 4px solid #374151; }
+    .stat-card-success { border-left: 4px solid #059669; }
+    .stat-card-warning { border-left: 4px solid #D97706; }
+    .stat-card-info { border-left: 4px solid #4B5563; }
 
     .stat-icon {
       font-size: 3rem;
@@ -189,7 +189,7 @@ Chart.register(...registerables);
 
     .stat-label {
       font-size: 0.85rem;
-      color: #64748b;
+      color: #6B7280;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -199,7 +199,7 @@ Chart.register(...registerables);
     .stat-value {
       font-size: 2.5rem;
       font-weight: 700;
-      color: #1e293b;
+      color: #1F2933;
       line-height: 1;
     }
 
@@ -211,11 +211,11 @@ Chart.register(...registerables);
     }
 
     .chart-card {
-      background: white;
+      background: #FFFFFF;
       padding: 1.75rem;
       border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #E5E7EB;
     }
 
     .chart-card-wide {
@@ -228,14 +228,14 @@ Chart.register(...registerables);
 
     .chart-header h3 {
       margin: 0 0 0.25rem 0;
-      color: #1e293b;
+      color: #1F2933;
       font-size: 1.1rem;
       font-weight: 700;
     }
 
     .chart-header p {
       margin: 0;
-      color: #64748b;
+      color: #6B7280;
       font-size: 0.85rem;
     }
 
@@ -249,16 +249,16 @@ Chart.register(...registerables);
     }
 
     .quick-actions {
-      background: white;
+      background: #FFFFFF;
       padding: 1.75rem;
       border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #E5E7EB;
     }
 
     .quick-actions h3 {
       margin: 0 0 1.5rem 0;
-      color: #1e293b;
+      color: #1F2933;
       font-size: 1.1rem;
       font-weight: 700;
     }
@@ -275,17 +275,18 @@ Chart.register(...registerables);
       align-items: center;
       gap: 0.75rem;
       padding: 1.5rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #374151;
       color: white;
       text-decoration: none;
       border-radius: 10px;
       transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 2px 8px rgba(55, 65, 81, 0.2);
     }
 
     .action-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+      background: #1F2937;
+      box-shadow: 0 4px 12px rgba(55, 65, 81, 0.3);
     }
 
     .action-icon {
@@ -331,6 +332,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     deals: 0
   };
 
+  // Real data for charts
+  private clientsData: any[] = [];
+  private dealsData: any[] = [];
+  private monthlyData: { clients: number[], properties: number[] } = { clients: [], properties: [] };
+
   private charts: any[] = [];
 
   constructor(
@@ -372,9 +378,107 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         visits: visits.length,
         deals: deals.length
       };
+
+      // Prepare data for charts
+      this.prepareChartData(clients, deals, properties);
+      
+      // Recreate charts with real data if they exist
+      if (this.clientsChartRef && this.dealsChartRef && this.monthlyChartRef) {
+        this.createCharts();
+      }
     } catch (error) {
       console.error('Error loading stats:', error);
     }
+  }
+
+  prepareChartData(clients: any[], deals: any[], properties: any[]) {
+    // Count clients by status
+    const clientStatusCount: any = {
+      'lead': 0,
+      'contato': 0,
+      'interessado': 0,
+      'cliente': 0
+    };
+
+    clients.forEach(client => {
+      const status = client.status?.toLowerCase() || 'lead';
+      if (clientStatusCount.hasOwnProperty(status)) {
+        clientStatusCount[status]++;
+      }
+    });
+
+    this.clientsData = [
+      clientStatusCount['lead'],
+      clientStatusCount['contato'],
+      clientStatusCount['interessado'],
+      clientStatusCount['cliente']
+    ];
+
+    // Count deals by status
+    const dealStatusCount: any = {
+      'proposta': 0,
+      'negociacao': 0,
+      'aceito': 0,
+      'fechado': 0
+    };
+
+    deals.forEach(deal => {
+      const status = deal.status?.toLowerCase() || 'proposta';
+      if (dealStatusCount.hasOwnProperty(status)) {
+        dealStatusCount[status]++;
+      }
+    });
+
+    this.dealsData = [
+      dealStatusCount['proposta'],
+      dealStatusCount['negociacao'],
+      dealStatusCount['aceito'],
+      dealStatusCount['fechado']
+    ];
+
+    // Prepare monthly data (last 6 months)
+    const now = new Date();
+    const monthlyClients = new Array(6).fill(0);
+    const monthlyProperties = new Array(6).fill(0);
+
+    clients.forEach(client => {
+      const createdDate = new Date(client.created_at);
+      const monthDiff = this.getMonthDifference(createdDate, now);
+      if (monthDiff >= 0 && monthDiff < 6) {
+        monthlyClients[5 - monthDiff]++;
+      }
+    });
+
+    properties.forEach(property => {
+      const createdDate = new Date(property.created_at);
+      const monthDiff = this.getMonthDifference(createdDate, now);
+      if (monthDiff >= 0 && monthDiff < 6) {
+        monthlyProperties[5 - monthDiff]++;
+      }
+    });
+
+    this.monthlyData = {
+      clients: monthlyClients,
+      properties: monthlyProperties
+    };
+  }
+
+  getMonthDifference(date1: Date, date2: Date): number {
+    return (date2.getFullYear() - date1.getFullYear()) * 12 + 
+           (date2.getMonth() - date1.getMonth());
+  }
+
+  getMonthLabels(): string[] {
+    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const labels: string[] = [];
+    const now = new Date();
+    
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      labels.push(months[date.getMonth()]);
+    }
+    
+    return labels;
   }
 
   createCharts() {
@@ -394,12 +498,12 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         labels: ['Leads', 'Em Contato', 'Interessados', 'Clientes'],
         datasets: [{
-          data: [12, 8, 15, 20],
+          data: this.clientsData.length > 0 ? this.clientsData : [0, 0, 0, 0],
           backgroundColor: [
-            '#3b82f6',
-            '#f59e0b',
-            '#8b5cf6',
-            '#10b981'
+            '#6B7280',
+            '#9CA3AF',
+            '#4B5563',
+            '#059669'
           ],
           borderWidth: 2,
           borderColor: '#fff'
@@ -444,21 +548,21 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const chart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ['Prospecção', 'Negociação', 'Proposta', 'Fechado'],
+        labels: ['Proposta', 'Negociação', 'Aceito', 'Fechado'],
         datasets: [{
           label: 'Negócios',
-          data: [8, 12, 6, 15],
+          data: this.dealsData.length > 0 ? this.dealsData : [0, 0, 0, 0],
           backgroundColor: [
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(245, 158, 11, 0.8)',
-            'rgba(139, 92, 246, 0.8)',
-            'rgba(16, 185, 129, 0.8)'
+            'rgba(107, 114, 128, 0.8)',
+            'rgba(156, 163, 175, 0.8)',
+            'rgba(75, 85, 99, 0.8)',
+            'rgba(5, 150, 105, 0.8)'
           ],
           borderColor: [
-            'rgb(59, 130, 246)',
-            'rgb(245, 158, 11)',
-            'rgb(139, 92, 246)',
-            'rgb(16, 185, 129)'
+            'rgb(107, 114, 128)',
+            'rgb(156, 163, 175)',
+            'rgb(75, 85, 99)',
+            'rgb(5, 150, 105)'
           ],
           borderWidth: 2,
           borderRadius: 8
@@ -513,33 +617,33 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const chart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+        labels: this.getMonthLabels(),
         datasets: [
           {
             label: 'Novos Clientes',
-            data: [12, 19, 15, 25, 22, 30],
-            borderColor: 'rgb(59, 130, 246)',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            data: this.monthlyData.clients.length > 0 ? this.monthlyData.clients : [0, 0, 0, 0, 0, 0],
+            borderColor: 'rgb(75, 85, 99)',
+            backgroundColor: 'rgba(75, 85, 99, 0.1)',
             borderWidth: 3,
             fill: true,
             tension: 0.4,
             pointRadius: 5,
             pointHoverRadius: 7,
-            pointBackgroundColor: 'rgb(59, 130, 246)',
+            pointBackgroundColor: 'rgb(75, 85, 99)',
             pointBorderColor: '#fff',
             pointBorderWidth: 2
           },
           {
             label: 'Novos Imóveis',
-            data: [8, 12, 10, 18, 15, 20],
-            borderColor: 'rgb(16, 185, 129)',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            data: this.monthlyData.properties.length > 0 ? this.monthlyData.properties : [0, 0, 0, 0, 0, 0],
+            borderColor: 'rgb(5, 150, 105)',
+            backgroundColor: 'rgba(5, 150, 105, 0.1)',
             borderWidth: 3,
             fill: true,
             tension: 0.4,
             pointRadius: 5,
             pointHoverRadius: 7,
-            pointBackgroundColor: 'rgb(16, 185, 129)',
+            pointBackgroundColor: 'rgb(5, 150, 105)',
             pointBorderColor: '#fff',
             pointBorderWidth: 2
           }
