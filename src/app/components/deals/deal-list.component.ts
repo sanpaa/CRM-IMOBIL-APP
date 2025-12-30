@@ -41,6 +41,19 @@ import { Deal } from '../../models/deal.model';
         </form>
       </div>
 
+      <!-- Total Summary Section -->
+      <div class="totals-summary">
+        <div class="summary-card summary-total">
+          <div class="summary-label">Valor Total de Vendas</div>
+          <div class="summary-value">{{ getTotalValue() | currency:'BRL' }}</div>
+        </div>
+        <div class="summary-card" *ngFor="let status of statuses">
+          <div class="summary-label">{{ status.label }}</div>
+          <div class="summary-value-small">{{ getTotalByStatus(status.value) | currency:'BRL' }}</div>
+          <div class="summary-count">{{ getDealsByStatus(status.value).length }} negócio(s)</div>
+        </div>
+      </div>
+
       <div class="deals-kanban">
         <div class="kanban-column" *ngFor="let status of statuses">
           <div class="column-header">
@@ -67,29 +80,29 @@ import { Deal } from '../../models/deal.model';
   styles: [`
     .page-container {
       min-height: 100vh;
-      background: #f8f9fa;
+      background: #F5F7FA;
     }
 
     .page-header {
-      background: white;
+      background: #FFFFFF;
       padding: 2rem 2.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      border-bottom: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border-bottom: 1px solid #E5E7EB;
     }
 
     .page-header h1 {
       margin: 0;
-      color: #1e293b;
+      color: #1F2933;
       font-size: 2rem;
       font-weight: 700;
     }
 
     .btn-primary {
       padding: 0.875rem 1.75rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #374151;
       color: white;
       border: none;
       border-radius: 8px;
@@ -97,30 +110,31 @@ import { Deal } from '../../models/deal.model';
       font-weight: 600;
       font-size: 0.95rem;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 2px 8px rgba(55, 65, 81, 0.2);
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+      background: #1F2937;
+      box-shadow: 0 4px 12px rgba(55, 65, 81, 0.3);
     }
 
     .form-card {
-      background: white;
+      background: #FFFFFF;
       margin: 2rem 2.5rem;
       padding: 2.5rem;
       border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #E5E7EB;
     }
 
     .form-card h2 {
       margin: 0 0 2rem 0;
-      color: #1e293b;
+      color: #1F2933;
       font-size: 1.5rem;
       font-weight: 700;
       padding-bottom: 1rem;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid #E5E7EB;
     }
 
     .form-row {
@@ -137,7 +151,7 @@ import { Deal } from '../../models/deal.model';
 
     .form-group label {
       margin-bottom: 0.5rem;
-      color: #475569;
+      color: #6B7280;
       font-weight: 600;
       font-size: 0.9rem;
     }
@@ -145,23 +159,80 @@ import { Deal } from '../../models/deal.model';
     .form-control {
       width: 100%;
       padding: 0.875rem;
-      border: 2px solid #e5e7eb;
+      border: 2px solid #E5E7EB;
       border-radius: 8px;
       font-size: 0.95rem;
       transition: all 0.2s ease;
       box-sizing: border-box;
       font-family: inherit;
+      color: #1F2933;
     }
 
     .form-control:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      border-color: #374151;
+      box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1);
     }
 
     select.form-control {
       cursor: pointer;
       background-color: white;
+    }
+
+    .totals-summary {
+      margin: 2rem 2.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .summary-card {
+      background: #FFFFFF;
+      padding: 1.75rem;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #E5E7EB;
+      transition: all 0.3s ease;
+    }
+
+    .summary-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .summary-total {
+      grid-column: 1 / -1;
+      background: #374151;
+      color: white;
+      border: none;
+    }
+
+    .summary-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.75rem;
+      opacity: 0.9;
+    }
+
+    .summary-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .summary-value-small {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1F2933;
+      margin-bottom: 0.5rem;
+    }
+
+    .summary-count {
+      font-size: 0.85rem;
+      color: #6B7280;
+      font-weight: 500;
     }
 
     .deals-kanban {
@@ -172,11 +243,11 @@ import { Deal } from '../../models/deal.model';
     }
 
     .kanban-column {
-      background: white;
+      background: #FFFFFF;
       border-radius: 12px;
       padding: 1.5rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #E5E7EB;
     }
 
     .column-header {
@@ -185,18 +256,18 @@ import { Deal } from '../../models/deal.model';
       align-items: center;
       margin-bottom: 1.25rem;
       padding-bottom: 1rem;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid #E5E7EB;
     }
 
     .column-header h3 {
       margin: 0;
-      color: #1e293b;
+      color: #1F2933;
       font-size: 1.1rem;
       font-weight: 700;
     }
 
     .count {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #374151;
       color: white;
       padding: 0.35rem 0.75rem;
       border-radius: 20px;
@@ -212,29 +283,29 @@ import { Deal } from '../../models/deal.model';
     }
 
     .deal-card {
-      background: #f8f9fa;
+      background: #F5F7FA;
       padding: 1.25rem;
       border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      border-left: 4px solid #667eea;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border-left: 4px solid #374151;
       transition: all 0.2s ease;
     }
 
     .deal-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
     .deal-value {
       font-size: 1.3rem;
       font-weight: 700;
-      color: #1e293b;
+      color: #1F2933;
       margin-bottom: 0.5rem;
     }
 
     .deal-status {
       font-size: 0.85rem;
-      color: #64748b;
+      color: #6B7280;
       margin-bottom: 1rem;
       text-transform: capitalize;
       font-weight: 500;
@@ -248,14 +319,14 @@ import { Deal } from '../../models/deal.model';
     .empty-column {
       text-align: center;
       padding: 3rem 1rem;
-      color: #94a3b8;
+      color: #6B7280;
       font-size: 0.9rem;
       font-style: italic;
     }
 
     .btn-sm {
       padding: 0.5rem 1rem;
-      background: #64748b;
+      background: #6B7280;
       color: white;
       border: none;
       border-radius: 6px;
@@ -266,16 +337,16 @@ import { Deal } from '../../models/deal.model';
     }
 
     .btn-sm:hover {
-      background: #475569;
+      background: #4B5563;
       transform: translateY(-1px);
     }
 
     .btn-danger {
-      background: #ef4444;
+      background: #DC2626;
     }
 
     .btn-danger:hover {
-      background: #dc2626;
+      background: #B91C1C;
     }
 
     @media (max-width: 768px) {
@@ -327,6 +398,14 @@ export class DealListComponent implements OnInit {
 
   getDealsByStatus(status: string): Deal[] {
     return this.deals.filter(deal => deal.status === status);
+  }
+
+  getTotalValue(): number {
+    return this.deals.reduce((sum, deal) => sum + (deal.proposed_value || 0), 0);
+  }
+
+  getTotalByStatus(status: string): number {
+    return this.getDealsByStatus(status).reduce((sum, deal) => sum + (deal.proposed_value || 0), 0);
   }
 
   resetForm() {
