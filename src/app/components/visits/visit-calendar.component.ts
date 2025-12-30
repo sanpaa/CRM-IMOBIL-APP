@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Visit } from '../../models/visit.model';
 
@@ -471,6 +471,8 @@ interface CalendarDay {
 })
 export class VisitCalendarComponent implements OnInit {
   @Input() visits: Visit[] = [];
+  @Output() viewChange = new EventEmitter<'day' | 'week' | 'month'>();
+  @Output() dateChange = new EventEmitter<Date>();
 
   currentDate: Date = new Date();
   currentView: 'day' | 'week' | 'month' = 'month';
@@ -513,6 +515,7 @@ export class VisitCalendarComponent implements OnInit {
 
   setView(view: 'day' | 'week' | 'month') {
     this.currentView = view;
+    this.viewChange.emit(view);
     this.generateCalendar();
   }
 
@@ -529,6 +532,7 @@ export class VisitCalendarComponent implements OnInit {
         break;
     }
     this.currentDate = new Date(this.currentDate);
+    this.dateChange.emit(this.currentDate);
     this.generateCalendar();
   }
 
@@ -545,6 +549,7 @@ export class VisitCalendarComponent implements OnInit {
         break;
     }
     this.currentDate = new Date(this.currentDate);
+    this.dateChange.emit(this.currentDate);
     this.generateCalendar();
   }
 
