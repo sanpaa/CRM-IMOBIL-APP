@@ -11,11 +11,13 @@ export interface Property {
   parking?: number;
   image_url?: string;
   image_urls?: string[];
+  video_urls?: string[];
   street?: string;
   neighborhood?: string;
   city?: string;
   state?: string;
   zip_code?: string;
+  cep?: string;
   latitude?: number;
   longitude?: number;
   contact: string;

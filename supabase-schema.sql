@@ -79,18 +79,22 @@ CREATE TABLE properties (
     parking INTEGER,
     image_url TEXT,
     image_urls TEXT[] DEFAULT '{}',
+    video_urls TEXT[] DEFAULT '{}',
     street VARCHAR(255),
     neighborhood VARCHAR(255),
     city VARCHAR(255),
     state VARCHAR(50),
     zip_code VARCHAR(20),
+    cep VARCHAR(20),
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
     contact VARCHAR(50) NOT NULL,
     featured BOOLEAN DEFAULT FALSE,
     sold BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    CONSTRAINT max_images_check CHECK (array_length(image_urls, 1) IS NULL OR array_length(image_urls, 1) <= 20),
+    CONSTRAINT max_videos_check CHECK (array_length(video_urls, 1) IS NULL OR array_length(video_urls, 1) <= 3)
 );
 
 -- ============================================
