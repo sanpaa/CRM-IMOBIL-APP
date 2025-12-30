@@ -105,14 +105,14 @@ import { Property } from '../../models/property.model';
         <h3 class="section-title">Mídia</h3>
         
         <div class="form-group">
-          <label>Imagens (até 20)</label>
+          <label>Imagens (até {{ maxImages }})</label>
           <input 
             type="file" 
             (change)="onImageSelect($event)" 
             class="form-control" 
             accept="image/*" 
             multiple>
-          <small class="form-hint">{{ imageUrls.length }}/20 imagens adicionadas</small>
+          <small class="form-hint">{{ imageUrls.length }}/{{ maxImages }} imagens adicionadas</small>
           <div class="media-preview" *ngIf="imageUrls.length > 0">
             <div *ngFor="let img of imageUrls; let i = index" class="media-item">
               <img [src]="img" alt="Preview">
@@ -122,14 +122,14 @@ import { Property } from '../../models/property.model';
         </div>
         
         <div class="form-group">
-          <label>Vídeos (até 3)</label>
+          <label>Vídeos (até {{ maxVideos }})</label>
           <input 
             type="file" 
             (change)="onVideoSelect($event)" 
             class="form-control" 
             accept="video/*" 
             multiple>
-          <small class="form-hint">{{ videoUrls.length }}/3 vídeos adicionados</small>
+          <small class="form-hint">{{ videoUrls.length }}/{{ maxVideos }} vídeos adicionados</small>
           <div class="media-preview" *ngIf="videoUrls.length > 0">
             <div *ngFor="let video of videoUrls; let i = index" class="media-item">
               <video [src]="video" controls></video>
@@ -334,6 +334,10 @@ export class PropertyFormComponent implements OnInit {
   @Output() save = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<void>();
 
+  private static readonly MAX_IMAGES = 20;
+  private static readonly MAX_VIDEOS = 3;
+  private static readonly CEP_REGEX = /\D/g;
+
   formData: any = {};
   imageUrls: string[] = [];
   videoUrls: string[] = [];
@@ -347,6 +351,14 @@ export class PropertyFormComponent implements OnInit {
       this.imageUrls = this.editingProperty.image_urls || [];
       this.videoUrls = this.editingProperty.video_urls || [];
     }
+  }
+
+  get maxImages(): number {
+    return PropertyFormComponent.MAX_IMAGES;
+  }
+
+  get maxVideos(): number {
+    return PropertyFormComponent.MAX_VIDEOS;
   }
 
   resetForm() {
@@ -371,7 +383,7 @@ export class PropertyFormComponent implements OnInit {
   }
 
   async fetchAddressFromCep() {
-    const cep = this.formData.cep?.replace(/\D/g, '');
+    const cep = this.formData.cep?.replace(PropertyFormComponent.CEP_REGEX, '');
     if (!cep || cep.length !== 8) return;
 
     this.loadingCep = true;
@@ -416,7 +428,7 @@ export class PropertyFormComponent implements OnInit {
   onImageSelect(event: any) {
     const files = event.target.files;
     if (files) {
-      const remainingSlots = 20 - this.imageUrls.length;
+      const remainingSlots = PropertyFormComponent.MAX_IMAGES - this.imageUrls.length;
       const filesToAdd = Math.min(files.length, remainingSlots);
       
       for (let i = 0; i < filesToAdd; i++) {
@@ -428,7 +440,7 @@ export class PropertyFormComponent implements OnInit {
       }
       
       if (files.length > remainingSlots) {
-        alert(`Limite de 20 imagens. Apenas ${filesToAdd} imagens foram adicionadas.`);
+        alert(`Limite de ${PropertyFormComponent.MAX_IMAGES} imagens. Apenas ${filesToAdd} imagens foram adicionadas.`);
       }
     }
     event.target.value = '';
@@ -437,7 +449,7 @@ export class PropertyFormComponent implements OnInit {
   onVideoSelect(event: any) {
     const files = event.target.files;
     if (files) {
-      const remainingSlots = 3 - this.videoUrls.length;
+      const remainingSlots = PropertyFormComponent.MAX_VIDEOS - this.videoUrls.length;
       const filesToAdd = Math.min(files.length, remainingSlots);
       
       for (let i = 0; i < filesToAdd; i++) {
@@ -449,7 +461,7 @@ export class PropertyFormComponent implements OnInit {
       }
       
       if (files.length > remainingSlots) {
-        alert(`Limite de 3 vídeos. Apenas ${filesToAdd} vídeos foram adicionados.`);
+        alert(`Limite de ${PropertyFormComponent.MAX_VIDEOS} vídeos. Apenas ${filesToAdd} vídeos foram adicionados.`);
       }
     }
     event.target.value = '';

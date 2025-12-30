@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Visit } from '../../models/visit.model';
 
@@ -469,7 +469,7 @@ interface CalendarDay {
     }
   `]
 })
-export class VisitCalendarComponent implements OnInit {
+export class VisitCalendarComponent implements OnInit, OnChanges {
   @Input() visits: Visit[] = [];
   @Output() viewChange = new EventEmitter<'day' | 'week' | 'month'>();
   @Output() dateChange = new EventEmitter<Date>();
@@ -480,6 +480,8 @@ export class VisitCalendarComponent implements OnInit {
   weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
   // Brazilian Holidays 2024-2025
+  // TODO: Consider implementing a more dynamic system or external configuration
+  // to avoid manual updates each year. For now, update this object annually.
   holidays: { [key: string]: string } = {
     '2024-01-01': 'Ano Novo',
     '2024-02-13': 'Carnaval',

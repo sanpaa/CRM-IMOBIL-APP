@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Visit } from '../../models/visit.model';
 
@@ -272,7 +272,7 @@ interface Statistics {
     }
   `]
 })
-export class VisitStatisticsComponent implements OnInit {
+export class VisitStatisticsComponent implements OnInit, OnChanges {
   @Input() visits: Visit[] = [];
   @Input() filterView: 'day' | 'week' | 'month' = 'month';
   @Input() currentDate: Date = new Date();
