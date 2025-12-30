@@ -1,0 +1,115 @@
+@import '../clients/client-list.component.scss';
+
+// Additional styles specific to properties
+.modal-large {
+  max-width: 900px;
+}
+
+.form-section {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #f1f5f9;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+
+  h3 {
+    margin: 0 0 1.5rem 0;
+    color: #475569;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.checkbox-group {
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #667eea;
+      background: #f8f9fa;
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+  }
+}
+
+.property-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.featured-badge {
+  font-size: 0.75rem;
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+.badge-available {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-sold {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+// Override filter row for properties
+.filter-row {
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+}
+
+@media (max-width: 1200px) {
+  .filter-row {
+    grid-template-columns: 1fr 1fr;
+    
+    .filter-actions {
+      grid-column: span 2;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-row {
+    grid-template-columns: 1fr;
+    
+    .filter-actions {
+      grid-column: 1;
+    }
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-large {
+    width: 95%;
+    max-height: 90vh;
+  }
+}

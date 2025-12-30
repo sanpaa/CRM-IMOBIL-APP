@@ -33,12 +33,20 @@ export const routes: Routes = [
         loadComponent: () => import('./components/properties/property-list.component').then(m => m.PropertyListComponent)
       },
       {
+        path: 'owners',
+        loadComponent: () => import('./components/owners/owner-list.component').then(m => m.OwnerListComponent)
+      },
+      {
         path: 'visits',
         loadComponent: () => import('./components/visits/visit-list.component').then(m => m.VisitListComponent)
       },
       {
         path: 'deals',
         loadComponent: () => import('./components/deals/deal-list.component').then(m => m.DealListComponent)
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./components/settings/settings.component').then(m => m.SettingsComponent)
       }
     ]
   },
