@@ -1,0 +1,227 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Imóveis</h1>
+    <button (click)="openModal()" class="btn-primary">
+      + Novo Imóvel
+    </button>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-card">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label>Buscar</label>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (ngModelChange)="applyFilters()"
+          placeholder="Título, endereço, bairro..." 
+          class="filter-input">
+      </div>
+      <div class="filter-group">
+        <label>Tipo</label>
+        <select [(ngModel)]="filterType" (ngModelChange)="applyFilters()" class="filter-input">
+          <option value="">Todos</option>
+          <option value="apartamento">Apartamento</option>
+          <option value="casa">Casa</option>
+          <option value="terreno">Terreno</option>
+          <option value="comercial">Comercial</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Cidade</label>
+        <input 
+          type="text" 
+          [(ngModel)]="filterCity" 
+          (ngModelChange)="applyFilters()"
+          placeholder="Filtrar por cidade" 
+          class="filter-input">
+      </div>
+      <div class="filter-group">
+        <label>Status</label>
+        <select [(ngModel)]="filterSold" (ngModelChange)="applyFilters()" class="filter-input">
+          <option value="">Todos</option>
+          <option value="false">Disponível</option>
+          <option value="true">Vendido</option>
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button (click)="clearFilters()" class="btn-secondary">Limpar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Form -->
+  <div class="modal-overlay" *ngIf="showForm" (click)="closeModal()">
+    <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editingProperty ? 'Editar Imóvel' : 'Novo Imóvel' }}</h2>
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+      </div>
+      <form (ngSubmit)="saveProperty()">
+        <div class="form-section">
+          <h3>Informações Básicas</h3>
+          <div class="form-group">
+            <label>Título *</label>
+            <input type="text" [(ngModel)]="formData.title" name="title" required class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Descrição *</label>
+            <textarea [(ngModel)]="formData.description" name="description" rows="3" required class="form-control"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tipo *</label>
+              <select [(ngModel)]="formData.type" name="type" required class="form-control">
+                <option value="apartamento">Apartamento</option>
+                <option value="casa">Casa</option>
+                <option value="terreno">Terreno</option>
+                <option value="comercial">Comercial</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Preço (R$) *</label>
+              <input type="number" [(ngModel)]="formData.price" name="price" required class="form-control">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Proprietário</label>
+              <select [(ngModel)]="formData.owner_id" name="owner_id" class="form-control">
+                <option value="">Nenhum</option>
+                <option *ngFor="let owner of owners" [value]="owner.id">{{ owner.name }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Contato *</label>
+              <input type="text" [(ngModel)]="formData.contact" name="contact" required class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Características</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Quartos</label>
+              <input type="number" [(ngModel)]="formData.bedrooms" name="bedrooms" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Banheiros</label>
+              <input type="number" [(ngModel)]="formData.bathrooms" name="bathrooms" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Área (m²)</label>
+              <input type="number" [(ngModel)]="formData.area" name="area" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Vagas</label>
+              <input type="number" [(ngModel)]="formData.parking" name="parking" class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Endereço</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>CEP</label>
+              <input type="text" [(ngModel)]="formData.zip_code" name="zip_code" placeholder="00000-000" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Rua</label>
+              <input type="text" [(ngModel)]="formData.street" name="street" class="form-control">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Bairro</label>
+              <input type="text" [(ngModel)]="formData.neighborhood" name="neighborhood" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Cidade</label>
+              <input type="text" [(ngModel)]="formData.city" name="city" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Estado</label>
+              <input type="text" [(ngModel)]="formData.state" name="state" maxlength="2" placeholder="UF" class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Status</h3>
+          <div class="form-row">
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" [(ngModel)]="formData.featured" name="featured">
+                Destacado
+              </label>
+            </div>
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" [(ngModel)]="formData.sold" name="sold">
+                Vendido
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="closeModal()" class="btn-secondary">Cancelar</button>
+          <button type="submit" class="btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Tipo</th>
+          <th>Endereço</th>
+          <th>Cidade</th>
+          <th>Proprietário</th>
+          <th>Valor</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let property of filteredProperties">
+          <td>
+            <div class="property-title">
+              {{ property.title }}
+              <span *ngIf="property.featured" class="featured-badge">⭐ Destaque</span>
+            </div>
+          </td>
+          <td>{{ property.type || '-' }}</td>
+          <td>{{ property.street || '-' }}, {{ property.neighborhood || '-' }}</td>
+          <td>{{ property.city || '-' }}</td>
+          <td>{{ getOwnerName(property.owner_id) }}</td>
+          <td>{{ property.price | currency:'BRL' }}</td>
+          <td>
+            <span class="badge" [ngClass]="property.sold ? 'badge-sold' : 'badge-available'">
+              {{ property.sold ? 'Vendido' : 'Disponível' }}
+            </span>
+          </td>
+          <td>
+            <button (click)="openModal(property)" class="btn-sm">Editar</button>
+            <button 
+              *ngIf="authService.isAdmin()" 
+              (click)="deleteProperty(property.id)" 
+              class="btn-sm btn-danger">
+              Excluir
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredProperties.length === 0">
+          <td colspan="8" class="text-center">Nenhum imóvel encontrado</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

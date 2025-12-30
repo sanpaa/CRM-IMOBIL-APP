@@ -128,9 +128,10 @@ interface CalendarDay {
     .calendar-container {
       background: white;
       border-radius: 12px;
-      padding: 2rem;
+      padding: 1.5rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
       border: 1px solid #e5e7eb;
+      max-width: 1200px;
     }
 
     .filter-buttons {
@@ -222,13 +223,14 @@ interface CalendarDay {
     }
 
     .calendar-day {
-      min-height: 100px;
-      padding: 0.75rem;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
+      min-height: 70px;
+      padding: 0.5rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s ease;
       position: relative;
+      font-size: 0.875rem;
     }
 
     .calendar-day:hover {
@@ -252,7 +254,8 @@ interface CalendarDay {
     .day-number {
       font-weight: 600;
       color: #1e293b;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
+      font-size: 0.875rem;
     }
 
     .holiday-badge {
@@ -270,14 +273,14 @@ interface CalendarDay {
 
     .visit-indicators {
       display: flex;
-      gap: 0.25rem;
+      gap: 0.2rem;
       flex-wrap: wrap;
-      margin-top: 0.5rem;
+      margin-top: 0.25rem;
     }
 
     .visit-dot {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       display: inline-block;
     }
@@ -340,8 +343,8 @@ interface CalendarDay {
     }
 
     .week-day-visits {
-      padding: 0.75rem;
-      min-height: 100px;
+      padding: 0.5rem;
+      min-height: 80px;
     }
 
     .visit-item {

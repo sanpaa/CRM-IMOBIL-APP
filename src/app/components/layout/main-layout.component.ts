@@ -37,6 +37,10 @@ import { Company } from '../../models/company.model';
             <span class="nav-icon">🏠</span>
             <span class="nav-label">Imóveis</span>
           </a>
+          <a routerLink="/owners" routerLinkActive="active" class="nav-item">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">Proprietários</span>
+          </a>
           <a routerLink="/visits" routerLinkActive="active" class="nav-item">
             <span class="nav-icon">📅</span>
             <span class="nav-label">Visitas</span>
@@ -44,6 +48,10 @@ import { Company } from '../../models/company.model';
           <a routerLink="/deals" routerLinkActive="active" class="nav-item">
             <span class="nav-icon">💼</span>
             <span class="nav-label">Negócios</span>
+          </a>
+          <a routerLink="/settings" routerLinkActive="active" class="nav-item">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label">Configurações</span>
           </a>
         </nav>
 
