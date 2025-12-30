@@ -331,7 +331,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     deals: 0
   };
 
-  private charts: Chart[] = [];
+  private charts: any[] = [];
 
   constructor(
     private authService: AuthService,
