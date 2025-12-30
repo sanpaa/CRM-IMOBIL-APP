@@ -101,4 +101,56 @@ export class ClientService {
     if (error) throw error;
     return data as Client[];
   }
+
+  async getFiltered(filters: {
+    status?: string;
+    assignedUserId?: string;
+    searchTerm?: string;
+  }): Promise<Client[]> {
+    const user = this.auth.getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+
+    let query = this.supabase
+      .from('clients')
+      .select('*')
+      .eq('company_id', user.company_id);
+
+    if (filters.status) {
+      query = query.eq('status', filters.status);
+    }
+
+    if (filters.assignedUserId) {
+      query = query.eq('assigned_user_id', filters.assignedUserId);
+    }
+
+    if (filters.searchTerm) {
+      query = query.or(`name.ilike.%${filters.searchTerm}%,email.ilike.%${filters.searchTerm}%,phone.ilike.%${filters.searchTerm}%,cpf.ilike.%${filters.searchTerm}%`);
+    }
+
+    query = query.order('created_at', { ascending: false });
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    return data as Client[];
+  }
+
+  async getClientsNeedingReminder(days: number): Promise<Client[]> {
+    const user = this.auth.getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+
+    const { data, error } = await this.supabase
+      .from('clients')
+      .select('*')
+      .eq('company_id', user.company_id)
+      .lt('last_status_change', cutoffDate.toISOString())
+      .neq('status', 'cliente')
+      .order('last_status_change', { ascending: true });
+
+    if (error) throw error;
+    return data as Client[];
+  }
 }

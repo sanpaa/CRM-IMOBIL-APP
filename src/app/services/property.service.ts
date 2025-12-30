@@ -79,7 +79,7 @@ export class PropertyService {
     const { data, error } = await this.supabase
       .from('properties')
       .select('*')
-      .eq('owner_client_id', ownerId)
+      .eq('owner_id', ownerId)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -96,6 +96,59 @@ export class PropertyService {
       .eq('company_id', user.company_id)
       .eq('status', status)
       .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data as Property[];
+  }
+
+  async getFiltered(filters: {
+    type?: string;
+    city?: string;
+    sold?: boolean;
+    featured?: boolean;
+    searchTerm?: string;
+    minPrice?: number;
+    maxPrice?: number;
+  }): Promise<Property[]> {
+    const user = this.auth.getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+
+    let query = this.supabase
+      .from('properties')
+      .select('*')
+      .eq('company_id', user.company_id);
+
+    if (filters.type) {
+      query = query.eq('type', filters.type);
+    }
+
+    if (filters.city) {
+      query = query.eq('city', filters.city);
+    }
+
+    if (filters.sold !== undefined) {
+      query = query.eq('sold', filters.sold);
+    }
+
+    if (filters.featured !== undefined) {
+      query = query.eq('featured', filters.featured);
+    }
+
+    if (filters.minPrice !== undefined) {
+      query = query.gte('price', filters.minPrice);
+    }
+
+    if (filters.maxPrice !== undefined) {
+      query = query.lte('price', filters.maxPrice);
+    }
+
+    if (filters.searchTerm) {
+      query = query.or(`title.ilike.%${filters.searchTerm}%,description.ilike.%${filters.searchTerm}%,street.ilike.%${filters.searchTerm}%,neighborhood.ilike.%${filters.searchTerm}%`);
+    }
+
+    query = query.order('created_at', { ascending: false });
+
+    const { data, error } = await query;
 
     if (error) throw error;
     return data as Property[];
