@@ -1,14 +1,25 @@
 -- ============================================
--- CRM IMOBILIÁRIO - MULTI-TENANT DATABASE SCHEMA
+-- CRM IMOBILIÁRIO - DATABASE SCHEMA
 -- ============================================
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================
+-- DROP EXISTING TABLES (USE WITH CAUTION - DELETES ALL DATA!)
+-- ============================================
+DROP TABLE IF EXISTS deals CASCADE;
+DROP TABLE IF EXISTS visits CASCADE;
+DROP TABLE IF EXISTS clients CASCADE;
+DROP TABLE IF EXISTS properties CASCADE;
+DROP TABLE IF EXISTS store_settings CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS companies CASCADE;
+
+-- ============================================
 -- 1. COMPANIES (Imobiliárias)
 -- ============================================
-CREATE TABLE IF NOT EXISTS companies (
+CREATE TABLE companies (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR NOT NULL,
   document VARCHAR,
@@ -19,24 +30,73 @@ CREATE TABLE IF NOT EXISTS companies (
 );
 
 -- ============================================
--- 2. USERS (Usuários - vinculado ao auth.users)
+-- 2. USERS (Usuários - Autenticação Customizada)
 -- ============================================
--- Note: users.id MUST equal auth.users.id
-CREATE TABLE IF NOT EXISTS users (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  name VARCHAR NOT NULL,
-  email VARCHAR NOT NULL,
-  role VARCHAR NOT NULL CHECK (role IN ('admin', 'gestor', 'corretor')),
-  active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+CREATE TABLE users (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('admin', 'user', 'agent')),
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- ============================================
--- 3. CLIENTS (Leads / Clientes)
+-- 3. STORE_SETTINGS (Configurações da Loja)
 -- ============================================
-CREATE TABLE IF NOT EXISTS clients (
+CREATE TABLE store_settings (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    logo TEXT,
+    whatsapp VARCHAR(20),
+    email VARCHAR(255),
+    phone VARCHAR(20),
+    address TEXT,
+    description TEXT,
+    primary_color VARCHAR(20) DEFAULT '#004AAD',
+    secondary_color VARCHAR(20) DEFAULT '#F5A623',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ============================================
+-- 4. PROPERTIES (Imóveis)
+-- ============================================
+CREATE TABLE properties (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    type VARCHAR(100) NOT NULL,
+    price DECIMAL(15, 2) NOT NULL,
+    bedrooms INTEGER,
+    bathrooms INTEGER,
+    area DECIMAL(10, 2),
+    parking INTEGER,
+    image_url TEXT,
+    image_urls TEXT[] DEFAULT '{}',
+    street VARCHAR(255),
+    neighborhood VARCHAR(255),
+    city VARCHAR(255),
+    state VARCHAR(50),
+    zip_code VARCHAR(20),
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
+    contact VARCHAR(50) NOT NULL,
+    featured BOOLEAN DEFAULT FALSE,
+    sold BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ============================================
+-- 5. CLIENTS (Leads / Clientes)
+-- ============================================
+CREATE TABLE clients (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
   name VARCHAR NOT NULL,
@@ -52,30 +112,9 @@ CREATE TABLE IF NOT EXISTS clients (
 );
 
 -- ============================================
--- 4. PROPERTIES (Imóveis)
+-- 6. VISITS (Agenda de Visitas)
 -- ============================================
-CREATE TABLE IF NOT EXISTS properties (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  type VARCHAR,
-  purpose VARCHAR,
-  address VARCHAR,
-  number VARCHAR,
-  neighborhood VARCHAR,
-  city VARCHAR,
-  value NUMERIC(14,2),
-  iptu NUMERIC(12,2),
-  condominium NUMERIC(12,2),
-  owner_client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
-  status VARCHAR,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- ============================================
--- 5. VISITS (Agenda de Visitas)
--- ============================================
-CREATE TABLE IF NOT EXISTS visits (
+CREATE TABLE visits (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
   client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
@@ -89,9 +128,9 @@ CREATE TABLE IF NOT EXISTS visits (
 );
 
 -- ============================================
--- 6. DEALS (Negócios / Propostas)
+-- 7. DEALS (Negócios / Propostas)
 -- ============================================
-CREATE TABLE IF NOT EXISTS deals (
+CREATE TABLE deals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
   client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
@@ -104,243 +143,35 @@ CREATE TABLE IF NOT EXISTS deals (
 );
 
 -- ============================================
--- 7. ATTACHMENTS (Documentos)
--- ============================================
-CREATE TABLE IF NOT EXISTS attachments (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  entity_type VARCHAR,
-  entity_id UUID,
-  file_path TEXT,
-  uploaded_by UUID REFERENCES users(id) ON DELETE SET NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- ============================================
--- 8. ACTIVITY_LOGS (Histórico)
--- ============================================
-CREATE TABLE IF NOT EXISTS activity_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  entity_type VARCHAR,
-  entity_id UUID,
-  action VARCHAR,
-  description TEXT,
-  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- ============================================
--- 9. NOTIFICATIONS (Notificações)
--- ============================================
-CREATE TABLE IF NOT EXISTS notifications (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-  title VARCHAR,
-  message TEXT,
-  read BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- ============================================
 -- INDEXES for Performance
 -- ============================================
 CREATE INDEX IF NOT EXISTS idx_users_company_id ON users(company_id);
+CREATE INDEX IF NOT EXISTS idx_properties_company_id ON properties(company_id);
+CREATE INDEX IF NOT EXISTS idx_properties_type ON properties(type);
+CREATE INDEX IF NOT EXISTS idx_properties_city ON properties(city);
+CREATE INDEX IF NOT EXISTS idx_properties_featured ON properties(featured);
+CREATE INDEX IF NOT EXISTS idx_properties_sold ON properties(sold);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_clients_company_id ON clients(company_id);
 CREATE INDEX IF NOT EXISTS idx_clients_assigned_user_id ON clients(assigned_user_id);
-CREATE INDEX IF NOT EXISTS idx_properties_company_id ON properties(company_id);
-CREATE INDEX IF NOT EXISTS idx_properties_owner_client_id ON properties(owner_client_id);
 CREATE INDEX IF NOT EXISTS idx_visits_company_id ON visits(company_id);
 CREATE INDEX IF NOT EXISTS idx_visits_user_id ON visits(user_id);
 CREATE INDEX IF NOT EXISTS idx_visits_date ON visits(visit_date);
 CREATE INDEX IF NOT EXISTS idx_deals_company_id ON deals(company_id);
 CREATE INDEX IF NOT EXISTS idx_deals_user_id ON deals(user_id);
-CREATE INDEX IF NOT EXISTS idx_attachments_company_id ON attachments(company_id);
-CREATE INDEX IF NOT EXISTS idx_attachments_entity ON attachments(entity_type, entity_id);
-CREATE INDEX IF NOT EXISTS idx_activity_logs_company_id ON activity_logs(company_id);
-CREATE INDEX IF NOT EXISTS idx_activity_logs_entity ON activity_logs(entity_type, entity_id);
-CREATE INDEX IF NOT EXISTS idx_notifications_company_id ON notifications(company_id);
-CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_store_settings_company_id ON store_settings(company_id);
 
 -- ============================================
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- ROW LEVEL SECURITY (RLS) - DISABLED
 -- ============================================
-
--- Enable RLS on all tables
-ALTER TABLE companies ENABLE ROW LEVEL SECURITY;
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
-ALTER TABLE properties ENABLE ROW LEVEL SECURITY;
-ALTER TABLE visits ENABLE ROW LEVEL SECURITY;
-ALTER TABLE deals ENABLE ROW LEVEL SECURITY;
-ALTER TABLE attachments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE activity_logs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
-
--- ============================================
--- COMPANIES POLICIES
--- ============================================
-CREATE POLICY "Users can view their own company"
-  ON companies FOR SELECT
-  USING (id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
-CREATE POLICY "Admins can update their company"
-  ON companies FOR UPDATE
-  USING (id IN (
-    SELECT company_id FROM users WHERE id = auth.uid() AND role = 'admin'
-  ));
-
--- ============================================
--- USERS POLICIES
--- ============================================
-CREATE POLICY "Users can view users from their company"
-  ON users FOR SELECT
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
-CREATE POLICY "Admins and gestores can manage users"
-  ON users FOR ALL
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid() AND role IN ('admin', 'gestor')
-  ));
-
--- ============================================
--- CLIENTS POLICIES
--- ============================================
-CREATE POLICY "Users can view clients from their company"
-  ON clients FOR SELECT
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
-CREATE POLICY "Corretores can view their assigned clients"
-  ON clients FOR SELECT
-  USING (
-    assigned_user_id = auth.uid() OR
-    company_id IN (
-      SELECT company_id FROM users WHERE id = auth.uid() AND role IN ('admin', 'gestor')
-    )
-  );
-
-CREATE POLICY "Users can manage clients from their company"
-  ON clients FOR ALL
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
--- ============================================
--- PROPERTIES POLICIES
--- ============================================
-CREATE POLICY "Users can view properties from their company"
-  ON properties FOR SELECT
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
-CREATE POLICY "Users can manage properties from their company"
-  ON properties FOR ALL
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
--- ============================================
--- VISITS POLICIES
--- ============================================
-CREATE POLICY "Users can view visits from their company"
-  ON visits FOR SELECT
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
-CREATE POLICY "Corretores can view their visits"
-  ON visits FOR SELECT
-  USING (
-    user_id = auth.uid() OR
-    company_id IN (
-      SELECT company_id FROM users WHERE id = auth.uid() AND role IN ('admin', 'gestor')
-    )
-  );
-
-CREATE POLICY "Users can manage visits from their company"
-  ON visits FOR ALL
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
--- ============================================
--- DEALS POLICIES
--- ============================================
-CREATE POLICY "Users can view deals from their company"
-  ON deals FOR SELECT
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
-CREATE POLICY "Corretores can view their deals"
-  ON deals FOR SELECT
-  USING (
-    user_id = auth.uid() OR
-    company_id IN (
-      SELECT company_id FROM users WHERE id = auth.uid() AND role IN ('admin', 'gestor')
-    )
-  );
-
-CREATE POLICY "Users can manage deals from their company"
-  ON deals FOR ALL
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
--- ============================================
--- ATTACHMENTS POLICIES
--- ============================================
-CREATE POLICY "Users can view attachments from their company"
-  ON attachments FOR SELECT
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
-CREATE POLICY "Users can manage attachments from their company"
-  ON attachments FOR ALL
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
--- ============================================
--- ACTIVITY_LOGS POLICIES
--- ============================================
-CREATE POLICY "Users can view activity logs from their company"
-  ON activity_logs FOR SELECT
-  USING (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
-CREATE POLICY "Users can create activity logs"
-  ON activity_logs FOR INSERT
-  WITH CHECK (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
-
--- ============================================
--- NOTIFICATIONS POLICIES
--- ============================================
-CREATE POLICY "Users can view their own notifications"
-  ON notifications FOR SELECT
-  USING (user_id = auth.uid());
-
-CREATE POLICY "Users can update their own notifications"
-  ON notifications FOR UPDATE
-  USING (user_id = auth.uid());
-
-CREATE POLICY "System can create notifications"
-  ON notifications FOR INSERT
-  WITH CHECK (company_id IN (
-    SELECT company_id FROM users WHERE id = auth.uid()
-  ));
+ALTER TABLE companies DISABLE ROW LEVEL SECURITY;
+ALTER TABLE users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE store_settings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE properties DISABLE ROW LEVEL SECURITY;
+ALTER TABLE clients DISABLE ROW LEVEL SECURITY;
+ALTER TABLE visits DISABLE ROW LEVEL SECURITY;
+ALTER TABLE deals DISABLE ROW LEVEL SECURITY;
 
 -- ============================================
 -- TRIGGERS for updated_at
@@ -353,11 +184,20 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_properties_updated_at
+    BEFORE UPDATE ON properties
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_store_settings_updated_at
+    BEFORE UPDATE ON store_settings
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_users_updated_at
+    BEFORE UPDATE ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_clients_updated_at BEFORE UPDATE ON clients
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_properties_updated_at BEFORE UPDATE ON properties
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

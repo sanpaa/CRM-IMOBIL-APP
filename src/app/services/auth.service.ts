@@ -15,47 +15,53 @@ export class AuthService {
     private supabase: SupabaseService,
     private router: Router
   ) {
-    this.initAuthListener();
+    this.checkStoredSession();
   }
 
-  private initAuthListener() {
-    this.supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        await this.loadUserProfile(session.user.id);
-      } else {
-        this.currentUserSubject.next(null);
-      }
-    });
-  }
-
-  async loadUserProfile(userId: string) {
-    try {
-      const { data, error } = await this.supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) throw error;
-      this.currentUserSubject.next(data as User);
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-      this.currentUserSubject.next(null);
+  private checkStoredSession() {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      this.currentUserSubject.next(JSON.parse(storedUser));
     }
   }
 
   async signIn(email: string, password: string) {
     try {
-      const { data, error } = await this.supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      const { data, error } = await this.supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .eq('password', password)
+        .eq('active', true)
+        .single();
+
+      if (error || !data) {
+        return { data: null, error: { message: 'Email ou senha inválidos' } };
+      }
+
+      // Store user session
+      localStorage.setItem('currentUser', JSON.stringify(data));
+      this.currentUserSubject.next(data as User);
+
+      return { data, error: null };
+    } catch (error: any) {
+      return { data: null, error: { message: 'Email ou senha inválidos' } };
+    }
+  }
+
+  async signUp(email: string, password: string, userData: Partial<User>) {
+    try {
+      const { data, error } = await this.supabase
+        .from('users')
+        .insert({
+          email: email,
+          password: password,
+          ...userData
+        })
+        .select()
+        .single();
 
       if (error) throw error;
-      
-      if (data.user) {
-        await this.loadUserProfile(data.user.id);
-      }
 
       return { data, error: null };
     } catch (error: any) {
@@ -63,40 +69,9 @@ export class AuthService {
     }
   }
 
-  async signUp(email: string, password: string, userData: Partial<User>) {
-    try {
-      // First create auth user
-      const { data: authData, error: authError } = await this.supabase.auth.signUp({
-        email,
-        password
-      });
-
-      if (authError) throw authError;
-
-      // Then create user profile
-      if (authData.user) {
-        const { error: profileError } = await this.supabase
-          .from('users')
-          .insert({
-            id: authData.user.id,
-            email: email,
-            ...userData
-          });
-
-        if (profileError) throw profileError;
-      }
-
-      return { data: authData, error: null };
-    } catch (error: any) {
-      return { data: null, error };
-    }
-  }
-
   async signOut() {
     try {
-      const { error } = await this.supabase.auth.signOut();
-      if (error) throw error;
-      
+      localStorage.removeItem('currentUser');
       this.currentUserSubject.next(null);
       this.router.navigate(['/login']);
       return { error: null };
@@ -127,20 +102,17 @@ export class AuthService {
   }
 
   async resetPassword(email: string) {
-    try {
-      const { error } = await this.supabase.auth.resetPasswordForEmail(email);
-      if (error) throw error;
-      return { error: null };
-    } catch (error: any) {
-      return { error };
-    }
+    // Implementar lógica customizada de reset
+    return { error: null };
   }
 
-  async updatePassword(newPassword: string) {
+  async updatePassword(userId: string, newPassword: string) {
     try {
-      const { error } = await this.supabase.auth.updateUser({
-        password: newPassword
-      });
+      const { error } = await this.supabase
+        .from('users')
+        .update({ password: newPassword })
+        .eq('id', userId);
+
       if (error) throw error;
       return { error: null };
     } catch (error: any) {

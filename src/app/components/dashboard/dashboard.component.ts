@@ -7,11 +7,12 @@ import { PropertyService } from '../../services/property.service';
 import { VisitService } from '../../services/visit.service';
 import { DealService } from '../../services/deal.service';
 import { User } from '../../models/user.model';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, RouterModule],
   template: `
     <div class="dashboard-container">
       <nav class="sidebar">

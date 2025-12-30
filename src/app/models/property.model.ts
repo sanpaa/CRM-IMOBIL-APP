@@ -1,17 +1,26 @@
 export interface Property {
   id: string;
   company_id: string;
-  type?: string;
-  purpose?: string;
-  address?: string;
-  number?: string;
+  title: string;
+  description: string;
+  type: string;
+  price: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  area?: number;
+  parking?: number;
+  image_url?: string;
+  image_urls?: string[];
+  street?: string;
   neighborhood?: string;
   city?: string;
-  value?: number;
-  iptu?: number;
-  condominium?: number;
-  owner_client_id?: string;
-  status?: string;
+  state?: string;
+  zip_code?: string;
+  latitude?: number;
+  longitude?: number;
+  contact: string;
+  featured?: boolean;
+  sold?: boolean;
   created_at: string;
   updated_at: string;
 }

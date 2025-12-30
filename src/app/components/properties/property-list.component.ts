@@ -21,6 +21,14 @@ import { Property } from '../../models/property.model';
       <div class="form-card" *ngIf="showForm">
         <h2>{{ editingProperty ? 'Editar Imóvel' : 'Novo Imóvel' }}</h2>
         <form (ngSubmit)="saveProperty()">
+          <div class="form-group">
+            <label>Título</label>
+            <input type="text" [(ngModel)]="formData.title" name="title" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Descrição</label>
+            <textarea [(ngModel)]="formData.description" name="description" class="form-control" rows="3" required></textarea>
+          </div>
           <div class="form-row">
             <div class="form-group">
               <label>Tipo</label>
@@ -32,47 +40,53 @@ import { Property } from '../../models/property.model';
               </select>
             </div>
             <div class="form-group">
-              <label>Finalidade</label>
-              <select [(ngModel)]="formData.purpose" name="purpose" class="form-control">
-                <option value="venda">Venda</option>
-                <option value="locacao">Locação</option>
-                <option value="ambos">Ambos</option>
-              </select>
+              <label>Preço</label>
+              <input type="number" [(ngModel)]="formData.price" name="price" class="form-control" required>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Endereço</label>
-              <input type="text" [(ngModel)]="formData.address" name="address" class="form-control">
+              <label>Quartos</label>
+              <input type="number" [(ngModel)]="formData.bedrooms" name="bedrooms" class="form-control">
             </div>
             <div class="form-group">
-              <label>Número</label>
-              <input type="text" [(ngModel)]="formData.number" name="number" class="form-control">
+              <label>Banheiros</label>
+              <input type="number" [(ngModel)]="formData.bathrooms" name="bathrooms" class="form-control">
             </div>
           </div>
           <div class="form-row">
+            <div class="form-group">
+              <label>Área (m²)</label>
+              <input type="number" [(ngModel)]="formData.area" name="area" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Vagas</label>
+              <input type="number" [(ngModel)]="formData.parking" name="parking" class="form-control">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Rua</label>
+              <input type="text" [(ngModel)]="formData.street" name="street" class="form-control">
+            </div>
             <div class="form-group">
               <label>Bairro</label>
               <input type="text" [(ngModel)]="formData.neighborhood" name="neighborhood" class="form-control">
             </div>
+          </div>
+          <div class="form-row">
             <div class="form-group">
               <label>Cidade</label>
               <input type="text" [(ngModel)]="formData.city" name="city" class="form-control">
             </div>
+            <div class="form-group">
+              <label>Estado</label>
+              <input type="text" [(ngModel)]="formData.state" name="state" class="form-control">
+            </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Valor</label>
-              <input type="number" [(ngModel)]="formData.value" name="value" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>IPTU</label>
-              <input type="number" [(ngModel)]="formData.iptu" name="iptu" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Condomínio</label>
-              <input type="number" [(ngModel)]="formData.condominium" name="condominium" class="form-control">
-            </div>
+          <div class="form-group">
+            <label>Contato</label>
+            <input type="text" [(ngModel)]="formData.contact" name="contact" class="form-control" required>
           </div>
           <button type="submit" class="btn-primary">Salvar</button>
         </form>
@@ -93,10 +107,10 @@ import { Property } from '../../models/property.model';
           <tbody>
             <tr *ngFor="let property of properties">
               <td>{{ property.type || '-' }}</td>
-              <td>{{ property.address }}, {{ property.number }}</td>
+              <td>{{ property.street || '-' }}</td>
               <td>{{ property.neighborhood || '-' }}</td>
               <td>{{ property.city || '-' }}</td>
-              <td>{{ property.value | currency:'BRL' }}</td>
+              <td>{{ property.price | currency:'BRL' }}</td>
               <td>
                 <button (click)="editProperty(property)" class="btn-sm">Editar</button>
                 <button (click)="deleteProperty(property.id)" class="btn-sm btn-danger">Excluir</button>
@@ -156,15 +170,19 @@ export class PropertyListComponent implements OnInit {
 
   resetForm() {
     this.formData = {
+      title: '',
+      description: '',
       type: 'apartamento',
-      purpose: 'venda',
-      address: '',
-      number: '',
+      price: 0,
+      bedrooms: 0,
+      bathrooms: 0,
+      area: 0,
+      parking: 0,
+      street: '',
       neighborhood: '',
       city: '',
-      value: 0,
-      iptu: 0,
-      condominium: 0
+      state: '',
+      contact: ''
     };
   }
 
