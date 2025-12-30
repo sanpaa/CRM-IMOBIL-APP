@@ -7,6 +7,18 @@ import { ClientNoteService } from '../../services/client-note.service';
 import { AuthService } from '../../services/auth.service';
 import { Client, ClientNote } from '../../models/client.model';
 
+/**
+ * ClientListComponent
+ * 
+ * Enhanced client management component with advanced features:
+ * - Real-time filtering by status and search terms
+ * - Immutable notes system with separate modal
+ * - CPF field with automatic formatting
+ * - Status badges displayed next to client names
+ * - Interest field to track client preferences
+ * - Role-based delete permissions (admin only)
+ * - Modern modal-based forms with smooth animations
+ */
 @Component({
   selector: 'app-client-list',
   standalone: true,

@@ -75,6 +75,11 @@ export class PropertyService {
     if (error) throw error;
   }
 
+  /**
+   * Get properties by owner ID
+   * Note: Field name changed from 'owner_client_id' to 'owner_id' 
+   * to align with the new owners table structure
+   */
   async getByOwner(ownerId: string): Promise<Property[]> {
     const { data, error } = await this.supabase
       .from('properties')

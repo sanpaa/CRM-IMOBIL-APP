@@ -145,7 +145,8 @@
       </div>
 
       <div class="alert-warning" *ngIf="!authService.isAdmin()">
-        <strong>⚠️ Acesso Restrito:</strong> Apenas administradores podem alterar as configurações do sistema.
+        <span class="warning-icon" aria-label="Aviso">⚠️</span>
+        <strong>Acesso Restrito:</strong> Apenas administradores podem alterar as configurações do sistema.
       </div>
     </form>
   </div>
