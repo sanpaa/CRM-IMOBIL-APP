@@ -66,8 +66,8 @@ import { Property } from '../../models/property.model';
             <label>CEP</label>
             <input 
               type="text" 
-              [(ngModel)]="formData.cep" 
-              name="cep" 
+              [(ngModel)]="formData.zip_code" 
+              name="zip_code" 
               class="form-control"
               (blur)="fetchAddressFromCep()"
               placeholder="00000-000"
@@ -121,22 +121,7 @@ import { Property } from '../../models/property.model';
           </div>
         </div>
         
-        <div class="form-group">
-          <label>Vídeos (até {{ maxVideos }})</label>
-          <input 
-            type="file" 
-            (change)="onVideoSelect($event)" 
-            class="form-control" 
-            accept="video/*" 
-            multiple>
-          <small class="form-hint">{{ videoUrls.length }}/{{ maxVideos }} vídeos adicionados</small>
-          <div class="media-preview" *ngIf="videoUrls.length > 0">
-            <div *ngFor="let video of videoUrls; let i = index" class="media-item">
-              <video [src]="video" controls></video>
-              <button type="button" (click)="removeVideo(i)" class="remove-btn">×</button>
-            </div>
-          </div>
-        </div>
+
         
         <div class="form-actions">
           <button type="button" (click)="onCancel()" class="btn-secondary">Cancelar</button>
@@ -241,8 +226,7 @@ import { Property } from '../../models/property.model';
       border: 2px solid #e5e7eb;
     }
 
-    .media-item img,
-    .media-item video {
+    .media-item img {
       width: 100%;
       height: 150px;
       object-fit: cover;
@@ -349,7 +333,7 @@ export class PropertyFormComponent implements OnInit {
     if (this.editingProperty) {
       this.formData = { ...this.editingProperty };
       this.imageUrls = this.editingProperty.image_urls || [];
-      this.videoUrls = this.editingProperty.video_urls || [];
+      // this.videoUrls = this.editingProperty.video_urls || [];
     }
   }
 
@@ -371,7 +355,7 @@ export class PropertyFormComponent implements OnInit {
       bathrooms: 0,
       area: 0,
       parking: 0,
-      cep: '',
+      zip_code: '',
       street: '',
       neighborhood: '',
       city: '',
@@ -379,11 +363,10 @@ export class PropertyFormComponent implements OnInit {
       contact: ''
     };
     this.imageUrls = [];
-    this.videoUrls = [];
   }
 
   async fetchAddressFromCep() {
-    const cep = this.formData.cep?.replace(PropertyFormComponent.CEP_REGEX, '');
+    const cep = this.formData.zip_code?.replace(PropertyFormComponent.CEP_REGEX, '');
     if (!cep || cep.length !== 8) return;
 
     this.loadingCep = true;
@@ -408,21 +391,54 @@ export class PropertyFormComponent implements OnInit {
   }
 
   async geocodeAddress() {
-    const address = `${this.formData.street}, ${this.formData.city}, ${this.formData.state}, Brazil`;
-    try {
-      // Using OpenStreetMap Nominatim (free geocoding service)
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
-      );
-      const data = await response.json();
-      
-      if (data && data.length > 0) {
-        this.formData.latitude = parseFloat(data[0].lat);
-        this.formData.longitude = parseFloat(data[0].lon);
-      }
-    } catch (error) {
-      console.error('Error geocoding address:', error);
+    if (!this.formData.city || !this.formData.state) {
+      return; // Need at least city and state
     }
+    
+    // Try multiple strategies to find coordinates
+    const strategies = [
+      // Strategy 1: Full address with formatted CEP
+      this.formData.street && this.formData.zip_code ? 
+        `${this.formData.street}, ${this.formData.city}, ${this.formData.state}, Brasil` : null,
+      
+      // Strategy 2: City + State + Brazil (most reliable for general area)
+      `${this.formData.city}, ${this.formData.state}, Brasil`,
+      
+      // Strategy 3: Just city and country
+      `${this.formData.city}, Brasil`
+    ].filter(s => s !== null);
+    
+    for (const address of strategies) {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address!)}&limit=1&countrycodes=br`,
+          {
+            headers: {
+              'User-Agent': 'CRM-Imobiliario/1.0'
+            }
+          }
+        );
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          this.formData.latitude = parseFloat(data[0].lat);
+          this.formData.longitude = parseFloat(data[0].lon);
+          console.log('✓ Coordenadas encontradas:', {
+            lat: this.formData.latitude,
+            lon: this.formData.longitude,
+            strategy: address
+          });
+          return; // Success, exit
+        }
+        
+        // Wait a bit between requests to respect Nominatim rate limits
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error('Erro na estratégia:', address, error);
+      }
+    }
+    
+    console.warn('⚠ Não foi possível encontrar coordenadas exatas. Usando cidade:', this.formData.city);
   }
 
   onImageSelect(event: any) {
@@ -446,38 +462,17 @@ export class PropertyFormComponent implements OnInit {
     event.target.value = '';
   }
 
-  onVideoSelect(event: any) {
-    const files = event.target.files;
-    if (files) {
-      const remainingSlots = PropertyFormComponent.MAX_VIDEOS - this.videoUrls.length;
-      const filesToAdd = Math.min(files.length, remainingSlots);
-      
-      for (let i = 0; i < filesToAdd; i++) {
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          this.videoUrls.push(e.target.result);
-        };
-        reader.readAsDataURL(files[i]);
-      }
-      
-      if (files.length > remainingSlots) {
-        alert(`Limite de ${PropertyFormComponent.MAX_VIDEOS} vídeos. Apenas ${filesToAdd} vídeos foram adicionados.`);
-      }
-    }
-    event.target.value = '';
-  }
-
   removeImage(index: number) {
     this.imageUrls.splice(index, 1);
   }
 
-  removeVideo(index: number) {
-    this.videoUrls.splice(index, 1);
-  }
-
-  onSubmit() {
+  async onSubmit() {
+    // Ensure coordinates are set before saving
+    if (!this.formData.latitude || !this.formData.longitude) {
+      await this.geocodeAddress();
+    }
+    
     this.formData.image_urls = this.imageUrls;
-    this.formData.video_urls = this.videoUrls;
     this.save.emit(this.formData);
   }
 
