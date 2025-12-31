@@ -1,0 +1,145 @@
+<div class="public-website" *ngIf="!loading && layout">
+  <!-- Render each section dynamically -->
+  <section *ngFor="let section of sections" 
+           [ngClass]="'section-' + section.type"
+           [ngStyle]="getSectionStyle(section)">
+    
+    <!-- Header Component -->
+    <div *ngIf="section.type === 'header'" class="component-header">
+      <nav class="navbar">
+        <div class="navbar-brand">
+          <h1>{{ section.config?.logo || 'Imobiliária' }}</h1>
+        </div>
+        <ul class="navbar-nav" *ngIf="section.config?.navigation">
+          <li *ngFor="let item of section.config.navigation">
+            <a [href]="item.link">{{ item.label }}</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Hero Component -->
+    <div *ngIf="section.type === 'hero'" class="component-hero" 
+         [class]="'hero-' + (section.config?.height || 'large')"
+         [style.background-image]="section.config?.backgroundImage ? 'url(' + section.config.backgroundImage + ')' : 'none'">
+      <div class="hero-content" [class]="'align-' + (section.config?.alignment || 'center')">
+        <h1 class="hero-title">{{ section.config?.title || 'Bem-vindo' }}</h1>
+        <p class="hero-subtitle" *ngIf="section.config?.subtitle">{{ section.config.subtitle }}</p>
+        <a *ngIf="section.config?.buttonText" 
+           [href]="section.config?.buttonLink || '#'" 
+           class="hero-button">
+          {{ section.config.buttonText }}
+        </a>
+      </div>
+    </div>
+
+    <!-- Search Bar Component -->
+    <div *ngIf="section.type === 'search-bar'" class="component-search">
+      <div class="search-form" [class]="section.config?.orientation || 'horizontal'">
+        <input type="text" placeholder="{{ section.config?.placeholder || 'Buscar imóveis...' }}">
+        <button class="search-button">{{ section.config?.buttonText || 'Buscar' }}</button>
+      </div>
+    </div>
+
+    <!-- Property Grid Component -->
+    <div *ngIf="section.type === 'property-grid'" class="component-property-grid">
+      <div class="properties-container" 
+           [style.grid-template-columns]="'repeat(' + (section.config?.columns || 3) + ', 1fr)'">
+        <div *ngFor="let property of getPropertiesForSection(section)" class="property-card">
+          <div class="property-image" 
+               [style.background-image]="'url(' + (property.image_url || '/assets/placeholder.jpg') + ')'">
+            <span *ngIf="property.featured" class="badge-featured">Destaque</span>
+          </div>
+          <div class="property-info">
+            <h3>{{ property.title }}</h3>
+            <p class="property-location">{{ property.city }}, {{ property.state }}</p>
+            <p class="property-price">R$ {{ property.price | number:'1.2-2' }}</p>
+            <div class="property-details">
+              <span *ngIf="property.bedrooms">🛏️ {{ property.bedrooms }}</span>
+              <span *ngIf="property.bathrooms">🚿 {{ property.bathrooms }}</span>
+              <span *ngIf="property.area">📏 {{ property.area }}m²</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Text Block Component -->
+    <div *ngIf="section.type === 'text-block'" class="component-text-block">
+      <div class="text-content" [class]="'align-' + (section.config?.alignment || 'left')">
+        <h2 *ngIf="section.config?.title">{{ section.config.title }}</h2>
+        <div [innerHTML]="section.config?.content || ''"></div>
+      </div>
+    </div>
+
+    <!-- Contact Form Component -->
+    <div *ngIf="section.type === 'contact-form'" class="component-contact-form">
+      <h2>Entre em Contato</h2>
+      <form class="contact-form">
+        <input type="text" placeholder="Nome" *ngIf="section.config?.fields?.includes('name')">
+        <input type="email" placeholder="Email" *ngIf="section.config?.fields?.includes('email')">
+        <input type="tel" placeholder="Telefone" *ngIf="section.config?.fields?.includes('phone')">
+        <textarea placeholder="Mensagem" rows="5" *ngIf="section.config?.fields?.includes('message')"></textarea>
+        <button type="submit" class="submit-button">{{ section.config?.submitText || 'Enviar' }}</button>
+      </form>
+      <div *ngIf="section.config?.showWhatsApp && section.config?.whatsappNumber" class="whatsapp-contact">
+        <a [href]="'https://wa.me/' + section.config.whatsappNumber" target="_blank" class="whatsapp-button">
+          💬 Falar no WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats Section Component -->
+    <div *ngIf="section.type === 'stats-section'" class="component-stats">
+      <div class="stats-container" [class]="section.config?.layout || 'horizontal'">
+        <div *ngFor="let stat of section.config?.stats" class="stat-item">
+          <span class="stat-icon" *ngIf="stat.icon">{{ stat.icon }}</span>
+          <div class="stat-value">{{ stat.value }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider Component -->
+    <div *ngIf="section.type === 'divider'" class="component-divider">
+      <hr [style.border-color]="section.config?.color || '#e0e0e0'"
+          [style.border-width]="section.config?.thickness || '1px'">
+    </div>
+
+    <!-- Spacer Component -->
+    <div *ngIf="section.type === 'spacer'" class="component-spacer"
+         [style.height]="section.config?.height || '2rem'">
+    </div>
+
+    <!-- Footer Component -->
+    <div *ngIf="section.type === 'footer'" class="component-footer">
+      <div class="footer-content">
+        <div class="footer-columns">
+          <div *ngFor="let column of section.config?.columns" class="footer-column">
+            <h4>{{ column.title }}</h4>
+            <ul>
+              <li *ngFor="let link of column.links">
+                <a [href]="link.link">{{ link.label }}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>{{ section.config?.copyrightText || '© 2024 Todos os direitos reservados' }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Carregando site...</p>
+</div>
+
+<!-- No Layout Found -->
+<div class="no-layout" *ngIf="!loading && !layout">
+  <h2>Site não encontrado</h2>
+  <p>Esta empresa ainda não configurou seu site personalizado.</p>
+</div>

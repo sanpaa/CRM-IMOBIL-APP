@@ -12,7 +12,7 @@ export class WebsiteCustomizationService {
    * Get all layouts for a company
    */
   async getLayouts(companyId: string): Promise<WebsiteLayout[]> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('website_layouts')
       .select('*')
       .eq('company_id', companyId)
@@ -29,7 +29,7 @@ export class WebsiteCustomizationService {
    * Get a specific layout by ID
    */
   async getLayout(layoutId: string): Promise<WebsiteLayout | null> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('website_layouts')
       .select('*')
       .eq('id', layoutId)
@@ -46,7 +46,7 @@ export class WebsiteCustomizationService {
    * Get layout by page type
    */
   async getLayoutByPageType(companyId: string, pageType: string): Promise<WebsiteLayout | null> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('website_layouts')
       .select('*')
       .eq('company_id', companyId)
@@ -67,7 +67,7 @@ export class WebsiteCustomizationService {
    * Create a new layout
    */
   async createLayout(layout: Partial<WebsiteLayout>): Promise<WebsiteLayout> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('website_layouts')
       .insert([layout])
       .select()
@@ -84,7 +84,7 @@ export class WebsiteCustomizationService {
    * Update an existing layout
    */
   async updateLayout(layoutId: string, updates: Partial<WebsiteLayout>): Promise<WebsiteLayout> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('website_layouts')
       .update(updates)
       .eq('id', layoutId)
@@ -109,7 +109,7 @@ export class WebsiteCustomizationService {
    * Delete a layout
    */
   async deleteLayout(layoutId: string): Promise<void> {
-    const { error } = await this.supabase.getClient()
+    const { error } = await this.supabase.client
       .from('website_layouts')
       .delete()
       .eq('id', layoutId);
@@ -154,7 +154,7 @@ export class WebsiteCustomizationService {
     }
 
     // First, remove default flag from all layouts of this page type
-    await this.supabase.getClient()
+    await this.supabase.client
       .from('website_layouts')
       .update({ is_default: false })
       .eq('company_id', layout.company_id)

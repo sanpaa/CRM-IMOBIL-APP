@@ -12,7 +12,7 @@ export class DomainManagementService {
    * Get all domains for a company
    */
   async getDomains(companyId: string): Promise<CustomDomain[]> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('custom_domains')
       .select('*')
       .eq('company_id', companyId)
@@ -29,7 +29,7 @@ export class DomainManagementService {
    * Get a specific domain
    */
   async getDomain(domainId: string): Promise<CustomDomain | null> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('custom_domains')
       .select('*')
       .eq('id', domainId)
@@ -46,7 +46,7 @@ export class DomainManagementService {
    * Get domain by domain name
    */
   async getDomainByName(domainName: string): Promise<CustomDomain | null> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('custom_domains')
       .select('*')
       .eq('domain', domainName)
@@ -63,7 +63,7 @@ export class DomainManagementService {
    * Get primary domain for a company
    */
   async getPrimaryDomain(companyId: string): Promise<CustomDomain | null> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('custom_domains')
       .select('*')
       .eq('company_id', companyId)
@@ -91,7 +91,7 @@ export class DomainManagementService {
       status: 'pending'
     };
 
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('custom_domains')
       .insert([domainData])
       .select()
@@ -108,7 +108,7 @@ export class DomainManagementService {
    * Update domain configuration
    */
   async updateDomain(domainId: string, updates: Partial<CustomDomain>): Promise<CustomDomain> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('custom_domains')
       .update(updates)
       .eq('id', domainId)
@@ -126,7 +126,7 @@ export class DomainManagementService {
    * Delete a domain
    */
   async deleteDomain(domainId: string): Promise<void> {
-    const { error } = await this.supabase.getClient()
+    const { error } = await this.supabase.client
       .from('custom_domains')
       .delete()
       .eq('id', domainId);
@@ -142,7 +142,7 @@ export class DomainManagementService {
    */
   async setPrimaryDomain(domainId: string, companyId: string): Promise<void> {
     // First, remove primary flag from all domains for this company
-    await this.supabase.getClient()
+    await this.supabase.client
       .from('custom_domains')
       .update({ is_primary: false })
       .eq('company_id', companyId);
@@ -151,7 +151,7 @@ export class DomainManagementService {
     await this.updateDomain(domainId, { is_primary: true });
 
     // Update company's custom_domain field
-    await this.supabase.getClient()
+    await this.supabase.client
       .from('companies')
       .update({ custom_domain: (await this.getDomain(domainId))?.domain })
       .eq('id', companyId);

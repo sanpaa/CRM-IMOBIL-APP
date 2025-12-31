@@ -16,6 +16,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/register/register.component').then(m => m.RegisterComponent)
   },
   {
+    path: 'public/:companyId',
+    loadComponent: () => import('./components/public-website/public-website.component').then(m => m.PublicWebsiteComponent)
+  },
+  {
     path: '',
     canActivate: [AuthGuard],
     loadComponent: () => import('./components/layout/main-layout.component').then(m => m.MainLayoutComponent),

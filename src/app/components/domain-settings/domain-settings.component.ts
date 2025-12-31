@@ -38,7 +38,7 @@ export class DomainSettingsComponent implements OnInit {
   async loadDomains() {
     this.loading = true;
     try {
-      const user = this.authService.currentUser;
+      const user = this.authService.getCurrentUser();
       if (user?.company_id) {
         this.domains = await this.domainService.getDomains(user.company_id);
       }
@@ -59,7 +59,7 @@ export class DomainSettingsComponent implements OnInit {
 
     this.saving = true;
     try {
-      const user = this.authService.currentUser;
+      const user = this.authService.getCurrentUser();
       if (!user?.company_id) return;
 
       const domain = await this.domainService.addDomain({
@@ -112,7 +112,7 @@ export class DomainSettingsComponent implements OnInit {
     }
 
     try {
-      const user = this.authService.currentUser;
+      const user = this.authService.getCurrentUser();
       if (!user?.company_id) return;
 
       await this.domainService.setPrimaryDomain(domain.id, user.company_id);

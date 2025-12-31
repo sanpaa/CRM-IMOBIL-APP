@@ -61,7 +61,7 @@ export class WebsiteBuilderComponent implements OnInit {
   async loadLayouts() {
     this.loading = true;
     try {
-      const user = this.authService.currentUser;
+      const user = this.authService.getCurrentUser();
       if (user?.company_id) {
         this.layouts = await this.customizationService.getLayouts(user.company_id);
         
@@ -92,7 +92,7 @@ export class WebsiteBuilderComponent implements OnInit {
 
     this.saving = true;
     try {
-      const user = this.authService.currentUser;
+      const user = this.authService.getCurrentUser();
       if (!user?.company_id) return;
 
       const template = this.customizationService.getDefaultLayoutTemplate(
@@ -249,6 +249,6 @@ export class WebsiteBuilderComponent implements OnInit {
     if (!section.style) {
       section.style = {};
     }
-    section.style[styleKey] = value;
+    (section.style as any)[styleKey] = value;
   }
 }

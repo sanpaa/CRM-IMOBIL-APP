@@ -12,7 +12,7 @@ export class ComponentLibraryService {
    * Get all components for a company
    */
   async getComponents(companyId: string): Promise<WebsiteComponent[]> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('website_components')
       .select('*')
       .eq('company_id', companyId)
@@ -29,7 +29,7 @@ export class ComponentLibraryService {
    * Get components by type
    */
   async getComponentsByType(companyId: string, componentType: string): Promise<WebsiteComponent[]> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('website_components')
       .select('*')
       .eq('company_id', companyId)
@@ -47,7 +47,7 @@ export class ComponentLibraryService {
    * Get a specific component
    */
   async getComponent(componentId: string): Promise<WebsiteComponent | null> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('website_components')
       .select('*')
       .eq('id', componentId)
@@ -64,7 +64,7 @@ export class ComponentLibraryService {
    * Create a new component
    */
   async createComponent(component: Partial<WebsiteComponent>): Promise<WebsiteComponent> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('website_components')
       .insert([component])
       .select()
@@ -81,7 +81,7 @@ export class ComponentLibraryService {
    * Update a component
    */
   async updateComponent(componentId: string, updates: Partial<WebsiteComponent>): Promise<WebsiteComponent> {
-    const { data, error } = await this.supabase.getClient()
+    const { data, error } = await this.supabase.client
       .from('website_components')
       .update(updates)
       .eq('id', componentId)
@@ -99,7 +99,7 @@ export class ComponentLibraryService {
    * Delete a component
    */
   async deleteComponent(componentId: string): Promise<void> {
-    const { error } = await this.supabase.getClient()
+    const { error } = await this.supabase.client
       .from('website_components')
       .delete()
       .eq('id', componentId);
