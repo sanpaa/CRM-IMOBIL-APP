@@ -1,8 +1,100 @@
-# 🚀 Guia de Implantação - CRM Imobiliário
+# 🚀 Guia de Implantação - CRM Imobiliário SaaS
 
-## Opções de Deploy
+## 📋 Visão Geral
 
-### 1. Vercel (Recomendado para Angular)
+Este CRM é projetado como uma aplicação SaaS multi-tenant para ser hospedada em plataformas modernas como **Netlify** ou **Vercel**, que fornecem:
+- ✅ SSL automático
+- ✅ CDN global
+- ✅ Deploy contínuo via Git
+- ✅ Escalabilidade automática
+
+## 🎯 Opções de Deploy Recomendadas
+
+### 1. Netlify (⭐ Recomendado para SaaS Multi-tenant)
+
+#### Por que Netlify?
+- SSL automático para domínio principal e subdomínios
+- Suporte nativo para wildcard subdomains
+- Plano gratuito generoso para começar
+- Fácil configuração de domínios customizados
+
+#### Passo a Passo:
+
+1. **Instale o Netlify CLI**
+```bash
+npm i -g netlify-cli
+```
+
+2. **Configure o arquivo `netlify.toml` na raiz do projeto**
+```toml
+[build]
+  command = "npm run build"
+  publish = "dist/crm-imobil-app"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  NODE_VERSION = "18"
+```
+
+3. **Configure variáveis de ambiente**
+Crie um arquivo `.env` (não commitar!):
+```
+SUPABASE_URL=sua_url_do_supabase
+SUPABASE_ANON_KEY=sua_chave_anonima
+```
+
+4. **Build e Deploy**
+```bash
+npm run build
+netlify deploy --prod
+```
+
+5. **Configure variáveis de ambiente no Netlify Dashboard**
+- Acesse Site Settings > Build & Deploy > Environment
+- Adicione as variáveis do Supabase
+
+#### Configurando Multi-tenant com Subdomínios
+
+1. **Configure o domínio principal no Netlify**
+   - Adicione seu domínio (ex: `seucrm.com`)
+   - Netlify configura SSL automaticamente
+
+2. **Configure Wildcard DNS no seu provedor**
+   - Adicione registro: `*.seucrm.com` → `seu-site.netlify.app`
+   - Todos os subdomínios (cliente1.seucrm.com, cliente2.seucrm.com) funcionarão automaticamente
+
+3. **SSL automático para subdomínios**
+   - Netlify fornece SSL para todos os subdomínios wildcard
+   - Sem necessidade de Certbot ou configuração manual
+
+#### Adicionando Domínios Customizados (Premium)
+
+Para permitir que clientes usem seus próprios domínios:
+
+1. **Cliente configura DNS**
+   - CNAME: `www` → `seu-site.netlify.app`
+   - CNAME: `@` → `seu-site.netlify.app` (ou ALIAS)
+
+2. **Você adiciona no Netlify Dashboard**
+   - Site Settings > Domain Management > Add domain
+   - Digite o domínio do cliente
+   - SSL é configurado automaticamente em minutos
+
+3. **Marque como ativo no CRM**
+   - Use a interface de domínios para ativar
+
+**Limitações:**
+- Plano Free: 1 domínio customizado
+- Plano Pro ($19/mês por site): Domínios ilimitados
+- Para múltiplos domínios customizados, considere plano pago
+
+---
+
+### 2. Vercel (Alternativa Recomendada)
 
 #### Passo a Passo:
 

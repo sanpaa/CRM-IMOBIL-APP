@@ -84,9 +84,9 @@
         <strong>ℹ️ Informações Importantes:</strong>
         <ul>
           <li>A propagação DNS pode levar de 1 a 48 horas</li>
-          <li>Certifique-se de adicionar todos os registros DNS</li>
-          <li>O registro TXT é usado para verificação de propriedade do domínio</li>
-          <li>Após configurar o DNS, clique em "Verificar" para ativar o domínio</li>
+          <li>Após configurar o DNS, adicione o domínio no painel do Netlify/Vercel</li>
+          <li>O SSL será configurado automaticamente pela plataforma</li>
+          <li>Após configuração completa, clique em "Verificar" e depois "Ativar"</li>
         </ul>
       </div>
 
@@ -117,31 +117,35 @@
             <span class="badge badge-primary" *ngIf="domain.is_primary">
               ⭐ Principal
             </span>
-            <span class="badge badge-success" *ngIf="domain.ssl_enabled">
-              🔒 SSL Ativo
+            <span class="badge badge-info" *ngIf="domain.is_subdomain_auto">
+              🚀 Subdomínio Automático
+            </span>
+            <span class="badge badge-success" *ngIf="domain.status === 'active'">
+              🔒 SSL Automático
             </span>
           </div>
         </div>
         
         <div class="domain-actions" *ngIf="authService.isAdmin()">
           <button class="btn-icon" 
+                  *ngIf="!domain.is_subdomain_auto"
                   (click)="showDnsInstructions(domain)" 
                   title="Ver configurações DNS">
             📋
           </button>
           
           <button class="btn-icon" 
-                  *ngIf="domain.status === 'pending'"
+                  *ngIf="domain.status === 'pending' && !domain.is_subdomain_auto"
                   (click)="verifyDomain(domain)" 
-                  title="Verificar domínio">
+                  title="Marcar como verificado">
             ✅
           </button>
           
           <button class="btn-icon" 
-                  *ngIf="domain.status === 'verified' && !domain.ssl_enabled"
-                  (click)="enableSSL(domain)" 
-                  title="Habilitar SSL">
-            🔒
+                  *ngIf="domain.status === 'verified'"
+                  (click)="activateDomain(domain)" 
+                  title="Ativar domínio">
+            🚀
           </button>
           
           <button class="btn-icon" 
@@ -164,15 +168,15 @@
           <strong>Subdomínio:</strong>
           <span>{{ domain.subdomain }}</span>
         </div>
+
+        <div class="detail-item" *ngIf="domain.is_subdomain_auto">
+          <strong>Tipo:</strong>
+          <span>Subdomínio automático (SSL incluído)</span>
+        </div>
         
         <div class="detail-item" *ngIf="domain.verified_at">
           <strong>Verificado em:</strong>
           <span>{{ domain.verified_at | date:'dd/MM/yyyy HH:mm' }}</span>
-        </div>
-        
-        <div class="detail-item" *ngIf="domain.ssl_enabled && domain.ssl_expires_at">
-          <strong>SSL expira em:</strong>
-          <span>{{ domain.ssl_expires_at | date:'dd/MM/yyyy' }}</span>
         </div>
 
         <div class="detail-item">
@@ -182,24 +186,29 @@
       </div>
 
       <!-- Status Message -->
-      <div class="status-message" *ngIf="domain.status === 'pending'">
+      <div class="status-message" *ngIf="domain.status === 'pending' && !domain.is_subdomain_auto">
         <span class="warning-icon">⚠️</span>
-        <p>Configure os registros DNS e clique em "Verificar" para ativar o domínio.</p>
+        <p>Configure os registros DNS no seu provedor e adicione o domínio no painel do Netlify/Vercel. Depois clique em "Verificar".</p>
       </div>
 
       <div class="status-message success" *ngIf="domain.status === 'verified'">
         <span class="success-icon">✅</span>
-        <p>Domínio verificado! Habilite o SSL para torná-lo ativo.</p>
+        <p>Domínio verificado! Confirme que foi adicionado no Netlify/Vercel e clique em "Ativar".</p>
       </div>
 
-      <div class="status-message success" *ngIf="domain.status === 'active'">
+      <div class="status-message success" *ngIf="domain.status === 'active' && domain.is_subdomain_auto">
         <span class="success-icon">🎉</span>
-        <p>Domínio ativo e funcionando! Seu site está acessível em <strong>{{ domain.domain }}</strong></p>
+        <p>Subdomínio automático ativo! Seu site está acessível em <strong>{{ domain.domain }}</strong> com SSL automático.</p>
+      </div>
+
+      <div class="status-message success" *ngIf="domain.status === 'active' && !domain.is_subdomain_auto">
+        <span class="success-icon">🎉</span>
+        <p>Domínio customizado ativo! Seu site está acessível em <strong>{{ domain.domain }}</strong> com SSL fornecido pelo Netlify/Vercel.</p>
       </div>
 
       <div class="status-message error" *ngIf="domain.status === 'failed'">
         <span class="error-icon">❌</span>
-        <p>Falha na verificação. Verifique as configurações DNS e tente novamente.</p>
+        <p>Falha na configuração. Verifique as configurações DNS e se o domínio foi adicionado no Netlify/Vercel.</p>
       </div>
     </div>
   </div>
@@ -221,21 +230,39 @@
   <!-- Help Section -->
   <div class="help-section">
     <h3>❓ Como funciona?</h3>
+    
+    <h4>🚀 Opção 1: Subdomínio Automático (Recomendado para iniciar)</h4>
+    <p><strong>Formato:</strong> <code>suaempresa.seusite.com</code></p>
+    <ul>
+      <li>✅ SSL automático incluído</li>
+      <li>✅ Zero configuração necessária</li>
+      <li>✅ Ativo imediatamente</li>
+      <li>✅ Sem custos adicionais</li>
+    </ul>
+    
+    <h4>🌐 Opção 2: Domínio Customizado (Premium)</h4>
+    <p><strong>Formato:</strong> <code>www.suaempresa.com.br</code></p>
     <ol>
-      <li>Adicione seu domínio personalizado</li>
-      <li>Configure os registros DNS no seu provedor (ex: Registro.br, GoDaddy)</li>
-      <li>Aguarde a propagação DNS (1-48 horas)</li>
-      <li>Clique em "Verificar" para validar o domínio</li>
-      <li>Habilite o SSL para segurança (certificado automático)</li>
-      <li>Defina como domínio principal se desejar</li>
+      <li>Adicione o domínio nesta interface</li>
+      <li>Configure os registros DNS CNAME no seu provedor</li>
+      <li>Adicione o domínio no painel do Netlify/Vercel</li>
+      <li>Aguarde propagação DNS (1-48 horas)</li>
+      <li>Clique em "Verificar" para confirmar configuração</li>
+      <li>Clique em "Ativar" para tornar o domínio ativo</li>
+      <li>SSL será configurado automaticamente pela plataforma</li>
     </ol>
     
     <h3>🔧 Requisitos Técnicos</h3>
+    <p><strong>Para domínios customizados:</strong></p>
     <ul>
-      <li>Acesso ao painel de controle do seu provedor de domínio</li>
+      <li>Acesso ao painel do seu provedor de domínio (ex: Registro.br, GoDaddy)</li>
       <li>Permissão para modificar registros DNS</li>
-      <li>Servidor com IP público (fornecido pelo sistema)</li>
-      <li>Certificado SSL será gerado automaticamente via Let's Encrypt</li>
+      <li>Conta no Netlify/Vercel (onde o site está hospedado)</li>
+      <li>SSL é configurado automaticamente pela plataforma de hospedagem</li>
     </ul>
+    
+    <div class="info-box">
+      <strong>💡 Dica:</strong> Para começar rapidamente, use o subdomínio automático. Você pode adicionar um domínio customizado posteriormente como recurso premium.
+    </div>
   </div>
 </div>

@@ -206,75 +206,114 @@ Estilos:
 1. Faça login como **Administrador**
 2. Clique em **🌐 Domínios** no menu
 
-### Adicionando um Domínio
+### Duas Opções de Domínio
+
+#### 🚀 Opção 1: Subdomínio Automático (Recomendado)
+
+**Formato:** `suaempresa.seusite.com`
+
+**Vantagens:**
+- ✅ SSL automático incluído
+- ✅ Zero configuração necessária
+- ✅ Ativo imediatamente
+- ✅ Sem custos adicionais
+
+**Como usar:**
+1. Ao criar sua conta, um subdomínio automático é gerado
+2. Use este subdomínio para começar rapidamente
+3. Compartilhe com seus clientes
+
+#### 🌐 Opção 2: Domínio Customizado (Premium)
+
+**Formato:** `www.suaempresa.com.br`
+
+**Requisitos:**
+- Domínio próprio registrado
+- Acesso ao painel do provedor de DNS
+- Conta Netlify/Vercel configurada
+
+### Adicionando um Domínio Customizado
 
 1. Clique em **➕ Adicionar Domínio**
 2. Preencha:
    - **Domínio**: Ex: minhaimo.com.br
    - **Subdomínio** (opcional): Ex: www
 3. Clique em **Adicionar**
-4. Anote as instruções de configuração DNS
+4. Siga as instruções de configuração DNS
 
 ### Configurando DNS
 
-Após adicionar o domínio, você verá 3 registros DNS necessários:
+Após adicionar o domínio, você verá as instruções de CNAME:
 
-#### 1. Registro A
-```
-Tipo: A
-Host: @
-Valor: [IP_DO_SERVIDOR]
-TTL: 3600
-```
-
-#### 2. Registro CNAME
+#### Registros CNAME necessários
 ```
 Tipo: CNAME
 Host: www
-Valor: minhaimo.com.br
+Valor: your-site.netlify.app
+TTL: 3600
+
+Tipo: CNAME (ou ALIAS)
+Host: @
+Valor: your-site.netlify.app
 TTL: 3600
 ```
 
-#### 3. Registro TXT (Verificação)
-```
-Tipo: TXT
-Host: _verification
-Valor: crm-verify-[TOKEN_ÚNICO]
-TTL: 3600
-```
+**Importante:** Substitua `your-site.netlify.app` pelo domínio real do seu site no Netlify/Vercel.
 
 ### Passo a Passo por Provedor
 
 #### Registro.br
 1. Acesse o painel do Registro.br
 2. Vá em "DNS" → "Editar Zona"
-3. Adicione os 3 registros
+3. Adicione os registros CNAME
 4. Aguarde propagação (até 48h)
 
 #### GoDaddy
 1. Acesse "Meus Domínios"
 2. Clique em "Gerenciar DNS"
-3. Adicione os registros
+3. Adicione os registros CNAME
 4. Salve alterações
 
 #### Hostgator
 1. Painel cPanel
 2. Seção "Domínios" → "Editor de Zona"
-3. Adicione registros
+3. Adicione registros CNAME
 4. Salve
+
+### Adicionando no Netlify/Vercel
+
+**IMPORTANTE:** Após configurar o DNS, você DEVE adicionar o domínio manualmente na plataforma de hospedagem:
+
+#### No Netlify:
+1. Acesse o painel do Netlify
+2. Vá para o seu site
+3. Clique em "Domain settings"
+4. Clique em "Add custom domain"
+5. Digite seu domínio e confirme
+6. O SSL será configurado automaticamente
+
+#### No Vercel:
+1. Acesse o painel do Vercel
+2. Vá para o seu projeto
+3. Clique em "Settings" → "Domains"
+4. Adicione o domínio customizado
+5. O SSL será configurado automaticamente
 
 ### Verificando o Domínio
 
 1. Aguarde propagação DNS (1-48 horas)
-2. Na interface de domínios, clique em **✅ Verificar**
-3. Se bem-sucedido, status muda para "Verificado"
+2. Confirme que o domínio foi adicionado no Netlify/Vercel
+3. Na interface de domínios do CRM, clique em **✅ Verificar**
+4. Se confirmado, clique em **🚀 Ativar**
+5. Status muda para "Ativo"
 
-### Habilitando SSL
+### SSL Automático
 
-1. Após verificação, clique em **🔒 Habilitar SSL**
-2. O sistema gerará automaticamente um certificado Let's Encrypt
-3. Certificado é válido por 90 dias e renovado automaticamente
-4. Status muda para "Ativo"
+O SSL é gerenciado automaticamente pelo Netlify/Vercel:
+- ✅ Certificado gerado automaticamente
+- ✅ Renovação automática
+- ✅ Sem configuração manual necessária
+- ✅ Sem necessidade de Certbot ou Let's Encrypt manual
 
 ### Definindo Domínio Principal
 
@@ -291,136 +330,159 @@ TTL: 3600
 
 ---
 
-## ⚙️ Configuração do Servidor
+## ⚙️ Configuração do Servidor (Netlify/Vercel)
 
-### Requisitos
+### Arquitetura SaaS Recomendada
 
-- **Servidor**: Linux (Ubuntu 20.04+ recomendado)
-- **Web Server**: Nginx ou Apache
-- **Node.js**: 18+
-- **SSL**: Certbot (Let's Encrypt)
-- **Banco de Dados**: PostgreSQL (via Supabase)
+Este CRM é projetado para ser hospedado em plataformas modernas como Netlify ou Vercel, que oferecem:
+- ✅ SSL automático
+- ✅ CDN global
+- ✅ Deploy contínuo
+- ✅ Escalabilidade automática
 
-### Configuração do Nginx
+### Opção 1: Netlify (Recomendado)
 
-#### 1. Instalar Nginx
+#### Requisitos
+- Conta no Netlify (plano gratuito funciona para começar)
+- Repositório Git (GitHub, GitLab, Bitbucket)
+- Supabase para banco de dados
+
+#### Configuração Inicial
+
+1. **Conecte seu repositório ao Netlify**
 ```bash
-sudo apt update
-sudo apt install nginx
+# Via Netlify CLI
+npm install -g netlify-cli
+netlify login
+netlify init
 ```
 
-#### 2. Configurar Domínio Principal
-Crie `/etc/nginx/sites-available/crm-imobil`:
+2. **Configure o `netlify.toml`**
+```toml
+[build]
+  command = "npm run build"
+  publish = "dist/crm-imobil-app"
 
-```nginx
-# Servidor principal do CRM
-server {
-    listen 80;
-    server_name crm.seuservidor.com;
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
-    root /var/www/crm-imobil-app/dist;
-    index index.html;
+[build.environment]
+  NODE_VERSION = "18"
+```
 
-    location / {
-        try_files $uri $uri/ /index.html;
+3. **Deploy**
+```bash
+npm run build
+netlify deploy --prod
+```
+
+#### Subdomínios Automáticos
+
+Para implementar subdomínios automáticos (ex: `cliente1.seusite.com`, `cliente2.seusite.com`):
+
+1. **No código Angular**, detecte o hostname:
+```typescript
+// Em um serviço de configuração
+const hostname = window.location.hostname;
+const subdomain = hostname.split('.')[0];
+
+// Busque configurações da empresa pelo subdomínio
+const company = await this.getCompanyBySubdomain(subdomain);
+```
+
+2. **Todos os subdomínios apontam para o mesmo site**
+   - Netlify automaticamente fornece SSL para subdomínios
+   - Use wildcard DNS: `*.seusite.com` → `seusite.netlify.app`
+
+#### Domínios Customizados
+
+**IMPORTANTE:** Domínios customizados devem ser adicionados manualmente:
+
+1. Cliente configura DNS (CNAME → seu-site.netlify.app)
+2. Você adiciona o domínio no painel do Netlify
+3. Netlify gera SSL automaticamente
+4. Marque como ativo no CRM
+
+**Limitações:**
+- Netlify Free: 1 domínio customizado
+- Netlify Pro: Domínios ilimitados (mas cobra por site)
+
+### Opção 2: Vercel
+
+Similar ao Netlify, com configuração via `vercel.json`:
+
+```json
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
+  ]
 }
 ```
 
-#### 3. Configurar Sites Personalizados
-Crie `/etc/nginx/sites-available/custom-domains`:
-
-```nginx
-# Captura todos os domínios personalizados
-server {
-    listen 80 default_server;
-    server_name _;
-
-    root /var/www/crm-imobil-app/dist;
-    index index.html;
-
-    # Redireciona para rota de site público baseado em domínio
-    location / {
-        # Detecta company_id pelo domínio no backend
-        # e redireciona para rota correta
-        try_files $uri $uri/ /index.html;
-    }
-
-    # Headers para identificação de domínio
-    location /api/ {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-```
-
-#### 4. Habilitar Sites
+Deploy:
 ```bash
-sudo ln -s /etc/nginx/sites-available/crm-imobil /etc/nginx/sites-enabled/
-sudo ln -s /etc/nginx/sites-available/custom-domains /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
+npm install -g vercel
+vercel --prod
 ```
 
-### Instalando SSL (Certbot)
+### Multi-tenant: Como Funciona
 
-```bash
-# Instalar Certbot
-sudo apt install certbot python3-certbot-nginx
+#### Frontend (Detecção de Tenant)
 
-# Gerar certificado para domínio
-sudo certbot --nginx -d minhaimo.com.br -d www.minhaimo.com.br
-
-# Renovação automática (já configurada)
-sudo certbot renew --dry-run
-```
-
-### Backend: Identificação por Domínio
-
-Para identificar a empresa pelo domínio, você precisará de um middleware no backend (Node.js/Express exemplo):
-
-```javascript
-// middleware/domainResolver.js
-const resolveCompanyByDomain = async (req, res, next) => {
-  const host = req.headers.host;
-  
-  // Buscar company_id pelo domínio
-  const { data: domain } = await supabase
-    .from('custom_domains')
-    .select('company_id')
-    .eq('domain', host)
-    .eq('status', 'active')
-    .single();
-  
-  if (domain) {
-    req.companyId = domain.company_id;
+```typescript
+// tenant-resolver.service.ts
+export class TenantResolverService {
+  getCurrentTenant(): string {
+    const hostname = window.location.hostname;
+    
+    // Para subdomínios automáticos: cliente1.seusite.com
+    if (hostname.includes('seusite.com')) {
+      return hostname.split('.')[0];
+    }
+    
+    // Para domínios customizados: www.cliente1.com.br
+    // Buscar no backend qual empresa usa este domínio
+    return this.fetchCompanyByDomain(hostname);
   }
   
-  next();
-};
-
-// Aplicar em rotas públicas
-app.use('/public/*', resolveCompanyByDomain);
+  async fetchCompanyByDomain(domain: string): Promise<string> {
+    const { data } = await this.supabase
+      .from('custom_domains')
+      .select('company_id')
+      .eq('domain', domain)
+      .eq('status', 'active')
+      .single();
+    
+    return data?.company_id;
+  }
+}
 ```
 
-### Deploy
+#### Backend (Supabase RLS)
 
-#### Build do Angular
-```bash
-cd /home/runner/work/CRM-IMOBIL-APP/CRM-IMOBIL-APP
-npm install
-npm run build --prod
-```
+As políticas de Row Level Security (RLS) já estão configuradas para isolar dados por `company_id`. O frontend apenas precisa passar o `company_id` correto nas queries.
 
-#### Deploy dos Arquivos
-```bash
-# Copiar para servidor
-sudo cp -r dist/crm-imobil-app/* /var/www/crm-imobil-app/dist/
-sudo chown -R www-data:www-data /var/www/crm-imobil-app/
-sudo chmod -R 755 /var/www/crm-imobil-app/
-```
+### Deploy do Banco de Dados
+
+#### Supabase (Backend Recomendado)
+
+1. Crie projeto no Supabase
+2. Execute `supabase-schema.sql`
+3. Configure variáveis de ambiente:
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
+
+### Monitoramento e Logs
+
+- **Netlify:** Logs disponíveis no painel
+- **Vercel:** Analytics integrado
+- **Supabase:** Logs de banco de dados e API
 
 ---
 

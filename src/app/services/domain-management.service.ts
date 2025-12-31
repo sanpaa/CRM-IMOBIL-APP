@@ -161,20 +161,21 @@ export class DomainManagementService {
    * Verify domain ownership via DNS
    * 
    * NOTE: This is a simplified implementation for demonstration.
-   * In production, implement actual DNS verification:
-   * 1. Query DNS TXT records for the domain
-   * 2. Verify the verification_token matches
-   * 3. Check A/CNAME records point to correct server
+   * In a real Netlify/Vercel SaaS deployment:
    * 
-   * Consider using a backend service that:
-   * - Performs actual DNS lookups (dns.resolve, dig, etc.)
-   * - Validates TXT record contains verification token
-   * - Checks SSL certificate status
-   * - Updates domain status accordingly
+   * For AUTOMATIC SUBDOMAINS (company.yoursite.com):
+   * - These work automatically with SSL via Netlify
+   * - No DNS verification needed
+   * - Mark as active immediately
    * 
-   * Security Warning: Current implementation allows any domain
-   * to be verified without actual DNS checks. This is insecure
-   * for production use.
+   * For CUSTOM DOMAINS (company's own domain):
+   * - Must be added manually in Netlify/Vercel dashboard
+   * - This function just records that admin manually verified DNS
+   * - SSL is handled by Netlify/Vercel automatically after DNS propagates
+   * 
+   * This function should be called AFTER:
+   * 1. Admin verifies DNS is pointed correctly
+   * 2. Domain is added in hosting platform (if custom domain)
    */
   async verifyDomain(domainId: string): Promise<boolean> {
     const domain = await this.getDomain(domainId);
@@ -182,14 +183,10 @@ export class DomainManagementService {
       throw new Error('Domain not found');
     }
 
-    // TODO: In production, implement real DNS verification here
-    // Example using a backend API:
-    // const response = await fetch(`/api/domains/${domainId}/verify`, { method: 'POST' });
-    // const result = await response.json();
-    // if (!result.verified) return false;
-    
+    // For automatic subdomains, mark as active immediately
+    // For custom domains, mark as verified (admin confirms DNS is configured)
     const updates: Partial<CustomDomain> = {
-      status: 'verified',
+      status: domain.is_subdomain_auto ? 'active' : 'verified',
       verified_at: new Date().toISOString(),
       dns_configured: true
     };
@@ -200,25 +197,34 @@ export class DomainManagementService {
 
   /**
    * Get DNS configuration instructions for a domain
+   * 
+   * For Netlify/Vercel deployment:
+   * - Automatic subdomains don't need DNS configuration
+   * - Custom domains need CNAME pointing to your Netlify/Vercel site
    */
   getDnsInstructions(domain: CustomDomain): DomainVerification {
+    // For automatic subdomains, no DNS configuration needed
+    if (domain.is_subdomain_auto) {
+      return {
+        domain: domain.domain,
+        token: domain.verification_token || '',
+        verified: true,
+        dns_records: []
+      };
+    }
+
+    // For custom domains on Netlify/Vercel
     const records: DnsRecord[] = [
       {
-        type: 'A',
-        host: '@',
-        value: 'YOUR_SERVER_IP', // This should come from backend config
+        type: 'CNAME',
+        host: 'www',
+        value: 'your-site.netlify.app', // Replace with actual Netlify/Vercel domain
         ttl: 3600
       },
       {
         type: 'CNAME',
-        host: 'www',
-        value: domain.domain,
-        ttl: 3600
-      },
-      {
-        type: 'TXT',
-        host: '_verification',
-        value: domain.verification_token || '',
+        host: '@',
+        value: 'your-site.netlify.app', // Or use ALIAS record if provider supports
         ttl: 3600
       }
     ];
@@ -232,33 +238,21 @@ export class DomainManagementService {
   }
 
   /**
-   * Check SSL certificate status
+   * Activate a verified custom domain
+   * For custom domains: Admin must first add domain in Netlify/Vercel dashboard
+   * Then call this to mark the domain as active in the system
    */
-  async checkSSLStatus(domainId: string): Promise<{ valid: boolean; expiresAt?: string }> {
+  async activateDomain(domainId: string): Promise<void> {
     const domain = await this.getDomain(domainId);
     if (!domain) {
       throw new Error('Domain not found');
     }
 
-    // In a real implementation, this would call a backend API
-    // that checks SSL certificate validity
-    return {
-      valid: domain.ssl_enabled,
-      expiresAt: domain.ssl_expires_at
-    };
-  }
-
-  /**
-   * Enable SSL for a domain
-   * In production, this would trigger Let's Encrypt certificate generation
-   */
-  async enableSSL(domainId: string): Promise<void> {
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 90); // SSL certs typically valid for 90 days
+    if (domain.status !== 'verified') {
+      throw new Error('Domain must be verified before activation');
+    }
 
     await this.updateDomain(domainId, {
-      ssl_enabled: true,
-      ssl_expires_at: expiresAt.toISOString(),
       status: 'active'
     });
   }
