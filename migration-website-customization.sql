@@ -124,6 +124,26 @@ CREATE TRIGGER update_website_components_updated_at
 -- ROW LEVEL SECURITY - DISABLED
 -- (Consistent with existing schema)
 -- ============================================
+-- NOTE: RLS is currently disabled to match existing architecture.
+-- For production, consider enabling RLS with the following policies:
+--
+-- ENABLE ROW LEVEL SECURITY FOR custom_domains:
+-- CREATE POLICY custom_domains_isolation ON custom_domains
+--   USING (company_id = current_setting('app.current_company_id')::uuid);
+--
+-- ENABLE ROW LEVEL SECURITY FOR website_layouts:
+-- CREATE POLICY website_layouts_isolation ON website_layouts
+--   USING (company_id = current_setting('app.current_company_id')::uuid);
+--
+-- ENABLE ROW LEVEL SECURITY FOR website_components:
+-- CREATE POLICY website_components_isolation ON website_components
+--   USING (company_id = current_setting('app.current_company_id')::uuid);
+--
+-- To enable, uncomment the following and implement session management:
+-- ALTER TABLE custom_domains ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE website_layouts ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE website_components ENABLE ROW LEVEL SECURITY;
+
 ALTER TABLE custom_domains DISABLE ROW LEVEL SECURITY;
 ALTER TABLE website_layouts DISABLE ROW LEVEL SECURITY;
 ALTER TABLE website_components DISABLE ROW LEVEL SECURITY;

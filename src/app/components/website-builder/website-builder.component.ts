@@ -121,9 +121,16 @@ export class WebsiteBuilderComponent implements OnInit {
     }
   }
 
+  /**
+   * Generate a unique section ID
+   */
+  private generateSectionId(): string {
+    return `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
   addComponent(componentType: ComponentType) {
     const newSection: LayoutSection = {
-      id: `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: this.generateSectionId(),
       type: componentType,
       order: this.sections.length,
       config: this.componentLibrary.getDefaultComponentConfig(componentType).config,
@@ -165,7 +172,7 @@ export class WebsiteBuilderComponent implements OnInit {
   duplicateSection(section: LayoutSection) {
     const duplicate: LayoutSection = {
       ...section,
-      id: `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: this.generateSectionId(),
       order: section.order + 1
     };
     

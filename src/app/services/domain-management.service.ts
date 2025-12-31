@@ -159,7 +159,22 @@ export class DomainManagementService {
 
   /**
    * Verify domain ownership via DNS
-   * This is a client-side check - actual verification should be done on backend
+   * 
+   * NOTE: This is a simplified implementation for demonstration.
+   * In production, implement actual DNS verification:
+   * 1. Query DNS TXT records for the domain
+   * 2. Verify the verification_token matches
+   * 3. Check A/CNAME records point to correct server
+   * 
+   * Consider using a backend service that:
+   * - Performs actual DNS lookups (dns.resolve, dig, etc.)
+   * - Validates TXT record contains verification token
+   * - Checks SSL certificate status
+   * - Updates domain status accordingly
+   * 
+   * Security Warning: Current implementation allows any domain
+   * to be verified without actual DNS checks. This is insecure
+   * for production use.
    */
   async verifyDomain(domainId: string): Promise<boolean> {
     const domain = await this.getDomain(domainId);
@@ -167,9 +182,11 @@ export class DomainManagementService {
       throw new Error('Domain not found');
     }
 
-    // In a real implementation, this would call a backend API
-    // that checks DNS records and validates ownership
-    // For now, we'll simulate success
+    // TODO: In production, implement real DNS verification here
+    // Example using a backend API:
+    // const response = await fetch(`/api/domains/${domainId}/verify`, { method: 'POST' });
+    // const result = await response.json();
+    // if (!result.verified) return false;
     
     const updates: Partial<CustomDomain> = {
       status: 'verified',

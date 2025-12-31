@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { WebsiteCustomizationService } from '../../services/website-customization.service';
 import { PropertyService } from '../../services/property.service';
 import { CompanyService } from '../../services/company.service';
@@ -15,13 +16,15 @@ import { Property } from '../../models/property.model';
   templateUrl: './public-website.component.html',
   styleUrls: ['./public-website.component.scss']
 })
-export class PublicWebsiteComponent implements OnInit {
+export class PublicWebsiteComponent implements OnInit, OnDestroy {
   layout: WebsiteLayout | null = null;
   sections: LayoutSection[] = [];
   storeSettings: StoreSettings | null = null;
   properties: Property[] = [];
   loading = true;
   companyId: string | null = null;
+  
+  private destroy$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
@@ -33,12 +36,19 @@ export class PublicWebsiteComponent implements OnInit {
   async ngOnInit() {
     // In a real implementation, companyId would be determined from the domain
     // For now, we'll get it from route params or use a default
-    this.route.queryParams.subscribe(async params => {
-      this.companyId = params['companyId'] || localStorage.getItem('company_id');
-      if (this.companyId) {
-        await this.loadWebsite();
-      }
-    });
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(async params => {
+        this.companyId = params['companyId'] || localStorage.getItem('company_id');
+        if (this.companyId) {
+          await this.loadWebsite();
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   async loadWebsite() {
