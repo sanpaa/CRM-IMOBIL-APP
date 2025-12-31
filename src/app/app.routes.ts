@@ -16,6 +16,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/register/register.component').then(m => m.RegisterComponent)
   },
   {
+    path: 'public/:companyId',
+    loadComponent: () => import('./components/public-website/public-website.component').then(m => m.PublicWebsiteComponent)
+  },
+  {
     path: '',
     canActivate: [AuthGuard],
     loadComponent: () => import('./components/layout/main-layout.component').then(m => m.MainLayoutComponent),
@@ -47,6 +51,14 @@ export const routes: Routes = [
       {
         path: 'settings',
         loadComponent: () => import('./components/settings/settings.component').then(m => m.SettingsComponent)
+      },
+      {
+        path: 'website-builder',
+        loadComponent: () => import('./components/website-builder/website-builder.component').then(m => m.WebsiteBuilderComponent)
+      },
+      {
+        path: 'domain-settings',
+        loadComponent: () => import('./components/domain-settings/domain-settings.component').then(m => m.DomainSettingsComponent)
       }
     ]
   },
