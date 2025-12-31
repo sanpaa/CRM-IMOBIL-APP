@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { DomainManagementService } from './domain-management.service';
+import { environment } from '../../environments/environment';
 
 /**
  * Service for resolving the current tenant (company) based on the domain/hostname
@@ -16,7 +17,7 @@ import { DomainManagementService } from './domain-management.service';
 })
 export class TenantResolverService {
   private cachedCompanyId: string | null = null;
-  private readonly baseHostname = 'yoursite.com'; // Replace with your actual base domain
+  private readonly baseHostname = environment.tenant.baseDomain;
 
   constructor(
     private supabase: SupabaseService,

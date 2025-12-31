@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { CustomDomain, DomainVerification, DnsRecord } from '../models/custom-domain.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -214,17 +215,18 @@ export class DomainManagementService {
     }
 
     // For custom domains on Netlify/Vercel
+    const deploymentUrl = environment.tenant.deploymentUrl;
     const records: DnsRecord[] = [
       {
         type: 'CNAME',
         host: 'www',
-        value: 'your-site.netlify.app', // Replace with actual Netlify/Vercel domain
+        value: deploymentUrl,
         ttl: 3600
       },
       {
         type: 'CNAME',
         host: '@',
-        value: 'your-site.netlify.app', // Or use ALIAS record if provider supports
+        value: deploymentUrl, // Or use ALIAS record if provider supports
         ttl: 3600
       }
     ];
