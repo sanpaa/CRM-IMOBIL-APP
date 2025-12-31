@@ -47,6 +47,14 @@ export const routes: Routes = [
       {
         path: 'settings',
         loadComponent: () => import('./components/settings/settings.component').then(m => m.SettingsComponent)
+      },
+      {
+        path: 'website-builder',
+        loadComponent: () => import('./components/website-builder/website-builder.component').then(m => m.WebsiteBuilderComponent)
+      },
+      {
+        path: 'domain-settings',
+        loadComponent: () => import('./components/domain-settings/domain-settings.component').then(m => m.DomainSettingsComponent)
       }
     ]
   },

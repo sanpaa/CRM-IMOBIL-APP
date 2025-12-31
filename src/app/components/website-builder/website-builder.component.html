@@ -1,0 +1,278 @@
+<div class="builder-container" *ngIf="!loading">
+  <!-- Header -->
+  <div class="builder-header">
+    <div class="header-left">
+      <h1>🎨 Construtor de Sites</h1>
+      <div class="layout-selector" *ngIf="currentLayout">
+        <select [(ngModel)]="currentLayout" (change)="selectLayout(currentLayout!)">
+          <option *ngFor="let layout of layouts" [ngValue]="layout">
+            {{ layout.name }} 
+            <span *ngIf="layout.is_default">(Padrão)</span>
+          </option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="showLayoutForm = true">
+        ➕ Novo Layout
+      </button>
+      <button class="btn-secondary" (click)="togglePreview()">
+        {{ previewMode ? '✏️ Editar' : '👁️ Visualizar' }}
+      </button>
+      <button class="btn-primary" (click)="saveLayout()" [disabled]="saving || !currentLayout">
+        {{ saving ? 'Salvando...' : '💾 Salvar' }}
+      </button>
+      <button class="btn-success" (click)="publishLayout()" [disabled]="!currentLayout">
+        🚀 Publicar
+      </button>
+    </div>
+  </div>
+
+  <!-- New Layout Form Modal -->
+  <div class="modal-overlay" *ngIf="showLayoutForm" (click)="showLayoutForm = false">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>Criar Novo Layout</h2>
+      <form (ngSubmit)="createNewLayout()">
+        <div class="form-group">
+          <label>Nome do Layout *</label>
+          <input type="text" [(ngModel)]="newLayoutData.name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Tipo de Página *</label>
+          <select [(ngModel)]="newLayoutData.page_type" name="page_type" required>
+            <option *ngFor="let type of pageTypes" [value]="type.value">
+              {{ type.label }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="form-group" *ngIf="newLayoutData.page_type === 'custom'">
+          <label>Slug (URL)</label>
+          <input type="text" [(ngModel)]="newLayoutData.slug" name="slug" 
+                 placeholder="ex: sobre-nos">
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="showLayoutForm = false">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="saving">
+            {{ saving ? 'Criando...' : 'Criar Layout' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="builder-content" *ngIf="currentLayout">
+    <!-- Component Library Sidebar -->
+    <div class="component-library" *ngIf="!previewMode">
+      <h3>📦 Componentes</h3>
+      <div class="component-categories">
+        <div class="component-item" 
+             *ngFor="let component of availableComponents"
+             (click)="addComponent(component.type)">
+          <span class="component-icon">{{ component.icon }}</span>
+          <span class="component-name">{{ component.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas Area -->
+    <div class="canvas-area" [class.preview-mode]="previewMode">
+      <div class="canvas-header">
+        <h3>{{ currentLayout.name }}</h3>
+        <span class="page-type-badge">{{ currentLayout.page_type }}</span>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="sections.length === 0 && !previewMode">
+        <div class="empty-icon">📱</div>
+        <h3>Página Vazia</h3>
+        <p>Adicione componentes da biblioteca para começar a construir seu site</p>
+      </div>
+
+      <!-- Sections List with Drag & Drop -->
+      <div class="sections-container" 
+           cdkDropList
+           [cdkDropListData]="sections"
+           (cdkDropListDropped)="onDrop($event)">
+        
+        <div class="section-wrapper"
+             *ngFor="let section of sections"
+             cdkDrag
+             [class.selected]="selectedSection === section"
+             (click)="selectSection(section)">
+          
+          <!-- Drag Handle -->
+          <div class="drag-handle" cdkDragHandle *ngIf="!previewMode">
+            <span>⋮⋮</span>
+          </div>
+          
+          <!-- Section Content Preview -->
+          <div class="section-content">
+            <div class="section-preview">
+              <span class="section-icon">{{ getComponentIcon(section.type) }}</span>
+              <span class="section-type">{{ getComponentLabel(section.type) }}</span>
+            </div>
+            
+            <!-- Section Actions -->
+            <div class="section-actions" *ngIf="!previewMode">
+              <button class="btn-icon" (click)="duplicateSection(section); $event.stopPropagation()" 
+                      title="Duplicar">
+                📋
+              </button>
+              <button class="btn-icon" (click)="removeSection(section); $event.stopPropagation()" 
+                      title="Remover">
+                🗑️
+              </button>
+            </div>
+          </div>
+          
+          <!-- Drag Preview -->
+          <div class="drag-preview" *cdkDragPreview>
+            <div class="section-preview-compact">
+              {{ getComponentIcon(section.type) }} {{ getComponentLabel(section.type) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Properties Panel -->
+    <div class="properties-panel" *ngIf="selectedSection && !previewMode">
+      <h3>⚙️ Propriedades</h3>
+      
+      <div class="property-section">
+        <h4>{{ getComponentLabel(selectedSection.type) }}</h4>
+        <p class="section-id">ID: {{ selectedSection.id }}</p>
+      </div>
+
+      <!-- Dynamic Configuration Fields -->
+      <div class="property-section" *ngIf="selectedSection.config">
+        <h4>Configurações</h4>
+        
+        <!-- Common config fields based on component type -->
+        <div *ngIf="selectedSection.type === 'hero'">
+          <div class="form-group">
+            <label>Título</label>
+            <input type="text" 
+                   [value]="selectedSection.config.title || ''"
+                   (input)="updateSectionConfig(selectedSection, 'title', $any($event.target).value)">
+          </div>
+          <div class="form-group">
+            <label>Subtítulo</label>
+            <input type="text" 
+                   [value]="selectedSection.config.subtitle || ''"
+                   (input)="updateSectionConfig(selectedSection, 'subtitle', $any($event.target).value)">
+          </div>
+          <div class="form-group">
+            <label>Altura</label>
+            <select [value]="selectedSection.config.height || 'large'"
+                    (change)="updateSectionConfig(selectedSection, 'height', $any($event.target).value)">
+              <option value="small">Pequena</option>
+              <option value="medium">Média</option>
+              <option value="large">Grande</option>
+              <option value="full">Tela Cheia</option>
+            </select>
+          </div>
+        </div>
+
+        <div *ngIf="selectedSection.type === 'property-grid'">
+          <div class="form-group">
+            <label>Limite de Imóveis</label>
+            <input type="number" 
+                   [value]="selectedSection.config.limit || 6"
+                   (input)="updateSectionConfig(selectedSection, 'limit', +$any($event.target).value)">
+          </div>
+          <div class="form-group">
+            <label>Colunas</label>
+            <select [value]="selectedSection.config.columns || 3"
+                    (change)="updateSectionConfig(selectedSection, 'columns', +$any($event.target).value)">
+              <option value="2">2 colunas</option>
+              <option value="3">3 colunas</option>
+              <option value="4">4 colunas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" 
+                     [checked]="selectedSection.config.showFeatured"
+                     (change)="updateSectionConfig(selectedSection, 'showFeatured', $any($event.target).checked)">
+              Mostrar apenas destaques
+            </label>
+          </div>
+        </div>
+
+        <div *ngIf="selectedSection.type === 'text-block'">
+          <div class="form-group">
+            <label>Título</label>
+            <input type="text" 
+                   [value]="selectedSection.config.title || ''"
+                   (input)="updateSectionConfig(selectedSection, 'title', $any($event.target).value)">
+          </div>
+          <div class="form-group">
+            <label>Conteúdo</label>
+            <textarea rows="5"
+                      [value]="selectedSection.config.content || ''"
+                      (input)="updateSectionConfig(selectedSection, 'content', $any($event.target).value)">
+            </textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Style Configuration -->
+      <div class="property-section">
+        <h4>Estilo</h4>
+        
+        <div class="form-group">
+          <label>Cor de Fundo</label>
+          <input type="color" 
+                 [value]="selectedSection.style?.backgroundColor || '#ffffff'"
+                 (input)="updateSectionStyle(selectedSection, 'backgroundColor', $any($event.target).value)">
+        </div>
+        
+        <div class="form-group">
+          <label>Cor do Texto</label>
+          <input type="color" 
+                 [value]="selectedSection.style?.textColor || '#333333'"
+                 (input)="updateSectionStyle(selectedSection, 'textColor', $any($event.target).value)">
+        </div>
+        
+        <div class="form-group">
+          <label>Espaçamento (padding)</label>
+          <input type="text" 
+                 [value]="selectedSection.style?.padding || '2rem'"
+                 (input)="updateSectionStyle(selectedSection, 'padding', $any($event.target).value)"
+                 placeholder="ex: 2rem">
+        </div>
+      </div>
+
+      <!-- Layout Actions -->
+      <div class="property-section">
+        <h4>Ações do Layout</h4>
+        <button class="btn-danger btn-block" (click)="deleteLayout()">
+          🗑️ Excluir Layout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- No Layout State -->
+  <div class="no-layout-state" *ngIf="!currentLayout && layouts.length === 0">
+    <div class="empty-icon">🎨</div>
+    <h2>Nenhum Layout Encontrado</h2>
+    <p>Crie seu primeiro layout para começar a personalizar seu site</p>
+    <button class="btn-primary btn-large" (click)="showLayoutForm = true">
+      ➕ Criar Primeiro Layout
+    </button>
+  </div>
+</div>
+
+<div class="loading-state" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Carregando construtor de sites...</p>
+</div>
