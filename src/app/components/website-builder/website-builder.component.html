@@ -17,8 +17,11 @@
       <button class="btn-secondary" (click)="showLayoutForm = true">
         ➕ Novo Layout
       </button>
+      <button class="btn-secondary" (click)="toggleLivePreview()">
+        {{ livePreviewEnabled ? '🔲 Ocultar Preview' : '👁️ Mostrar Preview' }}
+      </button>
       <button class="btn-secondary" (click)="togglePreview()">
-        {{ previewMode ? '✏️ Editar' : '👁️ Visualizar' }}
+        {{ previewMode ? '✏️ Editar' : '🖥️ Preview Completo' }}
       </button>
       <button class="btn-primary" (click)="saveLayout()" [disabled]="saving || !currentLayout">
         {{ saving ? 'Salvando...' : '💾 Salvar' }}
@@ -136,6 +139,180 @@
           <div class="drag-preview" *cdkDragPreview>
             <div class="section-preview-compact">
               {{ getComponentIcon(section.type) }} {{ getComponentLabel(section.type) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Preview Panel -->
+    <div class="live-preview-panel" *ngIf="livePreviewEnabled && !previewMode">
+      <div class="preview-header">
+        <h3>👁️ Preview ao Vivo</h3>
+        <div class="device-selector">
+          <button 
+            class="device-btn" 
+            [class.active]="previewDevice === 'desktop'"
+            (click)="setPreviewDevice('desktop')"
+            title="Desktop">
+            🖥️
+          </button>
+          <button 
+            class="device-btn" 
+            [class.active]="previewDevice === 'tablet'"
+            (click)="setPreviewDevice('tablet')"
+            title="Tablet">
+            📱
+          </button>
+          <button 
+            class="device-btn" 
+            [class.active]="previewDevice === 'mobile'"
+            (click)="setPreviewDevice('mobile')"
+            title="Mobile">
+            📱
+          </button>
+        </div>
+      </div>
+      
+      <div class="preview-container">
+        <div class="preview-wrapper" [class]="'device-' + previewDevice">
+          <div class="preview-website">
+            <!-- Render preview sections -->
+            <section *ngFor="let section of sections" 
+                     [ngClass]="'section-' + section.type"
+                     [ngStyle]="getSectionStyle(section)">
+              
+              <!-- Header Component Preview -->
+              <div *ngIf="section.type === 'header'" class="component-header">
+                <nav class="navbar">
+                  <div class="navbar-brand">
+                    <h1>{{ section.config?.logo || 'Imobiliária' }}</h1>
+                  </div>
+                  <ul class="navbar-nav" *ngIf="section.config?.navigation">
+                    <li *ngFor="let item of section.config.navigation">
+                      <a [href]="item.link">{{ item.label }}</a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+
+              <!-- Hero Component Preview -->
+              <div *ngIf="section.type === 'hero'" class="component-hero" 
+                   [class]="'hero-' + (section.config?.height || 'large')"
+                   [style.background-image]="section.config?.backgroundImage ? 'url(' + section.config.backgroundImage + ')' : 'none'">
+                <div class="hero-content" [class]="'align-' + (section.config?.alignment || 'center')">
+                  <h1 class="hero-title">{{ section.config?.title || 'Bem-vindo' }}</h1>
+                  <p class="hero-subtitle" *ngIf="section.config?.subtitle">{{ section.config.subtitle }}</p>
+                  <a *ngIf="section.config?.buttonText" 
+                     [href]="section.config?.buttonLink || '#'" 
+                     class="hero-button">
+                    {{ section.config.buttonText }}
+                  </a>
+                </div>
+              </div>
+
+              <!-- Search Bar Component Preview -->
+              <div *ngIf="section.type === 'search-bar'" class="component-search">
+                <div class="search-form" [class]="section.config?.orientation || 'horizontal'">
+                  <input type="text" placeholder="{{ section.config?.placeholder || 'Buscar imóveis...' }}">
+                  <button class="search-button">{{ section.config?.buttonText || 'Buscar' }}</button>
+                </div>
+              </div>
+
+              <!-- Property Grid Component Preview -->
+              <div *ngIf="section.type === 'property-grid'" class="component-property-grid">
+                <div class="properties-container" 
+                     [style.grid-template-columns]="'repeat(' + (section.config?.columns || 3) + ', 1fr)'">
+                  <div *ngFor="let property of getMockProperties(section)" class="property-card">
+                    <div class="property-image" 
+                         [style.background-image]="'url(' + property.image_url + ')'">
+                      <span *ngIf="property.featured" class="badge-featured">Destaque</span>
+                    </div>
+                    <div class="property-info">
+                      <h3>{{ property.title }}</h3>
+                      <p class="property-location">{{ property.city }}, {{ property.state }}</p>
+                      <p class="property-price">R$ {{ property.price.toLocaleString('pt-BR') }}</p>
+                      <div class="property-details">
+                        <span *ngIf="property.bedrooms">🛏️ {{ property.bedrooms }}</span>
+                        <span *ngIf="property.bathrooms">🚿 {{ property.bathrooms }}</span>
+                        <span *ngIf="property.area">📏 {{ property.area }}m²</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Text Block Component Preview -->
+              <div *ngIf="section.type === 'text-block'" class="component-text-block">
+                <div class="text-content" [class]="'align-' + (section.config?.alignment || 'left')">
+                  <h2 *ngIf="section.config?.title">{{ section.config.title }}</h2>
+                  <div [innerHTML]="section.config?.content || 'Adicione seu conteúdo aqui...'"></div>
+                </div>
+              </div>
+
+              <!-- Contact Form Component Preview -->
+              <div *ngIf="section.type === 'contact-form'" class="component-contact-form">
+                <h2>{{ section.config?.title || 'Entre em Contato' }}</h2>
+                <form class="contact-form">
+                  <input type="text" placeholder="Nome" *ngIf="!section.config?.fields || section.config?.fields?.includes('name')">
+                  <input type="email" placeholder="Email" *ngIf="!section.config?.fields || section.config?.fields?.includes('email')">
+                  <input type="tel" placeholder="Telefone" *ngIf="!section.config?.fields || section.config?.fields?.includes('phone')">
+                  <textarea placeholder="Mensagem" rows="5" *ngIf="!section.config?.fields || section.config?.fields?.includes('message')"></textarea>
+                  <button type="submit" class="submit-button">{{ section.config?.submitText || 'Enviar' }}</button>
+                </form>
+              </div>
+
+              <!-- Stats Section Component Preview -->
+              <div *ngIf="section.type === 'stats-section'" class="component-stats">
+                <div class="stats-container" [class]="section.config?.layout || 'horizontal'">
+                  <div *ngFor="let stat of (section.config?.stats || [{value: '100+', label: 'Imóveis', icon: '🏠'}, {value: '500+', label: 'Clientes', icon: '👥'}, {value: '15+', label: 'Anos', icon: '⭐'}])" class="stat-item">
+                    <span class="stat-icon" *ngIf="stat.icon">{{ stat.icon }}</span>
+                    <div class="stat-value">{{ stat.value }}</div>
+                    <div class="stat-label">{{ stat.label }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Divider Component Preview -->
+              <div *ngIf="section.type === 'divider'" class="component-divider">
+                <hr [style.border-color]="section.config?.color || '#e0e0e0'"
+                    [style.border-width]="section.config?.thickness || '1px'">
+              </div>
+
+              <!-- Spacer Component Preview -->
+              <div *ngIf="section.type === 'spacer'" class="component-spacer"
+                   [style.height]="section.config?.height || '2rem'">
+              </div>
+
+              <!-- Footer Component Preview -->
+              <div *ngIf="section.type === 'footer'" class="component-footer">
+                <div class="footer-content">
+                  <div class="footer-columns">
+                    <div *ngFor="let column of (section.config?.columns || [{title: 'Empresa', links: [{label: 'Sobre', link: '#'}]}])" class="footer-column">
+                      <h4>{{ column.title }}</h4>
+                      <ul>
+                        <li *ngFor="let link of column.links">
+                          <a [href]="link.link">{{ link.label }}</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="footer-bottom">
+                    <p>{{ section.config?.copyrightText || '© 2024 Todos os direitos reservados' }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Placeholder for other component types -->
+              <div *ngIf="!['header', 'hero', 'search-bar', 'property-grid', 'text-block', 'contact-form', 'stats-section', 'divider', 'spacer', 'footer'].includes(section.type)" 
+                   class="component-placeholder">
+                <p>{{ getComponentLabel(section.type) }}</p>
+              </div>
+            </section>
+
+            <!-- Empty preview message -->
+            <div class="preview-empty" *ngIf="sections.length === 0">
+              <p>Adicione componentes para ver o preview</p>
             </div>
           </div>
         </div>
