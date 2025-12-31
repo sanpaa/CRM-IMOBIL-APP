@@ -535,6 +535,12 @@ button:disabled {
   color: #333;
 }
 
+.preview-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .device-selector {
   display: flex;
   gap: 0.5rem;
@@ -559,6 +565,21 @@ button:disabled {
   background: #004AAD;
   border-color: #004AAD;
   color: white;
+}
+
+.fullscreen-btn {
+  padding: 0.5rem 0.75rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+}
+
+.fullscreen-btn:hover {
+  background: #f0f0f0;
+  transform: scale(1.05);
 }
 
 .preview-container {
@@ -940,4 +961,110 @@ button:disabled {
   text-align: center;
   color: #999;
   font-style: italic;
+}
+
+/* Fullscreen Preview Modal */
+.fullscreen-preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fullscreen-preview-content {
+  width: 95vw;
+  height: 95vh;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.fullscreen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: #f8f9fa;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.fullscreen-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.fullscreen-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.fullscreen-controls .device-selector .device-btn {
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+}
+
+.btn-close {
+  padding: 0.6rem 1.2rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-close:hover {
+  background: #c82333;
+  transform: scale(1.05);
+}
+
+.fullscreen-preview-body {
+  flex: 1;
+  overflow: auto;
+  background: #e0e0e0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+}
+
+.preview-wrapper-fullscreen {
+  background: white;
+  transition: all 0.3s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  overflow: auto;
+  max-height: 100%;
+}
+
+.preview-wrapper-fullscreen.device-desktop {
+  width: 100%;
+  max-width: 1400px;
+}
+
+.preview-wrapper-fullscreen.device-tablet {
+  width: 768px;
+  max-width: 90%;
+}
+
+.preview-wrapper-fullscreen.device-mobile {
+  width: 375px;
+  max-width: 90%;
 }

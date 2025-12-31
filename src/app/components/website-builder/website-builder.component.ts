@@ -26,6 +26,7 @@ export class WebsiteBuilderComponent implements OnInit {
   saving = false;
   previewMode = false;
   livePreviewEnabled = true;
+  fullScreenPreview = false;
   previewDevice: 'desktop' | 'tablet' | 'mobile' = 'desktop';
   
   pageTypes = [
@@ -239,6 +240,10 @@ export class WebsiteBuilderComponent implements OnInit {
 
   toggleLivePreview() {
     this.livePreviewEnabled = !this.livePreviewEnabled;
+  }
+
+  toggleFullScreenPreview() {
+    this.fullScreenPreview = !this.fullScreenPreview;
   }
 
   setPreviewDevice(device: 'desktop' | 'tablet' | 'mobile') {
