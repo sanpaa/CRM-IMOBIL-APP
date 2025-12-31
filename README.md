@@ -1,6 +1,26 @@
 # 🏢 CRM Imobiliário - Sistema Multi-Tenant SaaS
 
-Sistema completo de CRM para imobiliárias com arquitetura multi-tenant, desenvolvido com Angular e Supabase.
+Sistema completo de CRM para imobiliárias com arquitetura multi-tenant, desenvolvido com Angular e Supabase. **Pronto para deploy em Netlify/Vercel** com suporte real para múltiplos domínios e subdomínios.
+
+## ⚡ Deploy e Arquitetura SaaS
+
+Este sistema foi projetado para ser uma **aplicação SaaS real** que funciona em plataformas modernas como Netlify ou Vercel:
+
+### ✅ O que funciona (Realista)
+- 🚀 **Subdomínios Automáticos**: `cliente1.seusite.com`, `cliente2.seusite.com` com SSL automático
+- 🌐 **Domínios Customizados**: Suporte para domínios próprios dos clientes (configuração manual)
+- 🎨 **Construtor Visual Drag & Drop**: Interface para criar sites personalizados
+- 🔒 **SSL Automático**: Fornecido pelo Netlify/Vercel (sem Certbot/Let's Encrypt manual)
+- 📊 **Multi-tenant Completo**: Detecção automática de empresa por hostname
+- 🗄️ **Backend Serverless**: Supabase com Row Level Security (RLS)
+
+### ❌ O que NÃO tenta fazer (Impossível em Netlify/Vercel)
+- Configuração de Nginx
+- Upload de certificados SSL
+- Certbot ou Let's Encrypt manual
+- Automação completa de domínios via código
+
+**📖 Documentação Completa:** Veja [`DEPLOYMENT.md`](DEPLOYMENT.md) para guia de deploy e [`FRONTEND_PUBLIC_PROMPT.md`](FRONTEND_PUBLIC_PROMPT.md) para criar o site público.
 
 ## 🚀 Características
 
@@ -234,6 +254,69 @@ npm test
 npm run lint
 ```
 
+## 🌐 Deploy para Produção
+
+Este sistema está pronto para deploy em Netlify ou Vercel. Veja o guia completo em [`DEPLOYMENT.md`](DEPLOYMENT.md).
+
+### Quick Start - Netlify
+
+```bash
+# Build
+npm run build
+
+# Deploy via CLI
+npm install -g netlify-cli
+netlify deploy --prod
+```
+
+### Quick Start - Vercel
+
+```bash
+# Build
+npm run build
+
+# Deploy via CLI
+npm install -g vercel
+vercel --prod
+```
+
+### Configuração de Domínios
+
+**Subdomínios Automáticos (Recomendado):**
+1. Configure wildcard DNS: `*.seusite.com` → `seu-site.netlify.app`
+2. SSL funciona automaticamente para todos os subdomínios
+3. Cada empresa tem seu subdomínio: `empresa1.seusite.com`
+
+**Domínios Customizados (Premium):**
+1. Cliente configura DNS: CNAME → `seu-site.netlify.app`
+2. Adicione manualmente no painel Netlify/Vercel
+3. SSL configurado automaticamente pela plataforma
+
+## 🔧 Serviços Criados para Multi-tenant
+
+### TenantResolverService
+Detecta automaticamente qual empresa está sendo acessada baseado no hostname:
+```typescript
+const companyId = await this.tenantResolver.getCurrentTenant();
+```
+
+### PublicSiteConfigService
+Carrega configurações e dados da empresa para o site público:
+```typescript
+const config = await this.publicSiteConfig.getSiteConfig();
+```
+
+### DomainManagementService
+Gerencia domínios customizados e subdomínios automáticos.
+
+## 📚 Documentação Adicional
+
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Guia completo de deploy (Netlify/Vercel)
+- **[WEBSITE_CUSTOMIZATION_GUIDE.md](WEBSITE_CUSTOMIZATION_GUIDE.md)** - Guia do construtor de sites
+- **[FRONTEND_PUBLIC_PROMPT.md](FRONTEND_PUBLIC_PROMPT.md)** - Guia para criar o frontend público
+- **[SECURITY.md](SECURITY.md)** - Considerações de segurança
+- **Migration:** Execute `migration-netlify-domains.sql` no Supabase
+
 ## 🤝 Contribuição
 
 Contribuições são bem-vindas! Por favor:
@@ -249,7 +332,7 @@ Este projeto está sob a licença MIT.
 
 ## 👨‍💻 Autor
 
-Desenvolvido para ser um CRM imobiliário profissional, escalável e pronto para comercialização como SaaS multi-tenant.
+Desenvolvido para ser um CRM imobiliário profissional, escalável e pronto para comercialização como SaaS multi-tenant. Arquitetura otimizada para deploy em Netlify/Vercel com suporte real para múltiplos domínios.
 
 ## 📞 Suporte
 
@@ -257,4 +340,4 @@ Para dúvidas e suporte, abra uma issue no GitHub.
 
 ---
 
-**Nota**: Lembre-se de configurar corretamente as credenciais do Supabase antes de executar o projeto!
+**Nota Importante:** Este sistema foi refatorado para ser **compatível com Netlify/Vercel**. Não usa Nginx, Certbot ou upload de SSL - tudo isso é gerenciado automaticamente pela plataforma de hospedagem. Veja `DEPLOYMENT.md` para detalhes completos.

@@ -88,17 +88,23 @@ export class DomainSettingsComponent implements OnInit {
   }
 
   async verifyDomain(domain: CustomDomain) {
-    if (!confirm('Deseja verificar a configuração DNS deste domínio?')) {
+    if (domain.is_subdomain_auto) {
+      // Automatic subdomains are always verified and active
+      alert('Subdomínio automático já está ativo!');
+      return;
+    }
+
+    if (!confirm('Confirme que você já:\n1. Configurou os registros DNS no seu provedor\n2. Aguardou a propagação DNS (pode levar até 48h)\n\nDeseja marcar como verificado?')) {
       return;
     }
 
     try {
       const verified = await this.domainService.verifyDomain(domain.id);
       if (verified) {
-        alert('Domínio verificado com sucesso!');
+        alert('Domínio marcado como verificado! Agora você pode ativá-lo.');
         await this.loadDomains();
       } else {
-        alert('Não foi possível verificar o domínio. Verifique as configurações DNS.');
+        alert('Não foi possível verificar o domínio.');
       }
     } catch (error) {
       console.error('Error verifying domain:', error);
@@ -124,18 +130,23 @@ export class DomainSettingsComponent implements OnInit {
     }
   }
 
-  async enableSSL(domain: CustomDomain) {
-    if (!confirm('Deseja habilitar SSL para este domínio? Certifique-se de que o DNS está configurado corretamente.')) {
+  async activateDomain(domain: CustomDomain) {
+    if (domain.is_subdomain_auto) {
+      alert('Subdomínios automáticos já estão ativos!');
+      return;
+    }
+
+    if (!confirm('Confirme que você:\n1. Adicionou este domínio no painel do Netlify/Vercel\n2. O DNS já foi propagado\n3. O domínio está acessível\n\nDeseja ativar este domínio?')) {
       return;
     }
 
     try {
-      await this.domainService.enableSSL(domain.id);
-      alert('SSL habilitado com sucesso! O certificado será gerado automaticamente.');
+      await this.domainService.activateDomain(domain.id);
+      alert('Domínio ativado! SSL será fornecido automaticamente pelo Netlify/Vercel.');
       await this.loadDomains();
-    } catch (error) {
-      console.error('Error enabling SSL:', error);
-      alert('Erro ao habilitar SSL');
+    } catch (error: any) {
+      console.error('Error activating domain:', error);
+      alert(error.message || 'Erro ao ativar domínio');
     }
   }
 

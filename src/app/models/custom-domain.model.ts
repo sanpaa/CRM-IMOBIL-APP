@@ -4,9 +4,7 @@ export interface CustomDomain {
   domain: string;
   subdomain?: string;
   is_primary: boolean;
-  ssl_enabled: boolean;
-  ssl_certificate?: string;
-  ssl_expires_at?: string;
+  is_subdomain_auto: boolean; // True for automatic subdomains (e.g., company.yoursite.com)
   dns_configured: boolean;
   verification_token?: string;
   verified_at?: string;
