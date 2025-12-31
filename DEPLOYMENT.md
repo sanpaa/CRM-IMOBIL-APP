@@ -132,137 +132,51 @@ vercel --prod
 
 ---
 
-### 2. Netlify
+### 2. Vercel (Alternativa Recomendada)
 
 #### Passo a Passo:
 
-1. **Instale o Netlify CLI**
+1. **Instale o Vercel CLI**
 ```bash
-npm i -g netlify-cli
+npm i -g vercel
 ```
 
-2. **Configure o arquivo `netlify.toml`**
-```toml
-[build]
-  command = "npm run build"
-  publish = "dist/crm-imobil-app"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-```
-
-3. **Deploy**
-```bash
-npm run build
-netlify deploy --prod
-```
-
----
-
-### 3. Firebase Hosting
-
-#### Passo a Passo:
-
-1. **Instale Firebase CLI**
-```bash
-npm install -g firebase-tools
-```
-
-2. **Faça login no Firebase**
-```bash
-firebase login
-```
-
-3. **Inicialize o projeto**
-```bash
-firebase init hosting
-```
-
-Configurações:
-- Public directory: `dist/crm-imobil-app`
-- Single-page app: Yes
-- Overwrite index.html: No
-
-4. **Deploy**
-```bash
-npm run build
-firebase deploy
-```
-
----
-
-### 4. AWS S3 + CloudFront
-
-#### Passo a Passo:
-
-1. **Build do projeto**
-```bash
-npm run build
-```
-
-2. **Crie um bucket S3**
-- Nome: `crm-imobil-app`
-- Permissões: Público para leitura
-- Static Website Hosting: Habilitado
-
-3. **Upload dos arquivos**
-```bash
-aws s3 sync dist/crm-imobil-app/ s3://crm-imobil-app --acl public-read
-```
-
-4. **Configure CloudFront** (opcional)
-- Crie uma distribuição CloudFront
-- Origin: Seu bucket S3
-- Default Root Object: `index.html`
-- Error Pages: Redirecione 403/404 para `/index.html`
-
----
-
-### 5. Docker
-
-#### Dockerfile:
-```dockerfile
-# Build stage
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-# Production stage
-FROM nginx:alpine
-COPY --from=builder /app/dist/crm-imobil-app /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-#### nginx.conf:
-```nginx
-server {
-    listen 80;
-    server_name localhost;
-    root /usr/share/nginx/html;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ /index.html;
+2. **Configure o projeto - crie `vercel.json`**
+```json
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
+  ],
+  "build": {
+    "env": {
+      "NODE_VERSION": "18"
+    }
+  }
 }
 ```
 
-#### Build e Run:
+3. **Build e Deploy**
 ```bash
-docker build -t crm-imobil-app .
-docker run -p 8080:80 crm-imobil-app
+npm run build
+vercel --prod
 ```
+
+4. **Configure variáveis de ambiente no Vercel**
+- Acesse o painel do Vercel
+- Vá em Settings > Environment Variables
+- Adicione:
+  - `SUPABASE_URL`: sua URL do Supabase
+  - `SUPABASE_ANON_KEY`: sua chave anônima do Supabase
+
+**Multi-tenant no Vercel:** Similar ao Netlify, suporta wildcard domains e SSL automático.
 
 ---
 
-## Configuração do Supabase
+## 🗄️ Configuração do Supabase (Backend)
 
 ### 1. Criar projeto no Supabase
 - Acesse [supabase.com](https://supabase.com)
@@ -271,56 +185,156 @@ docker run -p 8080:80 crm-imobil-app
 
 ### 2. Executar o Schema SQL
 - No painel do Supabase, vá para SQL Editor
-- Copie e execute o conteúdo de `supabase-schema.sql`
+- Execute o arquivo `supabase-schema.sql`
+- Execute migrations adicionais se houver
 
-### 3. Configurar Storage (para anexos)
+### 3. Adicionar campo para subdomínios (Recomendado)
+
+Adicione um campo na tabela `companies` para subdomínios automáticos:
+
+```sql
+ALTER TABLE companies
+ADD COLUMN subdomain_slug VARCHAR(100) UNIQUE;
+
+-- Adicione índice para performance
+CREATE INDEX idx_companies_subdomain ON companies(subdomain_slug);
+```
+
+### 4. Atualizar tabela custom_domains
+
+Adicione o campo `is_subdomain_auto`:
+
+```sql
+ALTER TABLE custom_domains
+ADD COLUMN is_subdomain_auto BOOLEAN DEFAULT false;
+
+-- Remover campos de SSL que não são mais usados
+ALTER TABLE custom_domains
+DROP COLUMN IF EXISTS ssl_certificate,
+DROP COLUMN IF EXISTS ssl_expires_at;
+```
+
+### 5. Configurar Storage (para anexos e imagens)
 - Vá para Storage no painel
 - Crie um bucket chamado `attachments`
-- Configure as políticas de acesso conforme necessário
+- Configure as políticas de acesso
 
-### 4. Ativar Realtime (para notificações)
+### 6. Ativar Realtime (para notificações)
 - Vá para Database > Replication
 - Ative para a tabela `notifications`
 
 ---
 
-## Checklist de Deploy
+## 🌐 Configuração Multi-tenant
 
-- [ ] Build do projeto sem erros
-- [ ] Variáveis de ambiente configuradas
-- [ ] Schema SQL executado no Supabase
-- [ ] Testes básicos realizados
-- [ ] SSL/HTTPS configurado
-- [ ] Domain personalizado configurado (opcional)
-- [ ] Analytics configurado (opcional)
-- [ ] Backup do banco configurado
-- [ ] Monitoramento configurado
+### Como funciona a detecção de tenant
+
+O sistema detecta qual empresa mostrar baseado no domínio:
+
+#### 1. Subdomínios Automáticos (Recomendado)
+- **Formato:** `cliente1.seucrm.com`, `cliente2.seucrm.com`
+- **Como funciona:**
+  1. Frontend detecta hostname via `window.location.hostname`
+  2. Extrai o subdomínio (`cliente1`)
+  3. Busca no banco qual empresa tem esse subdomínio
+  4. Carrega dados filtrados por `company_id`
+
+#### 2. Domínios Customizados
+- **Formato:** `www.clienteproprio.com.br`
+- **Como funciona:**
+  1. Frontend detecta hostname
+  2. Busca na tabela `custom_domains` qual empresa usa esse domínio
+  3. Carrega dados filtrados por `company_id`
+
+### Implementação no Frontend
+
+O serviço `TenantResolverService` já foi criado e faz:
+
+```typescript
+// Exemplo de uso em um componente público
+export class PublicHomeComponent implements OnInit {
+  constructor(
+    private publicSiteConfig: PublicSiteConfigService
+  ) {}
+
+  async ngOnInit() {
+    const config = await this.publicSiteConfig.getSiteConfig();
+    
+    if (config) {
+      this.companyName = config.company.name;
+      this.layout = config.layout;
+      // Renderizar o site baseado na configuração
+    } else {
+      // Mostrar página de erro ou default
+    }
+  }
+}
+```
 
 ---
 
-## Dicas de Produção
+## ✅ Checklist de Deploy
+
+- [ ] Build do projeto sem erros (`npm run build`)
+- [ ] Variáveis de ambiente configuradas (Supabase)
+- [ ] Schema SQL executado no Supabase
+- [ ] Campo `subdomain_slug` adicionado à tabela companies
+- [ ] Campo `is_subdomain_auto` adicionado à tabela custom_domains
+- [ ] Deploy realizado (Netlify ou Vercel)
+- [ ] Domínio principal configurado
+- [ ] Wildcard DNS configurado para subdomínios (`*.seusite.com`)
+- [ ] SSL verificado (deve estar ativo automaticamente)
+- [ ] Teste de multi-tenant realizado (acessar diferentes subdomínios)
+- [ ] Storage do Supabase configurado
+- [ ] Realtime ativado para notificações
+
+---
+
+## 🔐 Segurança e Boas Práticas
 
 ### Segurança
-- ✅ Use HTTPS sempre
+- ✅ Use HTTPS sempre (automático no Netlify/Vercel)
 - ✅ Configure CORS adequadamente no Supabase
-- ✅ Revise as políticas RLS
+- ✅ Revise as políticas RLS (Row Level Security)
 - ✅ Nunca exponha chaves secretas no frontend
+- ✅ Valide entrada de usuários no backend (Supabase Functions)
 
 ### Performance
-- ✅ Habilite cache no CDN
-- ✅ Configure compressão gzip
-- ✅ Otimize imagens e assets
-- ✅ Use lazy loading nas rotas
+- ✅ Habilite cache no CDN (automático no Netlify/Vercel)
+- ✅ Configure compressão gzip (automático)
+- ✅ Otimize imagens e assets antes do upload
+- ✅ Use lazy loading nas rotas Angular
+- ✅ Implemente paginação para listagens grandes
 
 ### Monitoramento
 - ✅ Configure Google Analytics ou similar
 - ✅ Configure Sentry para tracking de erros
 - ✅ Monitore logs do Supabase
-- ✅ Configure alertas de uptime
+- ✅ Configure alertas de uptime (UptimeRobot, etc)
+- ✅ Monitore uso do Supabase para não exceder limites
 
 ---
 
-## Solução de Problemas
+## 🚫 O que NÃO fazer (Armadilhas Comuns)
+
+❌ **NÃO tente configurar Certbot ou Let's Encrypt manualmente**
+- Netlify/Vercel fazem isso automaticamente
+
+❌ **NÃO tente configurar Nginx**
+- Não é possível e não é necessário
+
+❌ **NÃO adicione domínios customizados sem adicionar no painel da plataforma**
+- Sempre adicione no Netlify/Vercel primeiro
+
+❌ **NÃO espere SSL instantâneo para domínios customizados**
+- Pode levar de minutos a algumas horas após DNS propagar
+
+❌ **NÃO misture VPS com Netlify/Vercel**
+- São abordagens diferentes; escolha uma
+
+---
+
+## 🔧 Solução de Problemas
 
 ### Erro: "Cannot find module '@angular/core'"
 ```bash
@@ -331,14 +345,60 @@ npm install
 ### Erro de CORS no Supabase
 - Vá para Project Settings > API
 - Adicione sua URL de produção em "Allowed Origins"
+- Adicione também URLs de preview do Netlify se necessário
 
 ### Rotas não funcionam após refresh
-- Configure seu servidor para redirecionar todas as rotas para `/index.html`
+- Verifique se configurou o redirect no `netlify.toml` ou `vercel.json`
+- Todas as rotas devem redirecionar para `/index.html`
+
+### SSL não ativa para domínio customizado
+1. Verifique se DNS propagou (`nslookup seudominio.com`)
+2. Confirme que adicionou no painel do Netlify/Vercel
+3. Aguarde até 24h para propagação completa
+4. Tente remover e adicionar novamente o domínio
+
+### Subdomínios não funcionam
+1. Verifique wildcard DNS: `*.seusite.com` → `seu-site.netlify.app`
+2. Confirme que o campo `subdomain_slug` existe na tabela companies
+3. Teste a query no Supabase SQL Editor
+4. Verifique logs do navegador (F12) para erros
+
+### Multi-tenant não detecta empresa
+1. Verifique se `TenantResolverService` está sendo usado
+2. Confirme que o domínio está na tabela `custom_domains` com status 'active'
+3. Para subdomínios, confirme que existe em `companies.subdomain_slug`
+4. Verifique logs do navegador
 
 ---
 
-## Suporte
+## 📚 Recursos Adicionais
 
-Para mais informações, consulte:
 - [Documentação do Angular](https://angular.io/docs)
 - [Documentação do Supabase](https://supabase.com/docs)
+- [Netlify Docs - Custom Domains](https://docs.netlify.com/domains-https/custom-domains/)
+- [Vercel Docs - Custom Domains](https://vercel.com/docs/concepts/projects/custom-domains)
+- [Wildcard SSL on Netlify](https://docs.netlify.com/domains-https/https-ssl/#certificates-for-subdomains)
+
+---
+
+## 💰 Considerações de Custo
+
+### Plano Gratuito (Desenvolvimento e MVPs)
+- **Netlify Free:** 100GB bandwidth, 1 domínio customizado
+- **Vercel Hobby:** 100GB bandwidth, domínios ilimitados (uso pessoal)
+- **Supabase Free:** 500MB database, 1GB storage, 2GB transfer
+
+### Plano Pago (Produção)
+- **Netlify Pro:** $19/mês - domínios ilimitados, 400GB bandwidth
+- **Vercel Pro:** $20/mês - uso comercial, analytics
+- **Supabase Pro:** $25/mês - 8GB database, 100GB storage
+
+### Recomendação
+- **Começar:** Free tier de todos
+- **1-10 clientes:** Netlify/Vercel Free + Supabase Free
+- **10-50 clientes:** Netlify/Vercel Pro + Supabase Pro
+- **50+ clientes:** Considerar planos Enterprise ou migrar para VPS próprio
+
+---
+
+**Última atualização:** 2024  
