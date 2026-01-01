@@ -3,14 +3,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { WebsiteCustomizationService } from '../../services/website-customization.service';
-import { ComponentLibraryService } from '../../services/component-library.service';
 import { AuthService } from '../../services/auth.service';
 import { WebsiteLayout, LayoutSection, ComponentType } from '../../models/website-layout.model';
+import { ComponentRegistryService } from '../../shared/website-components/component-registry.service';
+import { RenderComponentDirective } from '../../shared/website-components/render-component.directive';
+import { PropertyEditorComponent } from '../../shared/property-editor/property-editor.component';
+import { ComponentMetadata } from '../../shared/website-components/component-base.interface';
 
 @Component({
   selector: 'app-website-builder',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule],
+  imports: [CommonModule, FormsModule, DragDropModule, RenderComponentDirective, PropertyEditorComponent],
   templateUrl: './website-builder.component.html',
   styleUrls: ['./website-builder.component.scss']
 })
@@ -19,14 +22,8 @@ export class WebsiteBuilderComponent implements OnInit {
   currentLayout: WebsiteLayout | null = null;
   sections: LayoutSection[] = [];
   
-  availableComponents: any[] = [];
+  availableComponents: ComponentMetadata[] = [];
   selectedSection: LayoutSection | null = null;
-
-  // Component types that have full preview support
-  readonly supportedPreviewTypes: ComponentType[] = [
-    'header', 'hero', 'search-bar', 'property-grid', 'text-block', 
-    'contact-form', 'stats-section', 'divider', 'spacer', 'footer'
-  ];
   
   loading = false;
   saving = false;
@@ -53,7 +50,7 @@ export class WebsiteBuilderComponent implements OnInit {
 
   constructor(
     private customizationService: WebsiteCustomizationService,
-    private componentLibrary: ComponentLibraryService,
+    private componentRegistry: ComponentRegistryService,
     public authService: AuthService
   ) {}
 
@@ -63,7 +60,7 @@ export class WebsiteBuilderComponent implements OnInit {
       return;
     }
     
-    this.availableComponents = this.componentLibrary.getAvailableComponentTypes();
+    this.availableComponents = this.componentRegistry.getAllMetadata();
     await this.loadLayouts();
   }
 
@@ -138,12 +135,18 @@ export class WebsiteBuilderComponent implements OnInit {
   }
 
   addComponent(componentType: ComponentType) {
+    const metadata = this.componentRegistry.getMetadata(componentType);
+    if (!metadata) {
+      console.error(`Component metadata not found for type: ${componentType}`);
+      return;
+    }
+
     const newSection: LayoutSection = {
       id: this.generateSectionId(),
       type: componentType,
       order: this.sections.length,
-      config: this.componentLibrary.getDefaultComponentConfig(componentType).config,
-      style: this.componentLibrary.getDefaultComponentConfig(componentType).style_config
+      config: { ...metadata.defaultConfig },
+      style: metadata.defaultStyle ? { ...metadata.defaultStyle } : undefined
     };
 
     this.sections.push(newSection);
@@ -256,127 +259,23 @@ export class WebsiteBuilderComponent implements OnInit {
     this.previewDevice = device;
   }
 
-  getSectionStyle(section: LayoutSection): any {
-    return {
-      'background-color': section.style?.backgroundColor || 'transparent',
-      'color': section.style?.textColor || 'inherit',
-      'padding': section.style?.padding || '2rem',
-      'margin': section.style?.margin || '0'
-    };
-  }
-
-  // Mock properties for preview
-  getMockProperties(section: LayoutSection): any[] {
-    const config = section.config || {};
-    const limit = config.limit || 6;
-    
-    const mockProps = [
-      {
-        id: '1',
-        title: 'Casa com 3 Quartos',
-        city: 'São Paulo',
-        state: 'SP',
-        price: 450000,
-        bedrooms: 3,
-        bathrooms: 2,
-        area: 120,
-        image_url: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=500',
-        featured: true
-      },
-      {
-        id: '2',
-        title: 'Apartamento Moderno',
-        city: 'Rio de Janeiro',
-        state: 'RJ',
-        price: 380000,
-        bedrooms: 2,
-        bathrooms: 2,
-        area: 85,
-        image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500',
-        featured: true
-      },
-      {
-        id: '3',
-        title: 'Casa de Campo',
-        city: 'Gramado',
-        state: 'RS',
-        price: 650000,
-        bedrooms: 4,
-        bathrooms: 3,
-        area: 200,
-        image_url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=500',
-        featured: false
-      },
-      {
-        id: '4',
-        title: 'Cobertura Luxo',
-        city: 'Belo Horizonte',
-        state: 'MG',
-        price: 890000,
-        bedrooms: 3,
-        bathrooms: 3,
-        area: 180,
-        image_url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=500',
-        featured: true
-      },
-      {
-        id: '5',
-        title: 'Studio Compacto',
-        city: 'Curitiba',
-        state: 'PR',
-        price: 220000,
-        bedrooms: 1,
-        bathrooms: 1,
-        area: 45,
-        image_url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500',
-        featured: false
-      },
-      {
-        id: '6',
-        title: 'Casa em Condomínio',
-        city: 'Brasília',
-        state: 'DF',
-        price: 720000,
-        bedrooms: 4,
-        bathrooms: 4,
-        area: 250,
-        image_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500',
-        featured: true
-      }
-    ];
-
-    let filtered = [...mockProps];
-    if (config.showFeatured) {
-      filtered = filtered.filter(p => p.featured);
-    }
-    return filtered.slice(0, limit);
-  }
-
   getComponentIcon(type: ComponentType): string {
-    const component = this.availableComponents.find(c => c.type === type);
-    return component?.icon || '📦';
+    const metadata = this.componentRegistry.getMetadata(type);
+    return metadata?.icon || '📦';
   }
 
   getComponentLabel(type: ComponentType): string {
-    const component = this.availableComponents.find(c => c.type === type);
-    return component?.label || type;
+    const metadata = this.componentRegistry.getMetadata(type);
+    return metadata?.label || type;
   }
 
-  isPreviewSupported(type: ComponentType): boolean {
-    return this.supportedPreviewTypes.includes(type);
+  onConfigChange(config: any): void {
+    // Config updated through property editor
+    // The section reference is already updated
   }
 
-  updateSectionConfig(section: LayoutSection, configKey: string, value: any) {
-    if (!section.config) {
-      section.config = {};
-    }
-    section.config[configKey] = value;
-  }
-
-  updateSectionStyle(section: LayoutSection, styleKey: string, value: any) {
-    if (!section.style) {
-      section.style = {};
-    }
-    (section.style as any)[styleKey] = value;
+  onStyleChange(style: any): void {
+    // Style updated through property editor
+    // The section reference is already updated
   }
 }
