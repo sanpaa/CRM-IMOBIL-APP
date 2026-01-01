@@ -21,10 +21,19 @@ export class WebsiteBuilderComponent implements OnInit {
   
   availableComponents: any[] = [];
   selectedSection: LayoutSection | null = null;
+
+  // Component types that have full preview support
+  readonly supportedPreviewTypes: ComponentType[] = [
+    'header', 'hero', 'search-bar', 'property-grid', 'text-block', 
+    'contact-form', 'stats-section', 'divider', 'spacer', 'footer'
+  ];
   
   loading = false;
   saving = false;
   previewMode = false;
+  livePreviewEnabled = true;
+  fullScreenPreview = false;
+  previewDevice: 'desktop' | 'tablet' | 'mobile' = 'desktop';
   
   pageTypes = [
     { value: 'home', label: 'Home Page' },
@@ -235,6 +244,114 @@ export class WebsiteBuilderComponent implements OnInit {
     this.selectedSection = null;
   }
 
+  toggleLivePreview() {
+    this.livePreviewEnabled = !this.livePreviewEnabled;
+  }
+
+  toggleFullScreenPreview() {
+    this.fullScreenPreview = !this.fullScreenPreview;
+  }
+
+  setPreviewDevice(device: 'desktop' | 'tablet' | 'mobile') {
+    this.previewDevice = device;
+  }
+
+  getSectionStyle(section: LayoutSection): any {
+    return {
+      'background-color': section.style?.backgroundColor || 'transparent',
+      'color': section.style?.textColor || 'inherit',
+      'padding': section.style?.padding || '2rem',
+      'margin': section.style?.margin || '0'
+    };
+  }
+
+  // Mock properties for preview
+  getMockProperties(section: LayoutSection): any[] {
+    const config = section.config || {};
+    const limit = config.limit || 6;
+    
+    const mockProps = [
+      {
+        id: '1',
+        title: 'Casa com 3 Quartos',
+        city: 'São Paulo',
+        state: 'SP',
+        price: 450000,
+        bedrooms: 3,
+        bathrooms: 2,
+        area: 120,
+        image_url: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=500',
+        featured: true
+      },
+      {
+        id: '2',
+        title: 'Apartamento Moderno',
+        city: 'Rio de Janeiro',
+        state: 'RJ',
+        price: 380000,
+        bedrooms: 2,
+        bathrooms: 2,
+        area: 85,
+        image_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500',
+        featured: true
+      },
+      {
+        id: '3',
+        title: 'Casa de Campo',
+        city: 'Gramado',
+        state: 'RS',
+        price: 650000,
+        bedrooms: 4,
+        bathrooms: 3,
+        area: 200,
+        image_url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=500',
+        featured: false
+      },
+      {
+        id: '4',
+        title: 'Cobertura Luxo',
+        city: 'Belo Horizonte',
+        state: 'MG',
+        price: 890000,
+        bedrooms: 3,
+        bathrooms: 3,
+        area: 180,
+        image_url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=500',
+        featured: true
+      },
+      {
+        id: '5',
+        title: 'Studio Compacto',
+        city: 'Curitiba',
+        state: 'PR',
+        price: 220000,
+        bedrooms: 1,
+        bathrooms: 1,
+        area: 45,
+        image_url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500',
+        featured: false
+      },
+      {
+        id: '6',
+        title: 'Casa em Condomínio',
+        city: 'Brasília',
+        state: 'DF',
+        price: 720000,
+        bedrooms: 4,
+        bathrooms: 4,
+        area: 250,
+        image_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500',
+        featured: true
+      }
+    ];
+
+    let filtered = [...mockProps];
+    if (config.showFeatured) {
+      filtered = filtered.filter(p => p.featured);
+    }
+    return filtered.slice(0, limit);
+  }
+
   getComponentIcon(type: ComponentType): string {
     const component = this.availableComponents.find(c => c.type === type);
     return component?.icon || '📦';
@@ -243,6 +360,10 @@ export class WebsiteBuilderComponent implements OnInit {
   getComponentLabel(type: ComponentType): string {
     const component = this.availableComponents.find(c => c.type === type);
     return component?.label || type;
+  }
+
+  isPreviewSupported(type: ComponentType): boolean {
+    return this.supportedPreviewTypes.includes(type);
   }
 
   updateSectionConfig(section: LayoutSection, configKey: string, value: any) {
