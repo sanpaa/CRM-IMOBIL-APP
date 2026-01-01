@@ -1,0 +1,136 @@
+<div class="property-editor" *ngIf="section && metadata">
+  <div class="editor-header">
+    <h3>⚙️ Propriedades</h3>
+    <div class="component-badge">
+      <span class="badge-icon">{{ metadata.icon }}</span>
+      <span class="badge-label">{{ metadata.label }}</span>
+    </div>
+  </div>
+
+  <!-- Configuration Fields -->
+  <div class="editor-section" *ngIf="configFields.length > 0">
+    <h4>Configurações</h4>
+    
+    <div class="form-group" *ngFor="let field of configFields; trackBy: trackByKey">
+      <label [for]="'config-' + field.key">
+        {{ field.label }}
+        <span class="required" *ngIf="field.required">*</span>
+      </label>
+      
+      <small class="field-description" *ngIf="field.description">
+        {{ field.description }}
+      </small>
+
+      <!-- Text Input -->
+      <input 
+        *ngIf="field.type === 'text' || field.type === 'image-url' || field.type === 'link'"
+        type="text"
+        [id]="'config-' + field.key"
+        [value]="getFieldValue(field)"
+        [placeholder]="field.placeholder || ''"
+        (input)="onFieldChange(field, $event)"
+        class="form-control">
+
+      <!-- Textarea -->
+      <textarea 
+        *ngIf="field.type === 'textarea'"
+        [id]="'config-' + field.key"
+        [value]="getFieldValue(field)"
+        [placeholder]="field.placeholder || ''"
+        (input)="onFieldChange(field, $event)"
+        rows="4"
+        class="form-control"></textarea>
+
+      <!-- Number Input -->
+      <input 
+        *ngIf="field.type === 'number'"
+        type="number"
+        [id]="'config-' + field.key"
+        [value]="getFieldValue(field)"
+        [min]="field.min"
+        [max]="field.max"
+        (input)="onFieldChange(field, $event)"
+        class="form-control">
+
+      <!-- Color Input -->
+      <input 
+        *ngIf="field.type === 'color'"
+        type="color"
+        [id]="'config-' + field.key"
+        [value]="getFieldValue(field)"
+        (input)="onFieldChange(field, $event)"
+        class="form-control color-input">
+
+      <!-- Select -->
+      <select 
+        *ngIf="field.type === 'select'"
+        [id]="'config-' + field.key"
+        [value]="getFieldValue(field)"
+        (change)="onFieldChange(field, $event)"
+        class="form-control">
+        <option *ngFor="let option of field.options" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+
+      <!-- Checkbox -->
+      <label class="checkbox-label" *ngIf="field.type === 'checkbox'">
+        <input 
+          type="checkbox"
+          [id]="'config-' + field.key"
+          [checked]="getFieldValue(field)"
+          (change)="onFieldChange(field, $event)">
+        <span>{{ field.label }}</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Style Fields -->
+  <div class="editor-section" *ngIf="styleFields.length > 0">
+    <h4>Estilo</h4>
+    
+    <div class="form-group" *ngFor="let field of styleFields; trackBy: trackByKey">
+      <label [for]="'style-' + field.key">{{ field.label }}</label>
+
+      <!-- Text Input -->
+      <input 
+        *ngIf="field.type === 'text'"
+        type="text"
+        [id]="'style-' + field.key"
+        [value]="getFieldValue(field, true)"
+        [placeholder]="field.placeholder || ''"
+        (input)="onFieldChange(field, $event, true)"
+        class="form-control">
+
+      <!-- Color Input -->
+      <input 
+        *ngIf="field.type === 'color'"
+        type="color"
+        [id]="'style-' + field.key"
+        [value]="getFieldValue(field, true)"
+        (input)="onFieldChange(field, $event, true)"
+        class="form-control color-input">
+
+      <!-- Number Input -->
+      <input 
+        *ngIf="field.type === 'number'"
+        type="number"
+        [id]="'style-' + field.key"
+        [value]="getFieldValue(field, true)"
+        (input)="onFieldChange(field, $event, true)"
+        class="form-control">
+    </div>
+  </div>
+
+  <!-- Section Info -->
+  <div class="editor-section">
+    <h4>Informações</h4>
+    <p class="section-id">ID: {{ section.id }}</p>
+    <p class="section-type">Tipo: {{ section.type }}</p>
+    <p class="section-order">Ordem: {{ section.order }}</p>
+  </div>
+</div>
+
+<div class="property-editor-empty" *ngIf="!section">
+  <p>Selecione um componente para editar</p>
+</div>

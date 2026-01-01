@@ -8,11 +8,12 @@ import { CompanyService } from '../../services/company.service';
 import { WebsiteLayout, LayoutSection } from '../../models/website-layout.model';
 import { StoreSettings } from '../../models/company.model';
 import { Property } from '../../models/property.model';
+import { RenderComponentDirective } from '../../shared/website-components/render-component.directive';
 
 @Component({
   selector: 'app-public-website',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RenderComponentDirective],
   templateUrl: './public-website.component.html',
   styleUrls: ['./public-website.component.scss']
 })
@@ -77,29 +78,5 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
     } finally {
       this.loading = false;
     }
-  }
-
-  getSectionStyle(section: LayoutSection): any {
-    return {
-      'background-color': section.style?.backgroundColor || 'transparent',
-      'color': section.style?.textColor || 'inherit',
-      'padding': section.style?.padding || '2rem',
-      'margin': section.style?.margin || '0'
-    };
-  }
-
-  getPropertiesForSection(section: LayoutSection): Property[] {
-    const config = section.config || {};
-    let filtered = [...this.properties];
-
-    if (config.showFeatured) {
-      filtered = filtered.filter(p => p.featured);
-    }
-
-    if (config.limit) {
-      filtered = filtered.slice(0, config.limit);
-    }
-
-    return filtered;
   }
 }

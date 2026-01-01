@@ -1,0 +1,45 @@
+<div class="property-grid-container">
+  <div class="loading-spinner" *ngIf="loading">
+    <p>Carregando imóveis...</p>
+  </div>
+  
+  <div class="properties-grid" 
+       *ngIf="!loading && properties.length > 0"
+       [style.grid-template-columns]="getGridColumns()">
+    <div *ngFor="let property of properties" class="property-card">
+      <div class="property-image" 
+           [style.background-image]="property.image_url ? 'url(' + property.image_url + ')' : 'none'">
+        <span *ngIf="property.featured" class="badge-featured">Destaque</span>
+      </div>
+      
+      <div class="property-info">
+        <h3 class="property-title">{{ property.title }}</h3>
+        <p class="property-location">
+          {{ property.city }}<span *ngIf="property.state">, {{ property.state }}</span>
+        </p>
+        <p class="property-price">{{ formatPrice(property.price) }}</p>
+        
+        <div class="property-details">
+          <span *ngIf="property.bedrooms" class="detail-item">
+            🛏️ {{ property.bedrooms }}
+          </span>
+          <span *ngIf="property.bathrooms" class="detail-item">
+            🚿 {{ property.bathrooms }}
+          </span>
+          <span *ngIf="property.area" class="detail-item">
+            📏 {{ property.area }}m²
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="empty-state" *ngIf="!loading && properties.length === 0">
+    <p>Nenhum imóvel encontrado.</p>
+  </div>
+  
+  <!-- Edit Mode Overlay -->
+  <div class="edit-overlay" *ngIf="editMode">
+    <span class="edit-badge">Property Grid</span>
+  </div>
+</div>

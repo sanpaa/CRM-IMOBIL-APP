@@ -1,0 +1,20 @@
+<div class="hero-container" 
+     [ngClass]="[getHeightClass(), getAlignmentClass()]"
+     [ngStyle]="getBackgroundStyle()">
+  <div class="hero-content">
+    <h1 class="hero-title">{{ config.title }}</h1>
+    <p class="hero-subtitle" *ngIf="config.subtitle">{{ config.subtitle }}</p>
+    <a *ngIf="config.buttonText" 
+       [href]="config.buttonLink || '#'" 
+       class="hero-button"
+       [class.edit-mode-link]="editMode"
+       (click)="editMode ? $event.preventDefault() : null">
+      {{ config.buttonText }}
+    </a>
+  </div>
+  
+  <!-- Edit Mode Overlay -->
+  <div class="edit-overlay" *ngIf="editMode">
+    <span class="edit-badge">Hero Section</span>
+  </div>
+</div>
