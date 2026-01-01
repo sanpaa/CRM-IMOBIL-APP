@@ -4,6 +4,7 @@ import {
   ViewContainerRef,
   OnInit,
   OnChanges,
+  OnDestroy,
   SimpleChanges,
   ComponentRef
 } from '@angular/core';
@@ -18,7 +19,7 @@ import { ComponentLoaderService } from './component-loader.service';
   selector: '[appRenderComponent]',
   standalone: true
 })
-export class RenderComponentDirective implements OnInit, OnChanges {
+export class RenderComponentDirective implements OnInit, OnChanges, OnDestroy {
   @Input('appRenderComponent') section!: LayoutSection;
   @Input('appRenderComponentEditMode') editMode: boolean = false;
 

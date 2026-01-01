@@ -101,9 +101,11 @@ export class PropertyGridComponent implements WebsiteComponentBase, OnInit {
         return sorted.sort((a, b) => (b.area || 0) - (a.area || 0));
       case 'date':
       default:
-        return sorted.sort((a, b) => 
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
+        return sorted.sort((a, b) => {
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return dateB - dateA;
+        });
     }
   }
 

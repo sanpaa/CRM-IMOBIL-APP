@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LayoutSection } from '../../models/website-layout.model';
@@ -16,7 +16,7 @@ import { ConfigSchemaField, ComponentMetadata } from '../website-components/comp
   templateUrl: './property-editor.component.html',
   styleUrls: ['./property-editor.component.scss']
 })
-export class PropertyEditorComponent implements OnInit {
+export class PropertyEditorComponent implements OnInit, OnChanges {
   @Input() section!: LayoutSection;
   @Output() configChange = new EventEmitter<any>();
   @Output() styleChange = new EventEmitter<any>();

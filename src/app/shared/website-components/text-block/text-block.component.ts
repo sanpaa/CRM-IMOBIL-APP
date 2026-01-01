@@ -4,7 +4,7 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
 
 export interface TextBlockConfig {
   title?: string;
-  content: string;
+  content: string;  // Note: This will be rendered as innerHTML for rich text support. Sanitize on input if needed.
   alignment: 'left' | 'center' | 'right';
 }
 
