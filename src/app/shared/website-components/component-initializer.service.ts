@@ -9,6 +9,11 @@ import { TextBlockComponent } from './text-block/text-block.component';
 import { FooterComponent } from './footer/footer.component';
 import { DividerComponent } from './divider/divider.component';
 import { SpacerComponent } from './spacer/spacer.component';
+import { FAQComponent } from './faq/faq.component';
+import { FeaturesGridComponent } from './features-grid/features-grid.component';
+import { NewsletterComponent } from './newsletter/newsletter.component';
+import { MortgageCalculatorComponent } from './mortgage-calculator/mortgage-calculator.component';
+import { CustomCodeComponent } from './custom-code/custom-code.component';
 
 // Import all metadata
 import { HERO_METADATA } from './hero/hero.metadata';
@@ -18,6 +23,11 @@ import { TEXT_BLOCK_METADATA } from './text-block/text-block.metadata';
 import { FOOTER_METADATA } from './footer/footer.metadata';
 import { DIVIDER_METADATA } from './divider/divider.metadata';
 import { SPACER_METADATA } from './spacer/spacer.metadata';
+import { FAQ_METADATA } from './faq/faq.metadata';
+import { FEATURES_GRID_METADATA } from './features-grid/features-grid.metadata';
+import { NEWSLETTER_METADATA } from './newsletter/newsletter.metadata';
+import { MORTGAGE_CALCULATOR_METADATA } from './mortgage-calculator/mortgage-calculator.metadata';
+import { CUSTOM_CODE_METADATA } from './custom-code/custom-code.metadata';
 
 /**
  * Service to initialize and register all website components
@@ -42,6 +52,15 @@ export class ComponentInitializerService {
     this.registry.register('footer', FooterComponent, FOOTER_METADATA);
     this.registry.register('divider', DividerComponent, DIVIDER_METADATA);
     this.registry.register('spacer', SpacerComponent, SPACER_METADATA);
+    
+    // Register content components
+    this.registry.register('faq', FAQComponent, FAQ_METADATA);
+    this.registry.register('features-grid', FeaturesGridComponent, FEATURES_GRID_METADATA);
+    this.registry.register('newsletter', NewsletterComponent, NEWSLETTER_METADATA);
+    this.registry.register('mortgage-calculator', MortgageCalculatorComponent, MORTGAGE_CALCULATOR_METADATA);
+    
+    // Register advanced components
+    this.registry.register('custom-code', CustomCodeComponent, CUSTOM_CODE_METADATA);
 
     console.log(`✅ Registered ${this.registry.getAllTypes().length} website components`);
   }

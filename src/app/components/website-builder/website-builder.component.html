@@ -74,9 +74,17 @@
     <!-- Component Library Sidebar -->
     <div class="component-library" *ngIf="!previewMode">
       <h3>📦 Componentes</h3>
-      <div class="component-categories">
+      
+      <div class="component-categories"
+           cdkDropList
+           id="component-library"
+           [cdkDropListData]="availableComponents"
+           [cdkDropListConnectedTo]="['main-sections-list']"
+           [cdkDropListSortingDisabled]="true">
         <div class="component-item" 
              *ngFor="let component of availableComponents"
+             cdkDrag
+             [cdkDragData]="component"
              (click)="addComponent(component.type)"
              [title]="component.description">
           <span class="component-icon">{{ component.icon }}</span>
@@ -102,6 +110,7 @@
       <!-- Sections List with Drag & Drop -->
       <div class="sections-container" 
            cdkDropList
+           id="main-sections-list"
            [cdkDropListData]="sections"
            (cdkDropListDropped)="onDrop($event)">
         

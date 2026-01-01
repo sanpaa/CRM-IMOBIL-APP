@@ -153,7 +153,17 @@ export class WebsiteBuilderComponent implements OnInit {
     this.selectedSection = newSection;
   }
 
-  onDrop(event: CdkDragDrop<LayoutSection[]>) {
+
+
+  onDrop(event: CdkDragDrop<any>) {
+    // Se veio da biblioteca de componentes, adiciona novo
+    if (event.previousContainer.id === 'component-library') {
+      const componentMetadata = event.item.data as ComponentMetadata;
+      this.addComponent(componentMetadata.type);
+      return;
+    }
+
+    // Se está movendo dentro da mesma lista
     if (event.previousContainer === event.container) {
       moveItemInArray(this.sections, event.previousIndex, event.currentIndex);
       this.updateSectionOrder();

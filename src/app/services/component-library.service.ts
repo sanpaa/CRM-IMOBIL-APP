@@ -266,6 +266,87 @@ export class ComponentLibraryService {
           height: '2rem'
         },
         style_config: {}
+      },
+      faq: {
+        config: {
+          title: 'Perguntas Frequentes',
+          subtitle: 'Tire suas dúvidas sobre nossos serviços',
+          items: [
+            {
+              question: 'Como funciona o processo de compra?',
+              answer: 'O processo de compra envolve várias etapas, desde a escolha do imóvel até a assinatura do contrato. Nossa equipe te acompanha em todo o processo.'
+            },
+            {
+              question: 'Quais documentos são necessários?',
+              answer: 'Você precisará de documentos pessoais, comprovante de renda e outros documentos específicos dependendo do tipo de transação.'
+            },
+            {
+              question: 'Oferecem consultoria de financiamento?',
+              answer: 'Sim! Temos parceria com os principais bancos e podemos te ajudar a encontrar as melhores condições de financiamento.'
+            }
+          ]
+        },
+        style_config: {
+          backgroundColor: '#ffffff',
+          padding: '3rem'
+        }
+      },
+      'features-grid': {
+        config: {
+          title: 'Por que escolher a gente?',
+          subtitle: 'Vantagens de trabalhar conosco',
+          features: [
+            {
+              icon: 'fas fa-shield-alt',
+              title: 'Segurança Total',
+              description: 'Transações 100% seguras e garantidas'
+            },
+            {
+              icon: 'fas fa-clock',
+              title: 'Atendimento 24/7',
+              description: 'Suporte disponível a qualquer momento'
+            },
+            {
+              icon: 'fas fa-star',
+              title: 'Avaliação Gratuita',
+              description: 'Avaliamos seu imóvel sem custo'
+            },
+            {
+              icon: 'fas fa-handshake',
+              title: 'Consultoria Especializada',
+              description: 'Corretores experientes e qualificados'
+            }
+          ]
+        },
+        style_config: {
+          backgroundColor: '#f8f9fa',
+          padding: '3rem'
+        }
+      },
+      newsletter: {
+        config: {
+          title: 'Fique por dentro das novidades',
+          subtitle: 'Receba lançamentos e oportunidades exclusivas no seu email',
+          buttonText: 'Assinar Newsletter',
+          placeholder: 'Digite seu e-mail'
+        },
+        style_config: {
+          backgroundColor: '#004AAD',
+          textColor: '#ffffff',
+          padding: '3rem'
+        }
+      },
+      'mortgage-calculator': {
+        config: {
+          title: 'Calculadora de Financiamento',
+          subtitle: 'Simule as parcelas do seu financiamento imobiliário',
+          defaultInterestRate: 9.5,
+          defaultTermYears: 30
+        },
+        style_config: {
+          backgroundColor: '#ffffff',
+          padding: '2rem'
+        }
       }
     };
 
@@ -367,6 +448,34 @@ export class ComponentLibraryService {
         icon: '↕️',
         category: 'layout',
         description: 'Empty space'
+      },
+      {
+        type: 'faq',
+        label: 'FAQ Section',
+        icon: '❓',
+        category: 'content',
+        description: 'Frequently asked questions with accordion'
+      },
+      {
+        type: 'features-grid',
+        label: 'Features Grid',
+        icon: '⭐',
+        category: 'content',
+        description: 'Grid of features/benefits with icons'
+      },
+      {
+        type: 'newsletter',
+        label: 'Newsletter',
+        icon: '📮',
+        category: 'forms',
+        description: 'Newsletter subscription form'
+      },
+      {
+        type: 'mortgage-calculator',
+        label: 'Mortgage Calculator',
+        icon: '🧮',
+        category: 'tools',
+        description: 'Real estate financing calculator'
       }
     ];
   }

@@ -44,7 +44,12 @@ export type ComponentType =
   | 'video-section'
   | 'cta-button'
   | 'divider'
-  | 'spacer';
+  | 'spacer'
+  | 'faq'
+  | 'features-grid'
+  | 'newsletter'
+  | 'mortgage-calculator'
+  | 'custom-code';
 
 export interface ComponentStyle {
   backgroundColor?: string;

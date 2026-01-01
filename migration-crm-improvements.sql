@@ -76,13 +76,24 @@ CREATE TABLE IF NOT EXISTS reminder_settings (
 CREATE INDEX IF NOT EXISTS idx_reminder_settings_company_id ON reminder_settings(company_id);
 
 -- ============================================
+-- Insert default reminder settings for existing companies
+-- (Must be done BEFORE enabling RLS)
+-- ============================================
+INSERT INTO reminder_settings (company_id, days_without_change)
+SELECT id, 15 FROM companies
+WHERE id NOT IN (SELECT company_id FROM reminder_settings)
+ON CONFLICT DO NOTHING;
+
+-- ============================================
 -- TRIGGERS for updated_at
 -- ============================================
-CREATE TRIGGER IF NOT EXISTS update_owners_updated_at 
+DROP TRIGGER IF EXISTS update_owners_updated_at ON owners;
+CREATE TRIGGER update_owners_updated_at 
   BEFORE UPDATE ON owners
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER IF NOT EXISTS update_reminder_settings_updated_at 
+DROP TRIGGER IF EXISTS update_reminder_settings_updated_at ON reminder_settings;
+CREATE TRIGGER update_reminder_settings_updated_at 
   BEFORE UPDATE ON reminder_settings
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -106,61 +117,14 @@ CREATE TRIGGER trigger_client_status_change
     EXECUTE FUNCTION update_client_status_change();
 
 -- ============================================
--- ROW LEVEL SECURITY (RLS) - ENABLED WITH POLICIES
+-- ROW LEVEL SECURITY (RLS) - DISABLED
+-- Note: Using custom authentication without Supabase Auth
+-- RLS policies won't work because auth.uid() is NULL
+-- Security is handled at application level
 -- ============================================
 
--- Enable RLS on new tables
-ALTER TABLE client_notes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE owners ENABLE ROW LEVEL SECURITY;
-ALTER TABLE reminder_settings ENABLE ROW LEVEL SECURITY;
+-- Disable RLS on new tables (using custom auth)
+ALTER TABLE client_notes DISABLE ROW LEVEL SECURITY;
+ALTER TABLE owners DISABLE ROW LEVEL SECURITY;
+ALTER TABLE reminder_settings DISABLE ROW LEVEL SECURITY;
 
--- Create policies for client_notes
-CREATE POLICY "Users can view notes from their company" ON client_notes
-  FOR SELECT USING (
-    company_id IN (SELECT company_id FROM users WHERE id = auth.uid())
-  );
-
-CREATE POLICY "Users can create notes for their company" ON client_notes
-  FOR INSERT WITH CHECK (
-    company_id IN (SELECT company_id FROM users WHERE id = auth.uid())
-  );
-
--- Create policies for owners
-CREATE POLICY "Users can view owners from their company" ON owners
-  FOR SELECT USING (
-    company_id IN (SELECT company_id FROM users WHERE id = auth.uid())
-  );
-
-CREATE POLICY "Users can create owners for their company" ON owners
-  FOR INSERT WITH CHECK (
-    company_id IN (SELECT company_id FROM users WHERE id = auth.uid())
-  );
-
-CREATE POLICY "Users can update owners from their company" ON owners
-  FOR UPDATE USING (
-    company_id IN (SELECT company_id FROM users WHERE id = auth.uid())
-  );
-
-CREATE POLICY "Admins can delete owners from their company" ON owners
-  FOR DELETE USING (
-    company_id IN (SELECT company_id FROM users WHERE id = auth.uid() AND role = 'admin')
-  );
-
--- Create policies for reminder_settings
-CREATE POLICY "Users can view settings from their company" ON reminder_settings
-  FOR SELECT USING (
-    company_id IN (SELECT company_id FROM users WHERE id = auth.uid())
-  );
-
-CREATE POLICY "Admins can manage settings for their company" ON reminder_settings
-  FOR ALL USING (
-    company_id IN (SELECT company_id FROM users WHERE id = auth.uid() AND role = 'admin')
-  );
-
--- ============================================
--- Insert default reminder settings for existing companies
--- ============================================
-INSERT INTO reminder_settings (company_id, days_without_change)
-SELECT id, 15 FROM companies
-WHERE id NOT IN (SELECT company_id FROM reminder_settings)
-ON CONFLICT DO NOTHING;

@@ -29,11 +29,17 @@ export interface WebsiteComponentBase {
  */
 export interface ComponentStyle {
   backgroundColor?: string;
+  background?: string;
   textColor?: string;
+  color?: string;
   padding?: string;
   margin?: string;
   borderRadius?: string;
+  maxWidth?: string;
+  width?: string;
+  minHeight?: string;
   customCss?: string;
+  [key: string]: any; // Permitir qualquer propriedade CSS
 }
 
 /**
@@ -60,7 +66,7 @@ export interface ConfigSchemaField {
   label: string;
   type: ConfigFieldType;
   defaultValue?: any;
-  options?: Array<{ label: string; value: any }>;
+  options?: Array<{ label: string; value: any }> | string[];
   placeholder?: string;
   description?: string;
   min?: number;
@@ -69,6 +75,7 @@ export interface ConfigSchemaField {
   
   // For array/object types
   fields?: ConfigSchemaField[];
+  schema?: any; // Schema for nested objects
 }
 
 /**

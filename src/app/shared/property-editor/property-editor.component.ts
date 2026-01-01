@@ -98,4 +98,70 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
   trackByKey(index: number, field: ConfigSchemaField): string {
     return field.key;
   }
+
+  /**
+   * Normalize options to always return array of objects with label and value
+   */
+  normalizeOptions(options: Array<{ label: string; value: any }> | string[] | undefined): Array<{ label: string; value: any }> {
+    if (!options) return [];
+    
+    // Se já é um array de objetos, retorna como está
+    if (options.length > 0 && typeof options[0] === 'object' && 'label' in options[0]) {
+      return options as Array<{ label: string; value: any }>;
+    }
+    
+    // Se é array de strings, converte para array de objetos
+    return (options as string[]).map(opt => ({
+      label: opt,
+      value: opt
+    }));
+  }
+
+  /**
+   * Get schema fields for array items
+   */
+  getArraySchemaFields(field: ConfigSchemaField): Array<{ key: string; label: string; type: string }> {
+    if (!field.schema) return [];
+    return Object.keys(field.schema).map(key => ({
+      key,
+      label: field.schema![key].label || key,
+      type: field.schema![key].type || 'text'
+    }));
+  }
+
+  /**
+   * Add new item to array
+   */
+  addArrayItem(field: ConfigSchemaField): void {
+    const currentValue = this.getFieldValue(field) || [];
+    const newItem: any = {};
+    
+    // Initialize with empty values based on schema
+    if (field.schema) {
+      Object.keys(field.schema).forEach(key => {
+        newItem[key] = '';
+      });
+    }
+    
+    this.updateConfig(field.key, [...currentValue, newItem]);
+  }
+
+  /**
+   * Remove item from array
+   */
+  removeArrayItem(field: ConfigSchemaField, index: number): void {
+    const currentValue = this.getFieldValue(field) || [];
+    const newValue = currentValue.filter((_: any, i: number) => i !== index);
+    this.updateConfig(field.key, newValue);
+  }
+
+  /**
+   * Update specific field in array item
+   */
+  updateArrayItem(field: ConfigSchemaField, index: number, subKey: string, value: any): void {
+    const currentValue = this.getFieldValue(field) || [];
+    const newValue = [...currentValue];
+    newValue[index] = { ...newValue[index], [subKey]: value };
+    this.updateConfig(field.key, newValue);
+  }
 }

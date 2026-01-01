@@ -81,3 +81,40 @@ export interface Stat {
   value: string | number;
   icon?: string;
 }
+
+export interface FAQConfig {
+  title?: string;
+  subtitle?: string;
+  items: FAQItem[];
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface FeaturesGridConfig {
+  title?: string;
+  subtitle?: string;
+  features: Feature[];
+}
+
+export interface Feature {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+export interface NewsletterConfig {
+  title?: string;
+  subtitle?: string;
+  buttonText?: string;
+  placeholder?: string;
+}
+
+export interface MortgageCalculatorConfig {
+  title?: string;
+  subtitle?: string;
+  defaultInterestRate?: number;
+  defaultTermYears?: number;
+}

@@ -20,9 +20,9 @@ export class ReminderSettingsService {
       .from('reminder_settings')
       .select('*')
       .eq('company_id', user.company_id)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
+    if (error) throw error;
     return data as ReminderSettings | null;
   }
 
