@@ -134,7 +134,7 @@ export class WebsiteBuilderComponent implements OnInit {
     return `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
-  addComponent(componentType: ComponentType) {
+  addComponent(componentType: string) {
     const metadata = this.componentRegistry.getMetadata(componentType);
     if (!metadata) {
       console.error(`Component metadata not found for type: ${componentType}`);
@@ -143,7 +143,7 @@ export class WebsiteBuilderComponent implements OnInit {
 
     const newSection: LayoutSection = {
       id: this.generateSectionId(),
-      type: componentType,
+      type: componentType as ComponentType,
       order: this.sections.length,
       config: { ...metadata.defaultConfig },
       style: metadata.defaultStyle ? { ...metadata.defaultStyle } : undefined
