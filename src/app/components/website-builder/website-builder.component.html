@@ -174,7 +174,7 @@
             </button>
           </div>
           <button class="fullscreen-btn" (click)="toggleFullScreenPreview()" title="Tela Cheia">
-            {{ fullScreenPreview ? '⛶' : '⛶' }}
+            {{ fullScreenPreview ? '✕' : '⛶' }}
           </button>
         </div>
       </div>
@@ -309,7 +309,7 @@
               </div>
 
               <!-- Placeholder for other component types -->
-              <div *ngIf="!['header', 'hero', 'search-bar', 'property-grid', 'text-block', 'contact-form', 'stats-section', 'divider', 'spacer', 'footer'].includes(section.type)" 
+              <div *ngIf="!isPreviewSupported(section.type)" 
                    class="component-placeholder">
                 <p>{{ getComponentLabel(section.type) }}</p>
               </div>
@@ -622,7 +622,7 @@
             </div>
 
             <!-- Placeholder for other component types -->
-            <div *ngIf="!['header', 'hero', 'search-bar', 'property-grid', 'text-block', 'contact-form', 'stats-section', 'divider', 'spacer', 'footer'].includes(section.type)" 
+            <div *ngIf="!isPreviewSupported(section.type)" 
                  class="component-placeholder">
               <p>{{ getComponentLabel(section.type) }}</p>
             </div>

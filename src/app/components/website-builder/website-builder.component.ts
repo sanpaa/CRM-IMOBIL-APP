@@ -21,6 +21,12 @@ export class WebsiteBuilderComponent implements OnInit {
   
   availableComponents: any[] = [];
   selectedSection: LayoutSection | null = null;
+
+  // Component types that have full preview support
+  readonly supportedPreviewTypes: ComponentType[] = [
+    'header', 'hero', 'search-bar', 'property-grid', 'text-block', 
+    'contact-form', 'stats-section', 'divider', 'spacer', 'footer'
+  ];
   
   loading = false;
   saving = false;
@@ -354,6 +360,10 @@ export class WebsiteBuilderComponent implements OnInit {
   getComponentLabel(type: ComponentType): string {
     const component = this.availableComponents.find(c => c.type === type);
     return component?.label || type;
+  }
+
+  isPreviewSupported(type: ComponentType): boolean {
+    return this.supportedPreviewTypes.includes(type);
   }
 
   updateSectionConfig(section: LayoutSection, configKey: string, value: any) {
