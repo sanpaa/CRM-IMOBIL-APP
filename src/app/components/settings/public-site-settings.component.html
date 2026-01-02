@@ -1,0 +1,301 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>⚙️ Configurações do Site Público</h1>
+    <p class="subtitle">Configure o header, footer e informações de contato do seu site</p>
+  </div>
+
+  <form (ngSubmit)="saveSettings()">
+    
+    <!-- HEADER SECTION -->
+    <div class="settings-card">
+      <div class="settings-section">
+        <h2>
+          <span class="section-icon">📋</span>
+          Header (Cabeçalho)
+        </h2>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>URL da Logo</label>
+            <input 
+              type="url" 
+              [(ngModel)]="headerConfig.logoUrl" 
+              name="headerLogoUrl"
+              placeholder="https://exemplo.com/logo.png"
+              class="form-control">
+            <small class="form-hint">Cole a URL da imagem da sua logo</small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="checkbox-item">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="headerConfig.showLogo" 
+                name="showHeaderLogo">
+              <span>Mostrar logo no header</span>
+            </label>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-item">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="headerConfig.showMenu" 
+                name="showHeaderMenu">
+              <span>Mostrar menu de navegação</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Cor de Fundo</label>
+            <input 
+              type="color" 
+              [(ngModel)]="headerConfig.backgroundColor" 
+              name="headerBgColor"
+              class="form-control color-input">
+          </div>
+          
+          <div class="form-group">
+            <label>Cor do Texto</label>
+            <input 
+              type="color" 
+              [(ngModel)]="headerConfig.textColor" 
+              name="headerTextColor"
+              class="form-control color-input">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER SECTION -->
+    <div class="settings-card">
+      <div class="settings-section">
+        <h2>
+          <span class="section-icon">📄</span>
+          Footer (Rodapé)
+        </h2>
+        
+        <!-- Company Info -->
+        <h3>Informações da Empresa</h3>
+        
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label>Nome da Empresa (FIXO)</label>
+            <input 
+              type="text" 
+              [(ngModel)]="footerConfig.companyName" 
+              name="companyName"
+              class="form-control"
+              readonly>
+            <small class="form-hint">Nome fixo da empresa</small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label>Descrição (aparece abaixo do nome)</label>
+            <textarea 
+              [(ngModel)]="footerConfig.description" 
+              name="description"
+              rows="3"
+              placeholder="Ex: A melhor imobiliária da região..."
+              class="form-control"></textarea>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>URL da Logo (Footer)</label>
+            <input 
+              type="url" 
+              [(ngModel)]="footerConfig.logoUrl" 
+              name="footerLogoUrl"
+              placeholder="https://exemplo.com/logo.png"
+              class="form-control">
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-item">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="footerConfig.showLogo" 
+                name="showFooterLogo">
+              <span>Mostrar logo no footer</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Contact Info -->
+        <h3>Informações de Contato</h3>
+        
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label>📍 Endereço</label>
+            <input 
+              type="text" 
+              [(ngModel)]="footerConfig.address" 
+              name="address"
+              placeholder="Rua Exemplo, 123 - Cidade/UF"
+              class="form-control">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>📞 Telefone</label>
+            <input 
+              type="tel" 
+              [(ngModel)]="footerConfig.phone" 
+              name="phone"
+              placeholder="(00) 0000-0000"
+              class="form-control">
+          </div>
+          
+          <div class="form-group">
+            <label>✉️ Email</label>
+            <input 
+              type="email" 
+              [(ngModel)]="footerConfig.email" 
+              name="email"
+              placeholder="contato@empresa.com"
+              class="form-control">
+          </div>
+        </div>
+
+        <!-- Social Links -->
+        <h3>Redes Sociais</h3>
+        <p class="form-hint">Deixe em branco para não exibir</p>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>📷 Instagram</label>
+            <input 
+              type="url" 
+              [(ngModel)]="footerConfig.instagram" 
+              name="instagram"
+              placeholder="https://instagram.com/suaempresa"
+              class="form-control">
+          </div>
+          
+          <div class="form-group">
+            <label>📘 Facebook</label>
+            <input 
+              type="url" 
+              [(ngModel)]="footerConfig.facebook" 
+              name="facebook"
+              placeholder="https://facebook.com/suaempresa"
+              class="form-control">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>💬 WhatsApp</label>
+            <input 
+              type="tel" 
+              [(ngModel)]="footerConfig.whatsapp" 
+              name="whatsapp"
+              placeholder="5511999999999"
+              class="form-control">
+            <small class="form-hint">Apenas números com DDI (Ex: 5511999999999)</small>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <h3>Links Rápidos</h3>
+        
+        <div class="links-manager">
+          <div class="link-list" *ngIf="footerConfig.quickLinks && footerConfig.quickLinks.length > 0">
+            <div class="link-item" *ngFor="let link of footerConfig.quickLinks; let i = index">
+              <span class="link-label">{{ link.label }}</span>
+              <span class="link-route">{{ link.route }}</span>
+              <button type="button" class="btn-remove" (click)="removeQuickLink(i)">
+                🗑️
+              </button>
+            </div>
+          </div>
+          
+          <div class="add-link-form">
+            <input 
+              type="text" 
+              [(ngModel)]="newQuickLink.label" 
+              name="newQuickLinkLabel"
+              placeholder="Nome do link (ex: Sobre Nós)"
+              class="form-control">
+            <input 
+              type="text" 
+              [(ngModel)]="newQuickLink.route" 
+              name="newQuickLinkRoute"
+              placeholder="Rota (ex: /sobre)"
+              class="form-control">
+            <button type="button" class="btn-add" (click)="addQuickLink()">
+              ➕ Adicionar
+            </button>
+          </div>
+        </div>
+
+        <!-- Services -->
+        <h3>Serviços</h3>
+        
+        <div class="links-manager">
+          <div class="link-list" *ngIf="footerConfig.services && footerConfig.services.length > 0">
+            <div class="link-item" *ngFor="let service of footerConfig.services; let i = index">
+              <span class="link-label">{{ service.label }}</span>
+              <span class="link-route">{{ service.route }}</span>
+              <button type="button" class="btn-remove" (click)="removeService(i)">
+                🗑️
+              </button>
+            </div>
+          </div>
+          
+          <div class="add-link-form">
+            <input 
+              type="text" 
+              [(ngModel)]="newService.label" 
+              name="newServiceLabel"
+              placeholder="Nome do serviço (ex: Comprar)"
+              class="form-control">
+            <input 
+              type="text" 
+              [(ngModel)]="newService.route" 
+              name="newServiceRoute"
+              placeholder="Rota (ex: /imoveis?tipo=venda)"
+              class="form-control">
+            <button type="button" class="btn-add" (click)="addService()">
+              ➕ Adicionar
+            </button>
+          </div>
+        </div>
+
+        <!-- Copyright -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="checkbox-item">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="footerConfig.showCopyright" 
+                name="showCopyright">
+              <span>Mostrar copyright no footer</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Save Button -->
+    <div class="form-actions">
+      <button type="submit" class="btn-primary" [disabled]="saving">
+        <span *ngIf="!saving">💾 Salvar Configurações</span>
+        <span *ngIf="saving">⏳ Salvando...</span>
+      </button>
+      
+      <div class="success-message" *ngIf="saved">
+        ✅ Configurações salvas com sucesso!
+      </div>
+    </div>
+  </form>
+</div>

@@ -41,6 +41,8 @@ export class AuthService {
 
       // Store user session
       localStorage.setItem('currentUser', JSON.stringify(data));
+      localStorage.setItem('company_id', data.company_id);
+      console.log('✅ Company ID salvo no localStorage:', data.company_id);
       this.currentUserSubject.next(data as User);
 
       return { data, error: null };
@@ -72,6 +74,7 @@ export class AuthService {
   async signOut() {
     try {
       localStorage.removeItem('currentUser');
+      localStorage.removeItem('company_id');
       this.currentUserSubject.next(null);
       this.router.navigate(['/login']);
       return { error: null };

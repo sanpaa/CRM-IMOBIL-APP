@@ -8,6 +8,8 @@ export interface Company {
   custom_domain?: string;
   website_enabled?: boolean;
   website_published?: boolean;
+  header_config?: HeaderConfig;
+  footer_config?: FooterConfig;
   created_at: string;
 }
 
@@ -27,12 +29,52 @@ export interface StoreSettings {
   theme_config?: ThemeConfig;
   social_links?: SocialLinks;
   business_hours?: BusinessHours;
-  header_image?: string;
-  footer_text?: string;
+  header_config?: HeaderConfig;
+  footer_config?: FooterConfig;
   show_properties_count?: boolean;
   contact_form_enabled?: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface HeaderConfig {
+  logoUrl?: string;              // URL da logo
+  showLogo: boolean;             // Mostrar/esconder logo
+  showMenu: boolean;             // Mostrar/esconder menu de navegação
+  backgroundColor?: string;
+  textColor?: string;
+}
+
+export interface FooterConfig {
+  companyName: string;           // Nome da empresa (FIXO)
+  description?: string;          // Descrição abaixo do nome (editável)
+  logoUrl?: string;              // URL da logo
+  showLogo: boolean;             // Mostrar/esconder logo
+  
+  // Informações de contato
+  address?: string;
+  phone?: string;
+  email?: string;
+  
+  // Redes sociais (só aparecem se tiverem valor)
+  instagram?: string;
+  facebook?: string;
+  whatsapp?: string;
+  
+  // Links rápidos (editável)
+  quickLinks?: FooterLink[];
+  
+  // Serviços (editável)
+  services?: FooterLink[];
+  
+  showCopyright: boolean;        // Mostrar/esconder copyright
+  backgroundColor?: string;
+  textColor?: string;
+}
+
+export interface FooterLink {
+  label: string;
+  route: string;
 }
 
 export interface ThemeConfig {

@@ -53,12 +53,16 @@ import { Company } from '../../models/company.model';
             <span class="nav-icon">⚙️</span>
             <span class="nav-label">Configurações</span>
           </a>
+          <a routerLink="/public-site-settings" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()">
+            <span class="nav-icon">🌐</span>
+            <span class="nav-label">Site Público</span>
+          </a>
           <a routerLink="/website-builder" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()">
             <span class="nav-icon">🎨</span>
             <span class="nav-label">Construtor de Sites</span>
           </a>
           <a routerLink="/domain-settings" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()">
-            <span class="nav-icon">🌐</span>
+            <span class="nav-icon">🔗</span>
             <span class="nav-label">Domínios</span>
           </a>
         </nav>

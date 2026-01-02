@@ -1,0 +1,166 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { CompanyService } from '../../services/company.service';
+import { AuthService } from '../../services/auth.service';
+import { HeaderConfig, FooterConfig, FooterLink } from '../../models/company.model';
+
+@Component({
+  selector: 'app-public-site-settings',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './public-site-settings.component.html',
+  styleUrls: ['./public-site-settings.component.scss']
+})
+export class PublicSiteSettingsComponent implements OnInit {
+  companyId: string | null = null;
+  saving = false;
+  saved = false;
+  
+  // Header Config
+  headerConfig: HeaderConfig = {
+    logoUrl: '',
+    showLogo: false,
+    showMenu: true,
+    backgroundColor: '#ffffff',
+    textColor: '#333333'
+  };
+  
+  // Footer Config
+  footerConfig: FooterConfig = {
+    companyName: '',
+    description: '',
+    logoUrl: '',
+    showLogo: false,
+    address: '',
+    phone: '',
+    email: '',
+    instagram: '',
+    facebook: '',
+    whatsapp: '',
+    quickLinks: [],
+    services: [],
+    showCopyright: true,
+    backgroundColor: '#1a1a1a',
+    textColor: '#ffffff'
+  };
+  
+  // Temporary fields for adding links
+  newQuickLink: FooterLink = { label: '', route: '' };
+  newService: FooterLink = { label: '', route: '' };
+
+  constructor(
+    private companyService: CompanyService,
+    public authService: AuthService
+  ) {}
+
+  async ngOnInit() {
+    this.companyId = localStorage.getItem('company_id');
+    console.log('🟢 Company ID do localStorage:', this.companyId);
+    
+    if (!this.companyId) {
+      console.error('🔴 Company ID não encontrado no localStorage!');
+      alert('Erro: Company ID não encontrado. Faça login novamente.');
+      return;
+    }
+    
+    await this.loadSettings();
+  }
+
+  async loadSettings() {
+    try {
+      console.log('🟢 Carregando configurações da empresa:', this.companyId);
+      
+      const company = await this.companyService.getById(this.companyId!);
+      
+      if (!company) {
+        console.error('🔴 Empresa não encontrada!');
+        return;
+      }
+      
+      console.log('🟢 Empresa carregada:', company.name);
+      
+      // Carregar header_config se existir
+      if (company.header_config) {
+        console.log('🟢 Header config encontrado:', company.header_config);
+        this.headerConfig = company.header_config as any;
+      }
+      
+      // Carregar footer_config se existir
+      if (company.footer_config) {
+        console.log('🟢 Footer config encontrado:', company.footer_config);
+        this.footerConfig = company.footer_config as any;
+      } else {
+        // Valores default se não existir
+        this.footerConfig.companyName = company.name;
+        this.footerConfig.email = company.email || '';
+        this.footerConfig.phone = company.phone || '';
+      }
+      
+      console.log('✅ Configurações carregadas com sucesso!');
+    } catch (error) {
+      console.error('🔴 Error loading settings:', error);
+      alert('Erro ao carregar configurações: ' + error);
+    }
+  }
+
+  async saveSettings() {
+    if (!this.companyId) {
+      console.error('🔴 Company ID não encontrado!');
+      alert('Erro: Company ID não encontrado');
+      return;
+    }
+    
+    this.saving = true;
+    try {
+      console.log('🟢 Salvando configurações...');
+      console.log('🟢 Company ID:', this.companyId);
+      console.log('🟢 Header Config:', this.headerConfig);
+      console.log('🟢 Footer Config:', this.footerConfig);
+      
+      const success = await this.companyService.updateStoreSettings(this.companyId, {
+        header_config: this.headerConfig,
+        footer_config: this.footerConfig
+      });
+      
+      if (success) {
+        console.log('✅ Configurações salvas com sucesso!');
+        this.saved = true;
+        setTimeout(() => this.saved = false, 3000);
+      } else {
+        throw new Error('Falha ao salvar');
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      alert('Erro ao salvar configurações');
+    } finally {
+      this.saving = false;
+    }
+  }
+
+  // Quick Links Management
+  addQuickLink() {
+    if (this.newQuickLink.label && this.newQuickLink.route) {
+      this.footerConfig.quickLinks = this.footerConfig.quickLinks || [];
+      this.footerConfig.quickLinks.push({ ...this.newQuickLink });
+      this.newQuickLink = { label: '', route: '' };
+    }
+  }
+
+  removeQuickLink(index: number) {
+    this.footerConfig.quickLinks?.splice(index, 1);
+  }
+
+  // Services Management
+  addService() {
+    if (this.newService.label && this.newService.route) {
+      this.footerConfig.services = this.footerConfig.services || [];
+      this.footerConfig.services.push({ ...this.newService });
+      this.newService = { label: '', route: '' };
+    }
+  }
+
+  removeService(index: number) {
+    this.footerConfig.services?.splice(index, 1);
+  }
+}

@@ -15,7 +15,30 @@ export interface WebsiteLayout {
 }
 
 export interface LayoutConfig {
-  sections: LayoutSection[];
+  sections?: LayoutSection[];
+  components?: LayoutSection[];
+  visualConfig?: {
+    theme?: {
+      primaryColor?: string;
+      secondaryColor?: string;
+      fontFamily?: string;
+      headerBackgroundColor?: string;
+      headerTextColor?: string;
+      footerBackgroundColor?: string;
+      footerTextColor?: string;
+    };
+    branding?: {
+      companyName?: string;
+      logoUrl?: string;
+    };
+    contact?: {
+      email?: string;
+      phone?: string;
+    };
+    socialLinks?: any;
+    businessHours?: any;
+    layout?: any;
+  };
 }
 
 export interface LayoutSection {

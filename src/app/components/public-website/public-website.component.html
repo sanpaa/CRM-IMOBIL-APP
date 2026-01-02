@@ -1,14 +1,28 @@
-<div class="public-website" *ngIf="!loading && layout">
-  <!-- Render each section using shared components -->
-  <ng-container *ngFor="let section of sections">
-    <ng-container *appRenderComponent="section; editMode: false"></ng-container>
-  </ng-container>
-</div>
+<div class="public-website">
+  <!-- Header FIXO - sempre visível -->
+  <app-header-component 
+    [editMode]="false"
+    [config]="headerConfig">
+  </app-header-component>
 
-<!-- Loading State -->
-<div class="loading-container" *ngIf="loading">
-  <div class="spinner"></div>
-  <p>Carregando site...</p>
+  <!-- Conteúdo dinâmico (sections) -->
+  <main class="main-content" *ngIf="!loading">
+    <ng-container *ngFor="let section of sections">
+      <ng-container *appRenderComponent="section; editMode: false"></ng-container>
+    </ng-container>
+  </main>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Carregando...</p>
+  </div>
+
+  <!-- Footer FIXO - sempre visível -->
+  <app-footer-component 
+    [editMode]="false"
+    [config]="footerConfig">
+  </app-footer-component>
 </div>
 
 <!-- No Layout Found -->

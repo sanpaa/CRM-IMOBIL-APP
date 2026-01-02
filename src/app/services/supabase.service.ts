@@ -32,7 +32,9 @@ export class SupabaseService {
           storage: new CustomStorageAdapter(),
           autoRefreshToken: true,
           persistSession: true,
-          detectSessionInUrl: true
+          detectSessionInUrl: true,
+          storageKey: 'sb-auth-token',
+          flowType: 'pkce'
         }
       }
     );
