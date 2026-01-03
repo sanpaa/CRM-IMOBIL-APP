@@ -23,7 +23,7 @@ export const TEXT_BLOCK_METADATA: ComponentMetadata = {
       }
     ],
     styleFields: [
-      { key: 'backgroundColor', label: 'Cor de Fundo', type: 'color', defaultValue: 'transparent' },
+      { key: 'backgroundColor', label: 'Cor de Fundo', type: 'color', defaultValue: '#ffffff' },
       { key: 'textColor', label: 'Cor do Texto', type: 'color', defaultValue: '#333333' },
       { key: 'padding', label: 'Espaçamento', type: 'text', defaultValue: '2rem' }
     ]

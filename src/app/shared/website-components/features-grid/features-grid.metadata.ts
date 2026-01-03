@@ -17,7 +17,7 @@ export const FEATURES_GRID_METADATA: ComponentMetadata = {
       { key: 'cardTitleColor', label: 'Cor do Título do Card', type: 'color', defaultValue: '#2d3748' },
       { key: 'cardDescriptionColor', label: 'Cor da Descrição', type: 'color', defaultValue: '#718096' },
       { key: 'cardBackground', label: 'Fundo do Card', type: 'color', defaultValue: '#ffffff' },
-      { key: 'cardBorderColor', label: 'Cor da Borda do Card', type: 'color', defaultValue: 'transparent' },
+      { key: 'cardBorderColor', label: 'Cor da Borda do Card', type: 'color', defaultValue: '#ffffff' },
       { key: 'cardShadow', label: 'Sombra do Card', type: 'text', defaultValue: '0 2px 8px rgba(0,0,0,0.05)' },
       { key: 'gridGap', label: 'Espaçamento entre Cards', type: 'text', defaultValue: '2rem' },
       { 

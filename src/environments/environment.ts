@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api',
+  apiUrl: 'https://crm-imobil.onrender.com/api',
   supabase: {
     url: 'https://ogixrlwohcwdhitigpta.supabase.co',
     anonKey: 'sb_publishable_XlTekaoGb0PkW17rmnwZ5Q_7RCoemu5'

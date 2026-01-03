@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
 
@@ -23,18 +23,15 @@ class CustomStorageAdapter {
 export class SupabaseService {
   private supabase: SupabaseClient;
 
-  constructor() {
+  constructor(private ngZone: NgZone) {
     this.supabase = createClient(
       environment.supabase.url,
       environment.supabase.anonKey,
       {
         auth: {
-          storage: new CustomStorageAdapter(),
           autoRefreshToken: true,
           persistSession: true,
-          detectSessionInUrl: true,
-          storageKey: 'sb-auth-token',
-          flowType: 'pkce'
+          detectSessionInUrl: true
         }
       }
     );
@@ -57,8 +54,16 @@ export class SupabaseService {
   }
 
   async getCurrentUser(): Promise<User | null> {
-    const { data: { user } } = await this.supabase.auth.getUser();
-    return user;
+    try {
+      // Executa FORA da zone do Angular para evitar que zone.js interfira
+      return await this.ngZone.runOutsideAngular(async () => {
+        const { data: { session } } = await this.supabase.auth.getSession();
+        return session?.user || null;
+      });
+    } catch (error) {
+      console.error('Error getting current user:', error);
+      return null;
+    }
   }
 
   async getCurrentUserId(): Promise<string | null> {

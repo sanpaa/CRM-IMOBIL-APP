@@ -71,7 +71,14 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
 
   getFieldValue(field: ConfigSchemaField, isStyle: boolean = false): any {
     const value = isStyle ? this.getStyleValue(field.key) : this.getConfigValue(field.key);
-    return value !== undefined && value !== null ? value : field.defaultValue;
+    let finalValue = value !== undefined && value !== null ? value : field.defaultValue;
+    
+    // Fix: input type="color" doesn't accept "transparent", convert to white
+    if (field.type === 'color' && (finalValue === 'transparent' || !finalValue)) {
+      finalValue = '#ffffff';
+    }
+    
+    return finalValue;
   }
 
   onFieldChange(field: ConfigSchemaField, event: any, isStyle: boolean = false): void {

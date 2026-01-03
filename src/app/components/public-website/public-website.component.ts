@@ -73,69 +73,64 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
     try {
       console.log('🟢 Carregando site público para company:', this.companyId);
       
-      // Usar API do backend que retorna tudo junto
-      const siteConfig = await this.publicSiteApi.getSiteConfigByCompanyId(this.companyId);
+      // Buscar configurações diretamente do banco via CompanyService
+      const company = await this.companyService.getById(this.companyId);
       
-      if (!siteConfig.success) {
-        console.error('🔴 Erro na resposta da API:', siteConfig.error);
+      if (!company) {
+        console.error('🔴 Empresa não encontrada');
         return;
       }
       
-      console.log('✅ Configuração recebida da API:', siteConfig);
+      console.log('✅ Company data with footer_config:', company);
       
-      // Extrair visualConfig
-      const visualConfig = siteConfig.visualConfig;
-      const pages = siteConfig.pages || [];
-      const homePage = pages.find((p: any) => p.pageType === 'home') || pages[0];
-      const components = homePage?.components || [];
+      // Configurar header direto do header_config
+      if (company.header_config) {
+        this.headerConfig = {
+          logoUrl: company.header_config.logoUrl,
+          showLogo: company.header_config.showLogo ?? true,
+          showMenu: company.header_config.showMenu ?? true,
+          backgroundColor: company.header_config.backgroundColor || '#ffffff',
+          textColor: company.header_config.textColor || '#333333'
+        };
+      }
       
-      // Configurar header (BUSCA DO BACKEND, NÃO DO SUPABASE!)
-      this.headerConfig = {
-        logoUrl: visualConfig?.branding?.logoUrl || undefined,
-        showLogo: !!visualConfig?.branding?.logoUrl,
-        showMenu: true,
-        backgroundColor: visualConfig?.theme?.primaryColor || '#ffffff',
-        textColor: '#333333'
-      };
+      // Configurar footer direto do footer_config
+      if (company.footer_config) {
+        this.footerConfig = {
+          companyName: company.footer_config.companyName || company.name,
+          description: company.footer_config.description,
+          logoUrl: company.footer_config.logoUrl,
+          showLogo: company.footer_config.showLogo ?? false,
+          
+          // Informações de contato
+          address: company.footer_config.address,
+          phone: company.footer_config.phone || company.phone,
+          email: company.footer_config.email || company.email,
+          
+          // Redes sociais
+          instagram: company.footer_config.instagram,
+          facebook: company.footer_config.facebook,
+          whatsapp: company.footer_config.whatsapp,
+          
+          // Links e serviços
+          quickLinks: company.footer_config.quickLinks || [],
+          services: company.footer_config.services || [],
+          
+          showCopyright: company.footer_config.showCopyright ?? true,
+          backgroundColor: company.footer_config.backgroundColor || '#1a1a1a',
+          textColor: company.footer_config.textColor || '#ffffff'
+        };
+      }
       
-      // Configurar footer (BUSCA DO BACKEND, NÃO DO SUPABASE!)
-      this.footerConfig = {
-        companyName: visualConfig?.branding?.companyName || siteConfig.company?.name || 'Imobiliária',
-        description: visualConfig?.branding?.description,
-        logoUrl: visualConfig?.branding?.logoUrl || undefined,
-        showLogo: false,
-        
-        // Informações de contato
-        address: visualConfig?.contact?.address,
-        phone: visualConfig?.contact?.phone || siteConfig.company?.phone,
-        email: visualConfig?.contact?.email || siteConfig.company?.email,
-        
-        // Redes sociais
-        instagram: visualConfig?.socialLinks?.instagram,
-        facebook: visualConfig?.socialLinks?.facebook,
-        whatsapp: visualConfig?.socialLinks?.whatsapp,
-        
-        // Links rápidos (com defaults)
-        quickLinks: visualConfig?.footer?.quickLinks || [
-          { label: 'Sobre Nós', route: '/sobre' },
-          { label: 'Contato', route: '/contato' }
-        ],
-        
-        // Serviços (com defaults)
-        services: visualConfig?.footer?.services || [
-          { label: 'Comprar', route: '/imoveis?tipo=venda' },
-          { label: 'Alugar', route: '/imoveis?tipo=aluguel' }
-        ],
-        
-        showCopyright: true,
-        backgroundColor: '#1a1a1a',
-        textColor: '#ffffff'
-      };
-      
-      // Pegar TODOS os components EXCETO header e footer para o conteúdo
-      this.sections = components
-        .filter((s: any) => s.type !== 'header' && s.type !== 'footer')
-        .sort((a: any, b: any) => a.order - b.order);
+      // Carregar componentes do website builder
+      const layoutData = await this.customizationService.getLayout(this.companyId);
+      if (layoutData) {
+        this.layout = layoutData;
+        const sections = layoutData.layout_config?.sections || layoutData.layout_config?.components || [];
+        this.sections = sections
+          .filter((s: any) => s.type !== 'header' && s.type !== 'footer')
+          .sort((a: any, b: any) => a.order - b.order);
+      }
       
       console.log('✅ Site carregado com sucesso!');
       console.log('📋 Header Config:', this.headerConfig);

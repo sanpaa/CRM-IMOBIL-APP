@@ -63,6 +63,10 @@ export const routes: Routes = [
       {
         path: 'domain-settings',
         loadComponent: () => import('./components/domain-settings/domain-settings.component').then(m => m.DomainSettingsComponent)
+      },
+      {
+        path: 'whatsapp',
+        loadComponent: () => import('./components/settings/whatsapp-settings/whatsapp-settings.component').then(m => m.WhatsAppSettingsComponent)
       }
     ]
   },

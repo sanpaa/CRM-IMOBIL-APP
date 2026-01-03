@@ -61,7 +61,7 @@ export const PROPERTY_GRID_METADATA: ComponentMetadata = {
         key: 'backgroundColor',
         label: 'Cor de Fundo',
         type: 'color',
-        defaultValue: 'transparent'
+        defaultValue: '#ffffff'
       },
       {
         key: 'padding',

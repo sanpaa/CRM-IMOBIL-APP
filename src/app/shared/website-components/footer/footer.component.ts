@@ -55,11 +55,22 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
             <h4>Links Rápidos</h4>
             <ul>
               <li *ngFor="let link of config.quickLinks">
-                <a [routerLink]="link.route" 
-                   [class.edit-mode-link]="editMode" 
-                   (click)="editMode ? $event.preventDefault() : null">
-                  {{ link.label }}
-                </a>
+                <ng-container *ngIf="isExternalLink(link.route); else internalQuickLink">
+                  <a [href]="getCleanUrl(link.route)" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     [class.edit-mode-link]="editMode" 
+                     (click)="editMode ? $event.preventDefault() : null">
+                    {{ link.label }}
+                  </a>
+                </ng-container>
+                <ng-template #internalQuickLink>
+                  <a [routerLink]="link.route" 
+                     [class.edit-mode-link]="editMode" 
+                     (click)="editMode ? $event.preventDefault() : null">
+                    {{ link.label }}
+                  </a>
+                </ng-template>
               </li>
             </ul>
           </div>
@@ -69,11 +80,22 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
             <h4>Serviços</h4>
             <ul>
               <li *ngFor="let service of config.services">
-                <a [routerLink]="service.route" 
-                   [class.edit-mode-link]="editMode" 
-                   (click)="editMode ? $event.preventDefault() : null">
-                  {{ service.label }}
-                </a>
+                <ng-container *ngIf="isExternalLink(service.route); else internalService">
+                  <a [href]="getCleanUrl(service.route)" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     [class.edit-mode-link]="editMode" 
+                     (click)="editMode ? $event.preventDefault() : null">
+                    {{ service.label }}
+                  </a>
+                </ng-container>
+                <ng-template #internalService>
+                  <a [routerLink]="service.route" 
+                     [class.edit-mode-link]="editMode" 
+                     (click)="editMode ? $event.preventDefault() : null">
+                    {{ service.label }}
+                  </a>
+                </ng-template>
               </li>
             </ul>
           </div>
@@ -280,5 +302,25 @@ export class FooterComponent implements WebsiteComponentBase {
   @HostBinding('class.edit-mode') 
   get isEditMode() { 
     return this.editMode; 
+  }
+
+  /**
+   * Verifica se o link é externo (começa com http:// ou https://)
+   */
+  isExternalLink(url: string): boolean {
+    if (!url) return false;
+    const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
+    return cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://');
+  }
+
+  /**
+   * Retorna a URL limpa (remove barra inicial de URLs externas)
+   */
+  getCleanUrl(url: string): string {
+    if (!url) return url;
+    if (this.isExternalLink(url)) {
+      return url.startsWith('/') ? url.substring(1) : url;
+    }
+    return url;
   }
 }

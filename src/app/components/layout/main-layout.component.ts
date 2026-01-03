@@ -65,6 +65,10 @@ import { Company } from '../../models/company.model';
             <span class="nav-icon">🔗</span>
             <span class="nav-label">Domínios</span>
           </a>
+          <a routerLink="/whatsapp" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()">
+            <span class="nav-icon">💬</span>
+            <span class="nav-label">WhatsApp</span>
+          </a>
         </nav>
 
         <div class="sidebar-footer">
