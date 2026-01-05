@@ -78,22 +78,29 @@ import { Subscription } from 'rxjs';
           </div>
         </div>
 
-        <!-- Conectando -->
+        <!-- Gerando QR Code -->
         <div *ngIf="connectionStatus.status === 'connecting'" class="status-section connecting">
           <div class="loading-spinner"></div>
-          <h3>Conectando...</h3>
-          <p>Aguarde enquanto estabelecemos a conexão com o WhatsApp</p>
+          <h3>Gerando QR Code...</h3>
+          <p>Aguarde enquanto geramos o código de pareamento</p>
+        </div>
+
+        <!-- Autenticando (após escanear QR) -->
+        <div *ngIf="connectionStatus.status === 'authenticating'" class="status-section authenticating">
+          <div class="loading-spinner"></div>
+          <h3>Autenticando...</h3>
+          <p>QR Code escaneado! Finalizando conexão com o WhatsApp</p>
         </div>
 
         <!-- Conectado -->
         <div *ngIf="connectionStatus.status === 'connected'" class="status-section connected">
           <div class="status-icon success">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
               <polyline points="22 4 12 14.01 9 11.01"/>
             </svg>
           </div>
-          <h3>WhatsApp Conectado</h3>
+          <h3>✅ WhatsApp Conectado com Sucesso!</h3>
           <p class="phone-number">{{ connectionStatus.phone_number || 'Número não disponível' }}</p>
           <div class="connected-info">
             <div class="info-item">
@@ -199,6 +206,11 @@ import { Subscription } from 'rxjs';
     .status-icon.success {
       background: #dcfce7;
       color: #16a34a;
+    }
+
+    .status-section.authenticating {
+      background: #dbeafe;
+      color: #2563eb;
     }
 
     .status-section h3 {
@@ -514,7 +526,14 @@ export class WhatsAppSettingsComponent implements OnInit, OnDestroy {
     try {
       this.isLoading = true;
       this.errorMessage = '';
-      await this.whatsappService.initializeConnection();
+      console.log('🔵 Iniciando conexão WhatsApp...');
+      const result = await this.whatsappService.initializeConnection();
+      console.log('🟢 Resposta do initialize:', result);
+      console.log('🎯 QR Code presente?', !!result?.qr_code);
+      if (!result?.qr_code) {
+        console.warn('⚠️ QR Code não foi retornado na resposta do initialize');
+        this.errorMessage = 'QR Code não foi gerado. Tente novamente.';
+      }
     } catch (error: any) {
       this.errorMessage = error.message || 'Erro ao conectar WhatsApp';
       console.error('Error connecting WhatsApp:', error);

@@ -26,5 +26,6 @@ export interface WhatsAppConnectionStatus {
   is_connected: boolean;
   phone_number?: string;
   qr_code?: string;
-  status: 'disconnected' | 'qr_ready' | 'connected' | 'connecting';
+  status: 'disconnected' | 'qr_ready' | 'connected' | 'connecting' | 'authenticating';
+  message?: string;
 }

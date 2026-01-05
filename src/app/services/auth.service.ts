@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { SupabaseService } from './supabase.service';
 import { User } from '../models/user.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -25,29 +26,95 @@ export class AuthService {
     }
   }
 
+  /**
+   * Obtém o token de autenticação armazenado
+   */
+  getAuthToken(): string | null {
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        console.log('✅ Auth token found in localStorage');
+        return token;
+      }
+      console.warn('⚠️ No auth token found');
+      return null;
+    } catch (error) {
+      console.error('❌ Error getting auth token:', error);
+      return null;
+    }
+  }
+
+
   async signIn(email: string, password: string) {
     try {
-      const { data, error } = await this.supabase
-        .from('users')
-        .select('*')
-        .eq('email', email)
-        .eq('password', password)
-        .eq('active', true)
-        .single();
+      console.log('🔐 Chamando backend login:', `${environment.apiUrl}/auth/login`);
+      console.log('📧 Email/Username:', email);
+      console.log('🔑 Password length:', password.length);
+      
+      // Tenta diferentes nomes de campo que o backend pode esperar
+      const payload1 = { email, password };
+      const payload2 = { username: email, password };
+      const payload3 = { user: email, password };
+      
+      let response = await fetch(`${environment.apiUrl}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload1)
+      });
 
-      if (error || !data) {
-        return { data: null, error: { message: 'Email ou senha inválidos' } };
+      // Se falhou com email, tenta com username
+      if (response.status === 400) {
+        console.log('⚠️ Email field não funcionou, tentando username...');
+        response = await fetch(`${environment.apiUrl}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload2)
+        });
       }
 
-      // Store user session
-      localStorage.setItem('currentUser', JSON.stringify(data));
-      localStorage.setItem('company_id', data.company_id);
-      console.log('✅ Company ID salvo no localStorage:', data.company_id);
-      this.currentUserSubject.next(data as User);
+      // Se falhou com username, tenta com user
+      if (response.status === 400) {
+        console.log('⚠️ Username field não funcionou, tentando user...');
+        response = await fetch(`${environment.apiUrl}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload3)
+        });
+      }
 
-      return { data, error: null };
+      const result = await response.json();
+
+      if (!response.ok || result.error) {
+        console.error('❌ Backend login error:', result.error);
+        return { data: null, error: { message: result.error || 'Email ou senha inválidos' } };
+      }
+
+      if (!result.token || !result.user) {
+        console.error('❌ Backend não retornou token ou usuário');
+        return { data: null, error: { message: 'Erro ao receber token do servidor' } };
+      }
+
+      // Store token and user from backend
+      localStorage.setItem('auth_token', result.token);
+      localStorage.setItem('currentUser', JSON.stringify(result.user));
+      localStorage.setItem('company_id', result.user.company_id);
+      
+      console.log('✅ Token recebido do backend:', result.token.substring(0, 20) + '...');
+      console.log('✅ Usuário salvo no localStorage:', result.user.email);
+      console.log('✅ Company ID salvo no localStorage:', result.user.company_id);
+      
+      this.currentUserSubject.next(result.user as User);
+
+      return { data: result.user, error: null };
     } catch (error: any) {
-      return { data: null, error: { message: 'Email ou senha inválidos' } };
+      console.error('❌ Erro ao fazer login:', error);
+      return { data: null, error: { message: 'Erro ao conectar com o servidor' } };
     }
   }
 
@@ -75,6 +142,7 @@ export class AuthService {
     try {
       localStorage.removeItem('currentUser');
       localStorage.removeItem('company_id');
+      localStorage.removeItem('auth_token');
       this.currentUserSubject.next(null);
       this.router.navigate(['/login']);
       return { error: null };

@@ -3,6 +3,7 @@ import { environment } from '../../environments/environment';
 import { BehaviorSubject, Observable, interval } from 'rxjs';
 import { WhatsAppConnection, WhatsAppConnectionStatus, WhatsAppMessage } from '../models/whatsapp-connection.model';
 import { SupabaseService } from './supabase.service';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,11 +16,53 @@ export class WhatsAppService {
   
   public connectionStatus$ = this.connectionStatusSubject.asObservable();
   private pollingSubscription: any;
+  private pollingErrorCount = 0;
+  private maxPollingErrors = 5;
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(
+    private supabaseService: SupabaseService,
+    private authService: AuthService
+  ) {}
 
   /**
-   * Obtém o token - como você não usa Supabase Auth, usa o anonKey direto
+   * Helper para tratar respostas do backend e detectar HTML/erros
+   */
+  private async handleBackendResponse(response: Response): Promise<any> {
+    const contentType = response.headers.get('content-type');
+    
+    // Verifica se retornou HTML (backend offline/erro)
+    if (contentType && contentType.includes('text/html')) {
+      const text = await response.text();
+      console.error('⚠️ Backend retornou HTML (Status:', response.status, ')');
+      
+      if (response.status === 503) {
+        throw new Error('Backend WhatsApp está offline ou não foi buildado. Contate o administrador.');
+      }
+      throw new Error(`Backend WhatsApp indisponível (${response.status})`);
+    }
+
+    // Verifica se a resposta foi bem-sucedida
+    if (!response.ok) {
+      try {
+        const error = await response.json();
+        throw new Error(error.message || `Erro do servidor: ${response.status}`);
+      } catch (parseError) {
+        throw new Error(`Erro do servidor: ${response.status}`);
+      }
+    }
+
+    // Tenta fazer parse do JSON
+    try {
+      return await response.json();
+    } catch (parseError) {
+      const text = await response.text();
+      console.error('❌ Resposta não é JSON válido:', text.substring(0, 200));
+      throw new Error('Backend retornou resposta inválida');
+    }
+  }
+
+  /**
+   * Obtém o access_token da sessão autenticada
    */
   private async getAccessTokenFromSupabase(): Promise<string | null> {
     try {
@@ -35,10 +78,27 @@ export class WhatsAppService {
         return null;
       }
       
-      // Como você não usa Supabase Auth, retorna o anonKey
-      // O backend deve aceitar o anonKey e validar se o usuário existe via outro método
+      // Prioridade 1: Usa o auth_token gerado na autenticação
+      const authToken = this.authService.getAuthToken();
+      if (authToken) {
+        console.log('✅ Using auth_token from AuthService');
+        return authToken;
+      }
+      
+      // Prioridade 2: Tenta obter a sessão do Supabase
+      try {
+        const { data: { session } } = await this.supabaseService.client.auth.getSession();
+        if (session?.access_token) {
+          console.log('✅ Using Supabase session access_token');
+          return session.access_token;
+        }
+      } catch (supabaseError) {
+        console.warn('⚠️ Could not get Supabase session');
+      }
+      
+      // Prioridade 3: Fallback para anonKey
       const token = environment.supabase.anonKey;
-      console.log('✅ Using Supabase anonKey as token');
+      console.log('⚠️ Using Supabase anonKey as token (fallback)');
       return token;
     } catch (error) {
       console.error('❌ Error getting token:', error);
@@ -56,6 +116,19 @@ export class WhatsAppService {
         throw new Error('Você precisa estar logado no CRM para conectar o WhatsApp');
       }
 
+      // Busca user_id e company_id do localStorage
+      const currentUser = localStorage.getItem('currentUser');
+      const companyId = localStorage.getItem('company_id');
+      
+      if (!currentUser || !companyId) {
+        throw new Error('Dados do usuário não encontrados. Faça login novamente.');
+      }
+
+      const user = JSON.parse(currentUser);
+      const userId = user.id;
+
+      console.log('📦 Enviando para initialize:', { company_id: companyId, user_id: userId });
+
       const url = `${environment.apiUrl}/whatsapp/initialize`;
       console.log('🌐 Chamando:', url);
       console.log('🔑 Authorization header:', `Bearer ${accessToken.substring(0, 20)}...`);
@@ -66,19 +139,19 @@ export class WhatsAppService {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({
+          company_id: companyId,
+          user_id: userId
+        })
       });
 
       console.log('📡 Response status:', response.status, response.statusText);
 
-      const text = await response.text();
-      console.log('📄 Response body (first 500 chars):', text.substring(0, 500));
-
-      if (!response.ok) {
-        throw new Error(`Backend error: ${response.status} - ${text.substring(0, 100)}`);
-      }
-
-      const result = JSON.parse(text);
+      const result = await this.handleBackendResponse(response);
+      console.log('✅ Initialize response:', result);
+      
+      // Atualiza o status com a resposta do initialize (que deve conter o QR code)
+      this.connectionStatusSubject.next(result);
       
       // Inicia polling para verificar status
       this.startStatusPolling();
@@ -96,6 +169,8 @@ export class WhatsAppService {
   async getConnectionStatus(): Promise<WhatsAppConnectionStatus> {
     try {
       const accessToken = await this.getAccessTokenFromSupabase();
+      const companyId = localStorage.getItem('company_id');
+      
       if (!accessToken) {
         // Retorna status desconectado se não tiver token
         const status: WhatsAppConnectionStatus = {
@@ -106,23 +181,58 @@ export class WhatsAppService {
         return status;
       }
 
-      const response = await fetch(`${environment.apiUrl}/whatsapp/status`, {
+      // Envia company_id na query string para o backend validar
+      const url = new URL(`${environment.apiUrl}/whatsapp/status`);
+      if (companyId) {
+        url.searchParams.append('company_id', companyId);
+      }
+
+      console.log('🌐 Chamando status endpoint:', url.toString());
+      console.log('📦 company_id:', companyId);
+
+      const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`
         }
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to get WhatsApp status');
+      console.log('📡 Status response:', response.status);
+      
+      const status = await this.handleBackendResponse(response);
+      console.log('🎯 Status recebido do backend:', status);
+      console.log('🎯 QR Code presente no status?', !!status?.qr_code);
+      console.log('🎯 Status do WhatsApp:', status?.status);
+      
+      // Detecta quando QR foi escaneado (status !== connected mas qr_code sumiu)
+      const previousStatus = this.connectionStatusSubject.value;
+      if (previousStatus.qr_code && !status.qr_code && status.status !== 'connected' && status.status !== 'disconnected') {
+        console.log('📱 QR Code escaneado! Aguardando autenticação...');
+        status.status = 'authenticating';
       }
-
-      const status = await response.json();
+      
       this.connectionStatusSubject.next(status);
+      
+      // Reset error count on success
+      this.pollingErrorCount = 0;
+      
+      // Stop polling if connected
+      if (status.is_connected && status.status === 'connected') {
+        console.log('✅ WhatsApp conectado! Parando polling.');
+        this.stopStatusPolling();
+      }
+      
       return status;
     } catch (error) {
-      console.error('Error getting WhatsApp status:', error);
+      this.pollingErrorCount++;
+      console.warn(`⚠️ WhatsApp status check failed (${this.pollingErrorCount}/${this.maxPollingErrors}):`, error instanceof Error ? error.message : 'Unknown error');
+      
+      // Stop polling after max errors
+      if (this.pollingErrorCount >= this.maxPollingErrors) {
+        console.error('❌ Máximo de erros atingido. Parando verificação de status.');
+        this.stopStatusPolling();
+      }
+      
       // Retorna desconectado em caso de erro
       const status: WhatsAppConnectionStatus = {
         is_connected: false,
@@ -138,20 +248,31 @@ export class WhatsAppService {
    */
   async disconnect(): Promise<void> {
     try {
-      const { data: { session } } = await this.supabaseService.client.auth.getSession();
-      const user = session?.user;
-      if (!user) throw new Error('User not authenticated');
+      const accessToken = await this.getAccessTokenFromSupabase();
+      const companyId = localStorage.getItem('company_id');
+      
+      if (!accessToken) {
+        throw new Error('Você precisa estar logado no CRM para desconectar o WhatsApp');
+      }
 
-      const response = await fetch(`${environment.apiUrl}/whatsapp/disconnect`, {
+      if (!companyId) {
+        throw new Error('Dados da empresa não encontrados. Faça login novamente.');
+      }
+
+      const url = new URL(`${environment.apiUrl}/whatsapp/disconnect`);
+      if (companyId) {
+        url.searchParams.append('company_id', companyId);
+      }
+
+      const response = await fetch(url.toString(), {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session?.access_token}`
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
         }
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to disconnect WhatsApp');
-      }
+      await this.handleBackendResponse(response);
 
       this.stopStatusPolling();
       this.connectionStatusSubject.next({
@@ -169,22 +290,27 @@ export class WhatsAppService {
    */
   async getMessages(limit: number = 50): Promise<WhatsAppMessage[]> {
     try {
-      const { data: { session } } = await this.supabaseService.client.auth.getSession();
-      const user = session?.user;
-      if (!user) throw new Error('User not authenticated');
+      const accessToken = await this.getAccessTokenFromSupabase();
+      const companyId = localStorage.getItem('company_id');
+      
+      if (!accessToken) {
+        throw new Error('Você precisa estar logado no CRM para buscar mensagens');
+      }
 
-      const response = await fetch(`${environment.apiUrl}/whatsapp/messages?limit=${limit}`, {
+      const url = new URL(`${environment.apiUrl}/whatsapp/messages`);
+      url.searchParams.append('limit', limit.toString());
+      if (companyId) {
+        url.searchParams.append('company_id', companyId);
+      }
+
+      const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${session?.access_token}`
+          'Authorization': `Bearer ${accessToken}`
         }
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to get messages');
-      }
-
-      return await response.json();
+      return await this.handleBackendResponse(response);
     } catch (error) {
       console.error('Error getting WhatsApp messages:', error);
       throw error;
@@ -196,22 +322,28 @@ export class WhatsAppService {
    */
   async sendMessage(to: string, message: string): Promise<void> {
     try {
-      const { data: { session } } = await this.supabaseService.client.auth.getSession();
-      const user = session?.user;
-      if (!user) throw new Error('User not authenticated');
+      const accessToken = await this.getAccessTokenFromSupabase();
+      const companyId = localStorage.getItem('company_id');
+      
+      if (!accessToken) {
+        throw new Error('Você precisa estar logado no CRM para enviar mensagens');
+      }
 
-      const response = await fetch(`${environment.apiUrl}/whatsapp/send`, {
+      const url = new URL(`${environment.apiUrl}/whatsapp/send`);
+      if (companyId) {
+        url.searchParams.append('company_id', companyId);
+      }
+
+      const response = await fetch(url.toString(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`
+          'Authorization': `Bearer ${accessToken}`
         },
         body: JSON.stringify({ to, message })
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
+      await this.handleBackendResponse(response);
     } catch (error) {
       console.error('Error sending WhatsApp message:', error);
       throw error;
@@ -223,14 +355,23 @@ export class WhatsAppService {
    */
   async getConversation(phone: string, limit: number = 50): Promise<WhatsAppMessage[]> {
     try {
-      const { data: { session } } = await this.supabaseService.client.auth.getSession();
-      const user = session?.user;
-      if (!user) throw new Error('User not authenticated');
+      const accessToken = await this.getAccessTokenFromSupabase();
+      const companyId = localStorage.getItem('company_id');
+      
+      if (!accessToken) {
+        throw new Error('Você precisa estar logado no CRM para buscar conversas');
+      }
 
-      const response = await fetch(`${environment.apiUrl}/whatsapp/conversation/${phone}?limit=${limit}`, {
+      const url = new URL(`${environment.apiUrl}/whatsapp/conversation/${phone}`);
+      url.searchParams.append('limit', limit.toString());
+      if (companyId) {
+        url.searchParams.append('company_id', companyId);
+      }
+
+      const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${session?.access_token}`
+          'Authorization': `Bearer ${accessToken}`
         }
       });
 
@@ -250,14 +391,22 @@ export class WhatsAppService {
    */
   async getAutoCreatedClients(): Promise<any[]> {
     try {
-      const { data: { session } } = await this.supabaseService.client.auth.getSession();
-      const user = session?.user;
-      if (!user) throw new Error('User not authenticated');
+      const accessToken = await this.getAccessTokenFromSupabase();
+      const companyId = localStorage.getItem('company_id');
+      
+      if (!accessToken) {
+        throw new Error('Você precisa estar logado no CRM para buscar clientes');
+      }
 
-      const response = await fetch(`${environment.apiUrl}/whatsapp/auto-clients`, {
+      const url = new URL(`${environment.apiUrl}/whatsapp/auto-clients`);
+      if (companyId) {
+        url.searchParams.append('company_id', companyId);
+      }
+
+      const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${session?.access_token}`
+          'Authorization': `Bearer ${accessToken}`
         }
       });
 
@@ -277,9 +426,11 @@ export class WhatsAppService {
    */
   private startStatusPolling(): void {
     this.stopStatusPolling();
+    this.pollingErrorCount = 0; // Reset error count
     
-    // Verifica status a cada 3 segundos
-    this.pollingSubscription = interval(3000).subscribe(() => {
+    console.log('🔄 Iniciando polling de status (intervalo: 5 segundos)');
+    // Verifica status a cada 5 segundos
+    this.pollingSubscription = interval(5000).subscribe(() => {
       this.getConnectionStatus();
     });
   }
@@ -289,6 +440,7 @@ export class WhatsAppService {
    */
   private stopStatusPolling(): void {
     if (this.pollingSubscription) {
+      console.log('⏹️ Parando polling de status');
       this.pollingSubscription.unsubscribe();
       this.pollingSubscription = null;
     }

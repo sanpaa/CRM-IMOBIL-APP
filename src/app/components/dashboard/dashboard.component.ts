@@ -357,9 +357,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    // Initialize charts after view is ready
+    // Initialize charts after view is ready - only if data is loaded
     setTimeout(() => {
-      this.createCharts();
+      if (this.clientsData.length > 0 || this.dealsData.length > 0) {
+        this.createCharts();
+      }
     }, 100);
   }
 
@@ -381,6 +383,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
       // Prepare data for charts
       this.prepareChartData(clients, deals, properties);
+      
+      // Destroy existing charts before recreating
+      this.destroyCharts();
       
       // Recreate charts with real data if they exist
       if (this.clientsChartRef && this.dealsChartRef && this.monthlyChartRef) {
@@ -481,6 +486,15 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     return labels;
   }
 
+  destroyCharts() {
+    this.charts.forEach(chart => {
+      if (chart) {
+        chart.destroy();
+      }
+    });
+    this.charts = [];
+  }
+
   createCharts() {
     this.createClientsChart();
     this.createDealsChart();
@@ -490,8 +504,15 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   createClientsChart() {
     if (!this.clientsChartRef) return;
 
-    const ctx = this.clientsChartRef.nativeElement.getContext('2d');
+    const canvas = this.clientsChartRef.nativeElement;
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Get existing chart instance and destroy it
+    const existingChart = Chart.getChart(canvas);
+    if (existingChart) {
+      existingChart.destroy();
+    }
 
     const chart = new Chart(ctx, {
       type: 'doughnut',
@@ -542,8 +563,15 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   createDealsChart() {
     if (!this.dealsChartRef) return;
 
-    const ctx = this.dealsChartRef.nativeElement.getContext('2d');
+    const canvas = this.dealsChartRef.nativeElement;
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Get existing chart instance and destroy it
+    const existingChart = Chart.getChart(canvas);
+    if (existingChart) {
+      existingChart.destroy();
+    }
 
     const chart = new Chart(ctx, {
       type: 'bar',
@@ -611,8 +639,15 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   createMonthlyChart() {
     if (!this.monthlyChartRef) return;
 
-    const ctx = this.monthlyChartRef.nativeElement.getContext('2d');
+    const canvas = this.monthlyChartRef.nativeElement;
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Get existing chart instance and destroy it
+    const existingChart = Chart.getChart(canvas);
+    if (existingChart) {
+      existingChart.destroy();
+    }
 
     const chart = new Chart(ctx, {
       type: 'line',
@@ -702,7 +737,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     // Clean up charts
-    this.charts.forEach(chart => chart.destroy());
+    this.destroyCharts();
   }
 
   logout() {
