@@ -54,6 +54,42 @@ export class PropertyService {
     return data as Property;
   }
 
+  async uploadDocument(file: File, propertyId: string): Promise<string> {
+    const user = this.auth.getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // Validate file extension
+    const fileExt = file.name.split('.').pop()?.toLowerCase();
+    if (!fileExt) {
+      throw new Error(`Arquivo "${file.name}" não possui extensão válida`);
+    }
+
+    const fileName = `${propertyId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const filePath = `${user.company_id}/${fileName}`;
+
+    const { data, error } = await this.supabase.storage
+      .from('property-documents')
+      .upload(filePath, file);
+
+    if (error) throw error;
+    
+    // Validate upload was successful
+    if (!data || !data.path) {
+      throw new Error(`Falha ao fazer upload do arquivo "${file.name}"`);
+    }
+
+    const { data: urlData } = this.supabase.storage
+      .from('property-documents')
+      .getPublicUrl(filePath);
+
+    return urlData.publicUrl;
+  }
+
+  async uploadDocuments(files: File[], propertyId: string): Promise<string[]> {
+    const uploadPromises = files.map(file => this.uploadDocument(file, propertyId));
+    return Promise.all(uploadPromises);
+  }
+
   async update(id: string, updates: Partial<Property>): Promise<Property> {
     const { data, error } = await this.supabase
       .from('properties')

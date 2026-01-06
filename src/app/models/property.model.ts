@@ -12,6 +12,7 @@ export interface Property {
   parking?: number;
   image_url?: string;
   image_urls?: string[];
+  document_urls?: string[];
   street?: string;
   neighborhood?: string;
   city?: string;
