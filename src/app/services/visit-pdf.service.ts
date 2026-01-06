@@ -8,11 +8,21 @@ export class VisitPdfService {
 
   constructor() {}
 
+  /**
+   * Generates a PDF document for a visit by creating an HTML document
+   * and opening it in a new window for browser-based printing.
+   * This approach is compatible with Chromium/Puppeteer PDF engines.
+   */
   generateVisitPdf(visit: VisitWithDetails): void {
     const htmlContent = this.generateHtmlContent(visit);
     this.openPrintWindow(htmlContent);
   }
 
+  /**
+   * Generates complete HTML document with embedded CSS.
+   * Uses HTML tables for layout to ensure PDF compatibility.
+   * Each property gets its own page with page-break-before.
+   */
   private generateHtmlContent(visit: VisitWithDetails): string {
     const properties = visit.properties && visit.properties.length > 0 
       ? visit.properties 
@@ -58,6 +68,7 @@ export class VisitPdfService {
 
   private getStyles(): string {
     return `
+      /* Reset and Base Styles */
       * {
         margin: 0;
         padding: 0;
@@ -65,16 +76,16 @@ export class VisitPdfService {
       }
 
       body {
-        font-family: Arial, sans-serif;
+        font-family: Arial, sans-serif;  /* Standard font for PDF compatibility */
         font-size: 11pt;
-        line-height: 1.4;
+        line-height: 1.4;  /* Adequate spacing to prevent text overlap */
         color: #000;
         background: white;
       }
 
       .page {
-        width: 210mm;
-        min-height: 297mm;
+        width: 210mm;  /* A4 width */
+        min-height: 297mm;  /* A4 height */
         padding: 15mm;
         margin: 0 auto;
         background: white;
@@ -82,14 +93,14 @@ export class VisitPdfService {
       }
 
       .page-break {
-        page-break-before: always;
+        page-break-before: always;  /* Force new page for each property */
       }
 
-      /* Header */
+      /* Header - Uses table layout for proper alignment */
       .header-table {
         width: 100%;
         border: 1px solid #000;
-        border-collapse: collapse;
+        border-collapse: collapse;  /* Prevents double borders */
         margin-bottom: 10mm;
       }
 
@@ -109,13 +120,13 @@ export class VisitPdfService {
         height: 50px;
         border: 1px solid #ccc;
         display: inline-block;
-        overflow: hidden;
+        overflow: hidden;  /* Contain logo within bounds */
       }
 
       .logo-box img {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: contain;  /* Maintain logo aspect ratio */
       }
 
       .company-info {
@@ -251,7 +262,7 @@ export class VisitPdfService {
         color: #fff;
       }
 
-      /* Checkbox */
+      /* Checkbox - CSS-based, no Unicode characters */
       .checkbox-container {
         margin: 8px 0;
       }
@@ -272,14 +283,14 @@ export class VisitPdfService {
         display: inline-block;
         width: 14px;
         height: 14px;
-        border: 1px solid #000;
+        border: 1px solid #000;  /* Simple border creates checkbox */
         margin-right: 4px;
         vertical-align: middle;
         position: relative;
       }
 
       .checkbox-box.checked::before {
-        content: 'X';
+        content: 'X';  /* Simple X mark, not Unicode */
         position: absolute;
         top: -2px;
         left: 2px;
@@ -397,6 +408,10 @@ export class VisitPdfService {
     `;
   }
 
+  /**
+   * Generates HTML for header with company logo and information.
+   * Logo is displayed from URL (company_logo_url) - supports absolute URLs or base64.
+   */
   private generateHeader(visit: VisitWithDetails): string {
     const logoHtml = visit.company_logo_url 
       ? `<img src="${this.escapeHtml(visit.company_logo_url)}" alt="Logo" />`
@@ -630,6 +645,10 @@ export class VisitPdfService {
     `;
   }
 
+  /**
+   * Generates signature section with only Cliente and Corretor.
+   * Proprietário signature removed as per requirements.
+   */
   private generateSignatures(): string {
     return `
 <table class="signatures-table">
