@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { SupabaseService } from './supabase.service';
 import { AuthService } from './auth.service';
 import { Visit, VisitProperty, VisitEvaluation, VisitWithDetails } from '../models/visit.model';
+import { HeaderConfig } from '../models/company.model';
 
 @Injectable({
   providedIn: 'root'
@@ -135,7 +136,8 @@ export class VisitService {
       company_address = company.address;
       company_phone = company.phone;
       // Prioritize logo from header_config (settings), fallback to logo_url
-      company_logo_url = (company.header_config as any)?.logoUrl || company.logo_url;
+      const headerConfig = company.header_config as HeaderConfig | null;
+      company_logo_url = headerConfig?.logoUrl || company.logo_url;
     }
 
     if (visit.client_id) {
