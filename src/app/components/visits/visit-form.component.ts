@@ -629,13 +629,25 @@ export class VisitFormComponent implements OnInit, OnChanges {
   async saveVisit() {
     this.saving = true;
     try {
-      // Save or update visit
+      // Save or update visit - only send valid Visit table columns
+      const visitData: Partial<Visit> = {
+        visit_date: this.formData.visit_date,
+        visit_time: this.formData.visit_time,
+        status: this.formData.status,
+        notes: this.formData.notes,
+        client_id: this.formData.client_id || null,
+        broker_id: this.formData.broker_id || null,
+        owner_id: this.formData.owner_id || null,
+        property_id: this.formData.property_id || null,
+        user_id: this.formData.user_id || null
+      };
+
       let visitId: string;
       if (this.editingVisit) {
-        const updated = await this.visitService.update(this.editingVisit.id, this.formData);
+        const updated = await this.visitService.update(this.editingVisit.id, visitData);
         visitId = updated.id;
       } else {
-        const created = await this.visitService.create(this.formData);
+        const created = await this.visitService.create(visitData);
         visitId = created.id;
       }
 
