@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VisitService } from '../../services/visit.service';
@@ -497,7 +497,7 @@ import { AuthService } from '../../services/auth.service';
     }
   `]
 })
-export class VisitFormComponent implements OnInit {
+export class VisitFormComponent implements OnInit, OnChanges {
   @Input() isVisible = false;
   @Input() editingVisit: Visit | null = null;
   @Output() onClose = new EventEmitter<void>();
@@ -523,7 +523,7 @@ export class VisitFormComponent implements OnInit {
     this.resetForm();
   }
 
-  async ngOnChanges() {
+  async ngOnChanges(changes: SimpleChanges) {
     if (this.editingVisit && this.isVisible) {
       await this.loadVisitDetails();
     } else if (this.isVisible) {
@@ -662,9 +662,9 @@ export class VisitFormComponent implements OnInit {
           if (evaluation.id) {
             await this.visitService.updateVisitEvaluation(evaluation.id, evaluation);
           } else {
-            // Only save if there's some data
-            if (evaluation.conservation_state || evaluation.location_rating || 
-                evaluation.property_value_rating || evaluation.interest_level) {
+            // Only save if there's some meaningful data
+            if (evaluation.conservation_state != null || evaluation.location_rating != null || 
+                evaluation.property_value_rating != null || evaluation.interest_level != null) {
               await this.visitService.addVisitEvaluation(evaluation);
             }
           }
@@ -675,7 +675,7 @@ export class VisitFormComponent implements OnInit {
       this.closeForm();
     } catch (error) {
       console.error('Error saving visit:', error);
-      alert('Erro ao salvar visita. Por favor, tente novamente.');
+      this.showError('Erro ao salvar visita. Por favor, tente novamente.');
     } finally {
       this.saving = false;
     }
@@ -685,5 +685,10 @@ export class VisitFormComponent implements OnInit {
     this.isVisible = false;
     this.resetForm();
     this.onClose.emit();
+  }
+
+  private showError(message: string) {
+    // For now using alert, but this can be replaced with a toast/notification service
+    alert(message);
   }
 }

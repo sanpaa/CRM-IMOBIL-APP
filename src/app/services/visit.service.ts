@@ -227,10 +227,7 @@ export class VisitService {
   async updateVisitEvaluation(id: string, updates: Partial<VisitEvaluation>): Promise<VisitEvaluation> {
     const { data, error } = await this.supabase
       .from('visit_evaluations')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString()
-      })
+      .update(updates)
       .eq('id', id)
       .select()
       .single();

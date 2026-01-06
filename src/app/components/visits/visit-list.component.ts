@@ -305,11 +305,16 @@ export class VisitListComponent implements OnInit {
         this.pdfService.generateVisitPdf(visitWithDetails);
       } else {
         console.error('Visit not found');
-        alert('Erro ao carregar dados da visita.');
+        this.showError('Erro ao carregar dados da visita.');
       }
     } catch (error) {
       console.error('Error generating PDF:', error);
-      alert('Erro ao gerar PDF. Por favor, tente novamente.');
+      this.showError('Erro ao gerar PDF. Por favor, tente novamente.');
     }
+  }
+
+  private showError(message: string) {
+    // For now using alert, but this can be replaced with a toast/notification service
+    alert(message);
   }
 }
