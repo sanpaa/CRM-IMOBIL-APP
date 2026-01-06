@@ -10,401 +10,448 @@ export class VisitPdfService {
   constructor() {}
 
   generateVisitPdf(visit: VisitWithDetails): void {
-    // Create a temporary container for the HTML
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.innerHTML = this.generateHtmlContent(visit);
-    document.body.appendChild(container);
-
     const doc = new jsPDF('p', 'mm', 'a4');
     
-    // Use html method to convert HTML to PDF
-    doc.html(container, {
-      callback: (pdf) => {
-        // Clean up
-        document.body.removeChild(container);
-        
-        // Save the PDF
-        const fileName = `roteiro-visita-${visit.visit_date || 'sem-data'}.pdf`;
-        pdf.save(fileName);
-      },
-      x: 0,
-      y: 0,
-      width: 210, // A4 width in mm
-      windowWidth: 794, // A4 width in pixels at 96 DPI
-      margin: [0, 0, 0, 0]
-    });
-  }
-
-  private generateHtmlContent(visit: VisitWithDetails): string {
-    const visitDate = visit.visit_date ? new Date(visit.visit_date).toLocaleDateString('pt-BR') : '-';
-    const currentDateTime = new Date().toLocaleString('pt-BR');
-    
-    // Generate property pages
-    const propertyPages = (visit.properties || []).map((property, index) => {
-      const evaluation = visit.evaluations?.find(e => e.property_id === property.id);
-      return this.generatePropertyPage(property, evaluation, index + 1, visit, visitDate, currentDateTime);
-    }).join('');
-
-    const content = propertyPages || this.generateEmptyPage(visit, visitDate, currentDateTime);
-
-    return `
-    <style>
-      body {
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 12px;
-        margin: 0;
-        padding: 0;
-        color: #000;
-      }
-
-      .page {
-        width: 210mm;
-        min-height: 297mm;
-        padding: 15mm;
-        box-sizing: border-box;
-        background: white;
-      }
-
-      .header {
-        display: flex;
-        justify-content: space-between;
-        border-bottom: 2px solid #000;
-        padding-bottom: 8px;
-        margin-bottom: 10px;
-      }
-
-      .header-left {
-        display: flex;
-        gap: 10px;
-      }
-
-      .logo {
-        width: 60px;
-        height: 60px;
-        border: 1px solid #000;
-        text-align: center;
-        font-weight: bold;
-        font-size: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-      }
-
-      .header-info {
-        font-size: 11px;
-        line-height: 1.4;
-      }
-
-      .header-right {
-        text-align: right;
-        font-size: 11px;
-        line-height: 1.4;
-      }
-
-      h1 {
-        font-size: 16px;
-        margin: 10px 0;
-        text-transform: uppercase;
-        text-align: center;
-      }
-
-      .section {
-        border: 1px solid #000;
-        margin-bottom: 10px;
-      }
-
-      .section-title {
-        background: #f0f0f0;
-        padding: 4px 6px;
-        font-weight: bold;
-        border-bottom: 1px solid #000;
-        font-size: 11px;
-      }
-
-      .section-content {
-        padding: 6px;
-      }
-
-      .row {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 6px;
-      }
-
-      .col {
-        flex: 1;
-        font-size: 11px;
-      }
-
-      .label {
-        font-weight: bold;
-      }
-
-      .checkbox-group {
-        display: flex;
-        gap: 15px;
-        flex-wrap: wrap;
-      }
-
-      .checkbox {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 11px;
-      }
-
-      .rating {
-        display: flex;
-        gap: 8px;
-        margin-top: 4px;
-      }
-
-      .rating span {
-        border: 1px solid #000;
-        padding: 2px 6px;
-        font-size: 10px;
-        min-width: 20px;
-        text-align: center;
-      }
-
-      .rating .star-filled {
-        background: #000;
-        color: #fff;
-      }
-
-      .signature {
-        height: 40px;
-        border-top: 1px solid #000;
-        margin-top: 30px;
-        text-align: center;
-        padding-top: 4px;
-        font-size: 11px;
-      }
-
-      .footer-text {
-        font-size: 10px;
-        margin-top: 15px;
-        margin-bottom: 10px;
-        text-align: justify;
-        line-height: 1.4;
-      }
-
-      .page-break {
-        page-break-before: always;
-      }
-    </style>
-    ${content}
-    `;
-  }
-
-  private generatePropertyPage(
-    property: any,
-    evaluation: any,
-    propertyNumber: number,
-    visit: VisitWithDetails,
-    visitDate: string,
-    currentDateTime: string
-  ): string {
-    const visitTime = visit.visit_time || '-';
-    const status = this.formatStatus(visit.status);
-    
-    return `
-    <div class="page${propertyNumber > 1 ? ' page-break' : ''}">
-      ${this.generateHeader(visit)}
-      
-      <h1>Roteiro de Visita</h1>
-
-      <!-- DADOS DA VISITA -->
-      <div class="section">
-        <div class="section-title">Dados da Visita</div>
-        <div class="section-content">
-          <div class="row">
-            <div class="col"><span class="label">Data:</span> ${visitDate}</div>
-            <div class="col"><span class="label">Horário:</span> ${visitTime}</div>
-            <div class="col"><span class="label">Status:</span> ${status}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PARTICIPANTES -->
-      <div class="section">
-        <div class="section-title">Participantes</div>
-        <div class="section-content">
-          <div class="row">
-            <div class="col"><span class="label">Cliente:</span> ${visit.client_name || '-'}</div>
-          </div>
-          <div class="row">
-            <div class="col"><span class="label">Corretor:</span> ${visit.broker_name || '-'}</div>
-          </div>
-          <div class="row">
-            <div class="col"><span class="label">Proprietário:</span> ${visit.owner_name || '-'}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- IMÓVEL -->
-      <div class="section">
-        <div class="section-title">Dados do Imóvel ${propertyNumber}</div>
-        <div class="section-content">
-          <div class="row">
-            <div class="col"><span class="label">Referência:</span> ${property.property_reference || '-'}</div>
-          </div>
-          <div class="row">
-            <div class="col"><span class="label">Endereço:</span> ${property.full_address || '-'}</div>
-          </div>
-          ${property.development ? `<div class="row"><div class="col"><span class="label">Empreendimento:</span> ${property.development}</div></div>` : ''}
-          
-          <div class="row">
-            <div class="col"><span class="label">Dormitórios:</span> ${property.bedrooms || '-'}</div>
-            <div class="col"><span class="label">Suítes:</span> ${property.suites || '-'}</div>
-            <div class="col"><span class="label">Banheiros:</span> ${property.bathrooms || '-'}</div>
-          </div>
-          
-          <div class="row">
-            <div class="col"><span class="label">Vagas:</span> ${property.parking_spaces || '-'}</div>
-            <div class="col"><span class="label">Área Total:</span> ${property.total_area ? property.total_area + ' m²' : '-'}</div>
-            <div class="col"><span class="label">Área Construída:</span> ${property.built_area ? property.built_area + ' m²' : '-'}</div>
-          </div>
-          
-          <div class="row">
-            <div class="col"><span class="label">Valor Sugerido:</span> ${property.suggested_sale_value ? 'R$ ' + property.suggested_sale_value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-'}</div>
-          </div>
-        </div>
-      </div>
-
-      ${evaluation && visit.status === 'realizada' ? this.generateEvaluationSection(evaluation) : ''}
-
-      <!-- DECLARAÇÃO -->
-      <div class="footer-text">
-        Na qualidade de possível comprador, declaro para os devidos fins
-        que visitei o imóvel acima descrito por intermédio da imobiliária,
-        estando ciente das condições apresentadas.
-      </div>
-
-      <!-- ASSINATURAS -->
-      <div class="row">
-        <div class="col signature">Assinatura do Cliente</div>
-        <div class="col signature">Assinatura do Corretor</div>
-        <div class="col signature">Assinatura do Proprietário</div>
-      </div>
-
-      <div style="text-align: center; font-size: 10px; margin-top: 10px;">
-        Gerado em ${currentDateTime}
-      </div>
-    </div>
-    `;
-  }
-
-  private generateHeader(visit: VisitWithDetails): string {
-    const companyName = visit.company_name || 'Imobiliária';
-    const companyAddress = visit.company_address || '';
-    const companyPhone = visit.company_phone || '';
-    const companyCreci = visit.company_creci || '';
-    const companyLogo = visit.company_logo_url || '';
-    
-    const brokerName = visit.broker_name || '';
-    const brokerCreci = visit.broker_creci || '';
-    const brokerPhone = visit.broker_phone || '';
-
-    return `
-    <div class="header">
-      <div class="header-left">
-        <div class="logo">${companyLogo ? `<img src="${companyLogo}" alt="Logo" style="max-width: 100%; max-height: 100%; object-fit: contain;" />` : 'LOGO'}</div>
-        <div class="header-info">
-          <strong>${companyName}</strong><br>
-          ${companyAddress ? companyAddress + '<br>' : ''}
-          ${companyPhone ? 'Tel: ' + companyPhone + '<br>' : ''}
-          ${companyCreci ? 'CRECI: ' + companyCreci : ''}
-        </div>
-      </div>
-
-      <div class="header-right">
-        ${brokerName ? '<strong>Corretor Responsável</strong><br>' + brokerName + '<br>' : ''}
-        ${brokerCreci ? 'CRECI: ' + brokerCreci + '<br>' : ''}
-        ${brokerPhone ? 'Tel: ' + brokerPhone : ''}
-      </div>
-    </div>
-    `;
-  }
-
-  private generateEvaluationSection(evaluation: any): string {
-    return `
-    <div class="section">
-      <div class="section-title">Avaliação do Imóvel</div>
-      <div class="section-content">
-        <div class="row">
-          <div class="col">
-            <span class="label">Estado de conservação:</span>
-            <div class="rating">
-              ${this.generateRatingStars(evaluation.conservation_state)}
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-            <span class="label">Localização:</span>
-            <div class="rating">
-              ${this.generateRatingStars(evaluation.location_rating)}
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-            <span class="label">Valor do imóvel:</span>
-            <div class="rating">
-              ${this.generateRatingStars(evaluation.property_value_rating)}
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col">
-            <span class="label">Interesse do cliente:</span>
-            <div class="checkbox-group">
-              <div class="checkbox">${evaluation.interest_level === 'DESCARTOU' ? '☑' : '☐'} Descartou</div>
-              <div class="checkbox">${evaluation.interest_level === 'INTERESSOU' ? '☑' : '☐'} Interessou</div>
-              <div class="checkbox">${evaluation.interest_level === 'INTERESSOU_E_ASSINOU_PROPOSTA' ? '☑' : '☐'} Interessou e assinou proposta</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    `;
-  }
-
-  private generateRatingStars(rating?: number): string {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      const filled = rating && i <= rating;
-      stars.push(`<span class="${filled ? 'star-filled' : ''}">${i}</span>`);
+    if (visit.properties && visit.properties.length > 0) {
+      visit.properties.forEach((property, index) => {
+        if (index > 0) {
+          doc.addPage();
+        }
+        this.drawPropertyPage(doc, visit, property, index + 1);
+      });
+    } else {
+      this.drawEmptyPage(doc, visit);
     }
-    return stars.join('');
+
+    // Save the PDF
+    const fileName = `roteiro-visita-${visit.visit_date || 'sem-data'}.pdf`;
+    doc.save(fileName);
   }
 
-  private generateEmptyPage(visit: VisitWithDetails, visitDate: string, currentDateTime: string): string {
-    return `
-    <div class="page">
-      ${this.generateHeader(visit)}
-      <h1>Roteiro de Visita</h1>
-      <div class="section">
-        <div class="section-title">Dados da Visita</div>
-        <div class="section-content">
-          <div class="row">
-            <div class="col"><span class="label">Data:</span> ${visitDate}</div>
-            <div class="col"><span class="label">Horário:</span> ${visit.visit_time || '-'}</div>
-            <div class="col"><span class="label">Status:</span> ${this.formatStatus(visit.status)}</div>
-          </div>
-        </div>
-      </div>
-      <p style="text-align: center; margin-top: 40px; color: #666;">Nenhum imóvel vinculado a esta visita.</p>
-      <div style="text-align: center; font-size: 10px; margin-top: 20px;">Gerado em ${currentDateTime}</div>
-    </div>
-    `;
+  private drawPropertyPage(doc: jsPDF, visit: VisitWithDetails, property: any, propertyNumber: number): void {
+    const pageWidth = 210;
+    const margin = 15;
+    let y = margin;
+
+    // Draw Header
+    y = this.drawHeader(doc, visit, y, margin, pageWidth);
+
+    // Title
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ROTEIRO DE VISITA', pageWidth / 2, y, { align: 'center' });
+    y += 10;
+
+    // Visit Data Section
+    y = this.drawSection(doc, 'Dados da Visita', y, margin, pageWidth, () => {
+      const visitDate = visit.visit_date ? new Date(visit.visit_date).toLocaleDateString('pt-BR') : '-';
+      const visitTime = visit.visit_time || '-';
+      const status = this.formatStatus(visit.status);
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      
+      const col1 = margin + 4;
+      const col2 = margin + 70;
+      const col3 = margin + 140;
+      let rowY = y + 5;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.text('Data:', col1, rowY);
+      doc.text('Horário:', col2, rowY);
+      doc.text('Status:', col3, rowY);
+      
+      doc.setFont('helvetica', 'normal');
+      rowY += 5;
+      doc.text(visitDate, col1, rowY);
+      doc.text(visitTime, col2, rowY);
+      doc.text(status, col3, rowY);
+      
+      return rowY + 3;
+    });
+
+    // Participants Section
+    y = this.drawSection(doc, 'Participantes', y, margin, pageWidth, () => {
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      
+      let rowY = y + 5;
+      const col1 = margin + 4;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.text('Cliente:', col1, rowY);
+      doc.setFont('helvetica', 'normal');
+      doc.text(visit.client_name || '-', col1 + 20, rowY);
+      
+      rowY += 5;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Corretor:', col1, rowY);
+      doc.setFont('helvetica', 'normal');
+      doc.text(visit.broker_name || '-', col1 + 20, rowY);
+      
+      rowY += 5;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Proprietário:', col1, rowY);
+      doc.setFont('helvetica', 'normal');
+      doc.text(visit.owner_name || '-', col1 + 25, rowY);
+      
+      return rowY + 3;
+    });
+
+    // Property Data Section
+    y = this.drawSection(doc, `Dados do Imóvel ${propertyNumber}`, y, margin, pageWidth, () => {
+      doc.setFontSize(10);
+      let rowY = y + 5;
+      const col1 = margin + 4;
+      
+      const propertyData = [
+        ['Referência:', property.property_reference || '-'],
+        ['Endereço:', property.full_address || '-'],
+        ...(property.development ? [['Empreendimento:', property.development]] : []),
+      ];
+
+      propertyData.forEach(([label, value]) => {
+        doc.setFont('helvetica', 'bold');
+        doc.text(label, col1, rowY);
+        doc.setFont('helvetica', 'normal');
+        const textLines = doc.splitTextToSize(value, pageWidth - margin - col1 - 30);
+        doc.text(textLines, col1 + 30, rowY);
+        rowY += textLines.length * 5;
+      });
+
+      // Property specs in columns
+      const specs = [
+        ['Dormitórios:', property.bedrooms?.toString() || '-'],
+        ['Suítes:', property.suites?.toString() || '-'],
+        ['Banheiros:', property.bathrooms?.toString() || '-'],
+      ];
+      
+      const specs2 = [
+        ['Vagas:', property.parking_spaces?.toString() || '-'],
+        ['Área Total:', property.total_area ? property.total_area + ' m²' : '-'],
+        ['Área Construída:', property.built_area ? property.built_area + ' m²' : '-'],
+      ];
+
+      rowY += 2;
+      const colSpec1 = col1;
+      const colSpec2 = margin + 70;
+      const colSpec3 = margin + 135;
+      
+      let maxY = rowY;
+      
+      // First row of specs
+      [specs[0], specs[1], specs[2]].forEach((spec, idx) => {
+        const xPos = [colSpec1, colSpec2, colSpec3][idx];
+        doc.setFont('helvetica', 'bold');
+        doc.text(spec[0], xPos, rowY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(spec[1], xPos + 25, rowY);
+      });
+      
+      rowY += 5;
+      
+      // Second row of specs
+      [specs2[0], specs2[1], specs2[2]].forEach((spec, idx) => {
+        const xPos = [colSpec1, colSpec2, colSpec3][idx];
+        doc.setFont('helvetica', 'bold');
+        doc.text(spec[0], xPos, rowY);
+        doc.setFont('helvetica', 'normal');
+        const labelWidth = idx === 1 ? 22 : (idx === 2 ? 30 : 15);
+        doc.text(spec[1], xPos + labelWidth, rowY);
+      });
+      
+      rowY += 5;
+      
+      // Value
+      doc.setFont('helvetica', 'bold');
+      doc.text('Valor Sugerido:', col1, rowY);
+      doc.setFont('helvetica', 'normal');
+      const value = property.suggested_sale_value ? 
+        'R$ ' + property.suggested_sale_value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '-';
+      doc.text(value, col1 + 32, rowY);
+      
+      return rowY + 3;
+    });
+
+    // Evaluation Section (if exists and visit is completed)
+    const evaluation = visit.evaluations?.find(e => e.property_id === property.id);
+    if (evaluation && visit.status === 'realizada') {
+      y = this.drawSection(doc, 'Avaliação do Imóvel', y, margin, pageWidth, () => {
+        doc.setFontSize(10);
+        let rowY = y + 5;
+        const col1 = margin + 4;
+        
+        // Conservation state
+        doc.setFont('helvetica', 'bold');
+        doc.text('Estado de conservação:', col1, rowY);
+        rowY += 5;
+        this.drawRating(doc, col1 + 5, rowY, evaluation.conservation_state);
+        rowY += 8;
+        
+        // Location
+        doc.setFont('helvetica', 'bold');
+        doc.text('Localização:', col1, rowY);
+        rowY += 5;
+        this.drawRating(doc, col1 + 5, rowY, evaluation.location_rating);
+        rowY += 8;
+        
+        // Property value
+        doc.setFont('helvetica', 'bold');
+        doc.text('Valor do imóvel:', col1, rowY);
+        rowY += 5;
+        this.drawRating(doc, col1 + 5, rowY, evaluation.property_value_rating);
+        rowY += 8;
+        
+        // Interest level
+        doc.setFont('helvetica', 'bold');
+        doc.text('Interesse do cliente:', col1, rowY);
+        rowY += 5;
+        this.drawInterestCheckboxes(doc, col1 + 5, rowY, evaluation.interest_level);
+        
+        return rowY + 3;
+      });
+    }
+
+    // Declaration text
+    y += 5;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const declarationText = 'Na qualidade de possível comprador, declaro para os devidos fins que visitei o imóvel acima descrito por intermédio da imobiliária, estando ciente das condições apresentadas.';
+    const lines = doc.splitTextToSize(declarationText, pageWidth - 2 * margin);
+    doc.text(lines, margin, y, { align: 'justify' });
+    y += lines.length * 5 + 5;
+
+    // Signature lines
+    y += 10;
+    const sigWidth = (pageWidth - 2 * margin - 20) / 3;
+    const sig1X = margin;
+    const sig2X = margin + sigWidth + 10;
+    const sig3X = margin + 2 * sigWidth + 20;
+    
+    // Draw signature lines
+    doc.line(sig1X, y, sig1X + sigWidth, y);
+    doc.line(sig2X, y, sig2X + sigWidth, y);
+    doc.line(sig3X, y, sig3X + sigWidth, y);
+    
+    // Labels
+    doc.setFontSize(9);
+    doc.text('Assinatura do Cliente', sig1X + sigWidth / 2, y + 5, { align: 'center' });
+    doc.text('Assinatura do Corretor', sig2X + sigWidth / 2, y + 5, { align: 'center' });
+    doc.text('Assinatura do Proprietário', sig3X + sigWidth / 2, y + 5, { align: 'center' });
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    const timestamp = `Gerado em ${new Date().toLocaleString('pt-BR')}`;
+    doc.text(timestamp, pageWidth / 2, 287, { align: 'center' });
+  }
+
+  private drawEmptyPage(doc: jsPDF, visit: VisitWithDetails): void {
+    const pageWidth = 210;
+    const margin = 15;
+    let y = margin;
+
+    y = this.drawHeader(doc, visit, y, margin, pageWidth);
+
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ROTEIRO DE VISITA', pageWidth / 2, y, { align: 'center' });
+    y += 15;
+
+    y = this.drawSection(doc, 'Dados da Visita', y, margin, pageWidth, () => {
+      const visitDate = visit.visit_date ? new Date(visit.visit_date).toLocaleDateString('pt-BR') : '-';
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      
+      let rowY = y + 5;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Data:', margin + 4, rowY);
+      doc.setFont('helvetica', 'normal');
+      doc.text(visitDate, margin + 20, rowY);
+      
+      return rowY + 3;
+    });
+
+    y += 20;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(100, 100, 100);
+    doc.text('Nenhum imóvel vinculado a esta visita.', pageWidth / 2, y, { align: 'center' });
+    
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Gerado em ${new Date().toLocaleString('pt-BR')}`, pageWidth / 2, 287, { align: 'center' });
+  }
+
+  private drawHeader(doc: jsPDF, visit: VisitWithDetails, y: number, margin: number, pageWidth: number): number {
+    const headerHeight = 25;
+    
+    // Draw border
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    doc.line(margin, y + headerHeight, pageWidth - margin, y + headerHeight);
+    
+    // Company info (left side)
+    const logoSize = 18;
+    const logoX = margin + 2;
+    const logoY = y + 3;
+    
+    // Draw logo placeholder box
+    doc.setLineWidth(0.3);
+    doc.rect(logoX, logoY, logoSize, logoSize);
+    doc.setFontSize(8);
+    doc.text('LOGO', logoX + logoSize / 2, logoY + logoSize / 2 + 2, { align: 'center' });
+    
+    // Company details
+    const infoX = logoX + logoSize + 4;
+    let infoY = logoY + 4;
+    
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(visit.company_name || 'Imobiliária', infoX, infoY);
+    
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    if (visit.company_address) {
+      infoY += 4;
+      const addressLines = doc.splitTextToSize(visit.company_address, 70);
+      doc.text(addressLines[0], infoX, infoY);
+      if (addressLines.length > 1) {
+        infoY += 3.5;
+        doc.text(addressLines[1], infoX, infoY);
+      }
+    }
+    if (visit.company_phone) {
+      infoY += 4;
+      doc.text(`Tel: ${visit.company_phone}`, infoX, infoY);
+    }
+    if (visit.company_creci) {
+      infoY += 4;
+      doc.text(`CRECI: ${visit.company_creci}`, infoX, infoY);
+    }
+    
+    // Broker info (right side)
+    if (visit.broker_name) {
+      let brokerY = logoY + 4;
+      const brokerX = pageWidth - margin - 60;
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Corretor Responsável', brokerX, brokerY, { align: 'left' });
+      
+      brokerY += 4;
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text(visit.broker_name, brokerX, brokerY, { align: 'left' });
+      
+      if (visit.broker_creci) {
+        brokerY += 4;
+        doc.text(`CRECI: ${visit.broker_creci}`, brokerX, brokerY, { align: 'left' });
+      }
+      if (visit.broker_phone) {
+        brokerY += 4;
+        doc.text(`Tel: ${visit.broker_phone}`, brokerX, brokerY, { align: 'left' });
+      }
+    }
+    
+    return y + headerHeight + 5;
+  }
+
+  private drawSection(doc: jsPDF, title: string, y: number, margin: number, pageWidth: number, contentDrawer: () => number): number {
+    const sectionWidth = pageWidth - 2 * margin;
+    
+    // Section border
+    doc.setLineWidth(0.3);
+    doc.rect(margin, y, sectionWidth, 7);
+    
+    // Section title with gray background
+    doc.setFillColor(240, 240, 240);
+    doc.rect(margin, y, sectionWidth, 7, 'F');
+    doc.rect(margin, y, sectionWidth, 7, 'S');
+    
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(title, margin + 2, y + 5);
+    
+    y += 7;
+    
+    // Content area
+    const contentStartY = y;
+    const contentEndY = contentDrawer();
+    const contentHeight = contentEndY - contentStartY;
+    
+    // Draw content border
+    doc.setLineWidth(0.3);
+    doc.line(margin, contentStartY, margin, contentEndY);
+    doc.line(pageWidth - margin, contentStartY, pageWidth - margin, contentEndY);
+    doc.line(margin, contentEndY, pageWidth - margin, contentEndY);
+    
+    return contentEndY + 5;
+  }
+
+  private drawRating(doc: jsPDF, x: number, y: number, rating?: number): void {
+    const boxSize = 6;
+    const gap = 3;
+    
+    for (let i = 1; i <= 5; i++) {
+      const boxX = x + (i - 1) * (boxSize + gap);
+      
+      doc.setLineWidth(0.3);
+      doc.rect(boxX, y, boxSize, boxSize);
+      
+      if (rating && i <= rating) {
+        doc.setFillColor(0, 0, 0);
+        doc.rect(boxX, y, boxSize, boxSize, 'F');
+        doc.setTextColor(255, 255, 255);
+      } else {
+        doc.setTextColor(0, 0, 0);
+      }
+      
+      doc.setFontSize(8);
+      doc.text(i.toString(), boxX + boxSize / 2, y + boxSize / 2 + 1.5, { align: 'center' });
+      doc.setTextColor(0, 0, 0);
+    }
+  }
+
+  private drawInterestCheckboxes(doc: jsPDF, x: number, y: number, interestLevel?: string): void {
+    const options = [
+      { label: 'Descartou', value: 'DESCARTOU' },
+      { label: 'Interessou', value: 'INTERESSOU' },
+      { label: 'Interessou e assinou proposta', value: 'INTERESSOU_E_ASSINOU_PROPOSTA' }
+    ];
+    
+    const boxSize = 4;
+    let currentX = x;
+    
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    
+    options.forEach((option, index) => {
+      // Draw checkbox
+      doc.setLineWidth(0.3);
+      doc.rect(currentX, y - boxSize / 2, boxSize, boxSize);
+      
+      // Check if selected
+      if (interestLevel === option.value) {
+        doc.setFontSize(10);
+        doc.text('✓', currentX + boxSize / 2, y + 1, { align: 'center' });
+        doc.setFontSize(9);
+      }
+      
+      // Label
+      doc.text(option.label, currentX + boxSize + 2, y + 1);
+      
+      // Move to next position
+      const labelWidth = doc.getTextWidth(option.label);
+      currentX += boxSize + labelWidth + 10;
+      
+      // Break to new line if needed
+      if (index === 1 && options.length === 3) {
+        y += 6;
+        currentX = x;
+      }
+    });
   }
 
   private formatStatus(status?: string): string {
