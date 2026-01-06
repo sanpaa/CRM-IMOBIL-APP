@@ -622,8 +622,7 @@ export class VisitFormComponent implements OnInit, OnChanges {
       parking_spaces: undefined,
       total_area: undefined,
       built_area: undefined,
-      suggested_sale_value: undefined,
-      selected_property_id: undefined
+      suggested_sale_value: undefined
     });
 
     // Add corresponding evaluation placeholder
@@ -646,7 +645,6 @@ export class VisitFormComponent implements OnInit, OnChanges {
       this.properties[index].parking_spaces = selectedProperty.parking;
       this.properties[index].total_area = selectedProperty.area;
       this.properties[index].suggested_sale_value = Number(selectedProperty.price);
-      (this.properties[index] as any).selected_property_id = propertyId;
     }
   }
 
