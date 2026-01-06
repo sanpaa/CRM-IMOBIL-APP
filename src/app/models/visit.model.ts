@@ -47,5 +47,12 @@ export interface VisitWithDetails extends Visit {
   evaluations?: VisitEvaluation[];
   client_name?: string;
   broker_name?: string;
+  broker_creci?: string;
+  broker_phone?: string;
   owner_name?: string;
+  company_name?: string;
+  company_creci?: string;
+  company_address?: string;
+  company_phone?: string;
+  company_logo_url?: string;
 }
