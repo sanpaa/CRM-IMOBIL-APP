@@ -6,6 +6,9 @@ import { VisitWithDetails, VisitProperty, VisitEvaluation } from '../models/visi
 })
 export class VisitPdfService {
 
+  // Configuration constants
+  private readonly IMAGE_LOAD_TIMEOUT_MS = 2000;
+
   constructor() {}
 
   /**
@@ -91,7 +94,7 @@ export class VisitPdfService {
           if (loadedImages < totalImages) {
             printWindow.print();
           }
-        }, 2000);
+        }, this.IMAGE_LOAD_TIMEOUT_MS);
       };
     }
   }
@@ -449,9 +452,12 @@ export class VisitPdfService {
     
     if (visit.company_logo_url && typeof visit.company_logo_url === 'string') {
       const url = visit.company_logo_url.trim();
-      // Allow http(s) URLs and data URLs (base64)
-      if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image/')) {
-        logoHtml = `<img src="${this.escapeHtml(url)}" alt="Logo" onerror="this.style.display='none'" />`;
+      
+      // Validate URL format
+      const isValidUrl = this.isValidLogoUrl(url);
+      if (isValidUrl) {
+        // Use a div wrapper to hide on error instead of inline handler
+        logoHtml = `<img src="${this.escapeHtml(url)}" alt="Logo" style="display: block;" />`;
       }
     }
 
@@ -737,6 +743,33 @@ export class VisitPdfService {
     const div = document.createElement('div');
     div.textContent = text; // textContent automatically escapes HTML
     return div.innerHTML;
+  }
+
+  /**
+   * Validates if a URL is safe to use as a logo source.
+   * Allows HTTP(S) URLs and base64 data URLs with image MIME types.
+   */
+  private isValidLogoUrl(url: string): boolean {
+    if (!url) return false;
+
+    // Allow data URLs with image MIME types
+    if (url.startsWith('data:image/')) {
+      const validImageTypes = ['jpeg', 'jpg', 'png', 'gif', 'svg+xml', 'webp'];
+      return validImageTypes.some(type => url.startsWith(`data:image/${type}`));
+    }
+
+    // Allow HTTP(S) URLs
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      try {
+        // Additional validation using URL constructor
+        new URL(url);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    return false;
   }
 }
 
