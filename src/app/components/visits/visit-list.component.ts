@@ -6,17 +6,19 @@ import { VisitService } from '../../services/visit.service';
 import { Visit } from '../../models/visit.model';
 import { VisitCalendarComponent } from './visit-calendar.component';
 import { VisitStatisticsComponent } from './visit-statistics.component';
+import { VisitPdfService } from '../../services/visit-pdf.service';
+import { VisitFormComponent } from './visit-form.component';
 
 @Component({
   selector: 'app-visit-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, VisitCalendarComponent, VisitStatisticsComponent],
+  imports: [CommonModule, FormsModule, RouterLink, VisitCalendarComponent, VisitStatisticsComponent, VisitFormComponent],
   template: `
     <div class="page-container">
       <div class="page-header">
         <h1>Visitas Agendadas</h1>
-        <button (click)="showForm = !showForm" class="btn-primary">
-          {{ showForm ? 'Cancelar' : '+ Nova Visita' }}
+        <button (click)="openForm()" class="btn-primary">
+          + Nova Visita
         </button>
       </div>
 
@@ -35,38 +37,6 @@ import { VisitStatisticsComponent } from './visit-statistics.component';
           (viewChange)="onViewChange($event)"
           (dateChange)="onDateChange($event)">
         </app-visit-calendar>
-
-        <div class="form-card" *ngIf="showForm">
-        <h2>{{ editingVisit ? 'Editar Visita' : 'Nova Visita' }}</h2>
-        <form (ngSubmit)="saveVisit()">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Data da Visita *</label>
-              <input type="date" [(ngModel)]="formData.visit_date" name="visit_date" required class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Horário *</label>
-              <input type="time" [(ngModel)]="formData.visit_time" name="visit_time" required class="form-control">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Status</label>
-              <select [(ngModel)]="formData.status" name="status" class="form-control">
-                <option value="agendada">Agendada</option>
-                <option value="confirmada">Confirmada</option>
-                <option value="realizada">Realizada</option>
-                <option value="cancelada">Cancelada</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Observações</label>
-            <textarea [(ngModel)]="formData.notes" name="notes" rows="3" class="form-control"></textarea>
-          </div>
-          <button type="submit" class="btn-primary">Salvar</button>
-        </form>
-      </div>
 
       <div class="table-card">
         <table class="data-table">
@@ -88,6 +58,7 @@ import { VisitStatisticsComponent } from './visit-statistics.component';
               <td>
                 <button (click)="editVisit(visit)" class="btn-sm">Editar</button>
                 <button (click)="deleteVisit(visit.id)" class="btn-sm btn-danger">Excluir</button>
+                <button (click)="generatePdf(visit.id)" class="btn-sm btn-success">Gerar PDF</button>
               </td>
             </tr>
             <tr *ngIf="visits.length === 0">
@@ -97,6 +68,14 @@ import { VisitStatisticsComponent } from './visit-statistics.component';
         </table>
       </div>
       </div>
+
+      <!-- Visit Form Modal -->
+      <app-visit-form
+        [isVisible]="showForm"
+        [editingVisit]="editingVisit"
+        (onClose)="closeForm()"
+        (onSave)="onFormSave()">
+      </app-visit-form>
     </div>
   `,
   styles: [`
@@ -144,63 +123,13 @@ import { VisitStatisticsComponent } from './visit-statistics.component';
       box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
     }
 
-    .form-card, .table-card {
+    .table-card {
       background: white;
       margin-bottom: 2rem;
       padding: 2.5rem;
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
       border: 1px solid #e5e7eb;
-    }
-
-    .form-card h2 {
-      margin: 0 0 2rem 0;
-      color: #1e293b;
-      font-size: 1.5rem;
-      font-weight: 700;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid #e5e7eb;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .form-group label {
-      margin-bottom: 0.5rem;
-      color: #475569;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 0.875rem;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      transition: all 0.2s ease;
-      box-sizing: border-box;
-      font-family: inherit;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    select.form-control {
-      cursor: pointer;
-      background-color: white;
     }
 
     .data-table {
@@ -276,6 +205,14 @@ import { VisitStatisticsComponent } from './visit-statistics.component';
       background: #dc2626;
     }
 
+    .btn-success {
+      background: #10b981;
+    }
+
+    .btn-success:hover {
+      background: #059669;
+    }
+
     .text-center {
       text-align: center;
       padding: 2rem;
@@ -284,16 +221,12 @@ import { VisitStatisticsComponent } from './visit-statistics.component';
     }
 
     @media (max-width: 768px) {
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-
       .page-header, .content-wrapper {
         margin: 1rem;
         padding: 1.5rem;
       }
 
-      .form-card, .table-card {
+      .table-card {
         padding: 1.5rem;
       }
 
@@ -307,13 +240,13 @@ export class VisitListComponent implements OnInit {
   visits: Visit[] = [];
   showForm = false;
   editingVisit: Visit | null = null;
-  formData: any = {};
   currentView: 'day' | 'week' | 'month' = 'month';
   currentDate: Date = new Date();
 
-  constructor(private visitService: VisitService) {
-    this.resetForm();
-  }
+  constructor(
+    private visitService: VisitService,
+    private pdfService: VisitPdfService
+  ) {}
 
   async ngOnInit() {
     await this.loadVisits();
@@ -327,35 +260,23 @@ export class VisitListComponent implements OnInit {
     }
   }
 
-  resetForm() {
-    this.formData = {
-      visit_date: '',
-      visit_time: '',
-      status: 'agendada',
-      notes: ''
-    };
+  openForm() {
+    this.editingVisit = null;
+    this.showForm = true;
+  }
+
+  closeForm() {
+    this.showForm = false;
+    this.editingVisit = null;
   }
 
   editVisit(visit: Visit) {
     this.editingVisit = visit;
-    this.formData = { ...visit };
     this.showForm = true;
   }
 
-  async saveVisit() {
-    try {
-      if (this.editingVisit) {
-        await this.visitService.update(this.editingVisit.id, this.formData);
-      } else {
-        await this.visitService.create(this.formData);
-      }
-      this.showForm = false;
-      this.editingVisit = null;
-      this.resetForm();
-      await this.loadVisits();
-    } catch (error) {
-      console.error('Error saving visit:', error);
-    }
+  async onFormSave() {
+    await this.loadVisits();
   }
 
   async deleteVisit(id: string) {
@@ -375,5 +296,20 @@ export class VisitListComponent implements OnInit {
 
   onDateChange(date: Date) {
     this.currentDate = date;
+  }
+
+  async generatePdf(visitId: string) {
+    try {
+      const visitWithDetails = await this.visitService.getVisitWithDetails(visitId);
+      if (visitWithDetails) {
+        this.pdfService.generateVisitPdf(visitWithDetails);
+      } else {
+        console.error('Visit not found');
+        alert('Erro ao carregar dados da visita.');
+      }
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Erro ao gerar PDF. Por favor, tente novamente.');
+    }
   }
 }
