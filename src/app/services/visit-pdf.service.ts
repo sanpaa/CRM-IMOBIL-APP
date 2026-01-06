@@ -58,10 +58,40 @@ export class VisitPdfService {
       printWindow.document.close();
       
       // Wait for images to load before printing
+      // Check if there are any images in the document
       printWindow.onload = () => {
-        setTimeout(() => {
+        const images = printWindow.document.getElementsByTagName('img');
+        if (images.length === 0) {
+          // No images, print immediately
           printWindow.print();
-        }, 500);
+          return;
+        }
+
+        // Wait for all images to load
+        let loadedImages = 0;
+        const totalImages = images.length;
+        const checkAllLoaded = () => {
+          loadedImages++;
+          if (loadedImages === totalImages) {
+            printWindow.print();
+          }
+        };
+
+        Array.from(images).forEach(img => {
+          if (img.complete) {
+            checkAllLoaded();
+          } else {
+            img.onload = checkAllLoaded;
+            img.onerror = checkAllLoaded; // Continue even if image fails to load
+          }
+        });
+
+        // Fallback timeout in case image loading detection fails
+        setTimeout(() => {
+          if (loadedImages < totalImages) {
+            printWindow.print();
+          }
+        }, 2000);
       };
     }
   }
@@ -411,11 +441,19 @@ export class VisitPdfService {
   /**
    * Generates HTML for header with company logo and information.
    * Logo is displayed from URL (company_logo_url) - supports absolute URLs or base64.
+   * If logo fails to load or URL is invalid, a placeholder is shown.
    */
   private generateHeader(visit: VisitWithDetails): string {
-    const logoHtml = visit.company_logo_url 
-      ? `<img src="${this.escapeHtml(visit.company_logo_url)}" alt="Logo" />`
-      : '<div style="padding: 15px; font-size: 8pt; color: #999;">LOGO</div>';
+    // Validate and sanitize logo URL
+    let logoHtml = '<div style="padding: 15px; font-size: 8pt; color: #999;">LOGO</div>';
+    
+    if (visit.company_logo_url && typeof visit.company_logo_url === 'string') {
+      const url = visit.company_logo_url.trim();
+      // Allow http(s) URLs and data URLs (base64)
+      if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image/')) {
+        logoHtml = `<img src="${this.escapeHtml(url)}" alt="Logo" onerror="this.style.display='none'" />`;
+      }
+    }
 
     return `
 <table class="header-table">
@@ -474,6 +512,11 @@ export class VisitPdfService {
     `;
   }
 
+  /**
+   * Generates participants section with Cliente and Corretor.
+   * Note: Owner (Proprietário) information is intentionally excluded from this section
+   * as per requirements - owner signature was also removed from the document.
+   */
   private generateParticipantsSection(visit: VisitWithDetails): string {
     return `
 <div class="section">
@@ -683,9 +726,16 @@ export class VisitPdfService {
     return statusMap[status || ''] || status || '-';
   }
 
+  /**
+   * Escapes HTML special characters to prevent XSS attacks.
+   * Uses browser's built-in text content mechanism for safe escaping.
+   */
   private escapeHtml(text: string): string {
+    if (!text || typeof text !== 'string') {
+      return '';
+    }
     const div = document.createElement('div');
-    div.textContent = text;
+    div.textContent = text; // textContent automatically escapes HTML
     return div.innerHTML;
   }
 }
