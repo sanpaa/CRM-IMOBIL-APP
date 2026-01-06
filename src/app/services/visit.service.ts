@@ -119,7 +119,23 @@ export class VisitService {
     const evaluations = await this.getVisitEvaluations(visitId);
 
     // Get related names
-    let client_name, broker_name, owner_name;
+    let client_name, broker_name, broker_creci, broker_phone, owner_name;
+    let company_name, company_creci, company_address, company_phone, company_logo_url;
+
+    // Get company information
+    const { data: company } = await this.supabase
+      .from('companies')
+      .select('name, creci, address, phone, logo_url')
+      .eq('id', visit.company_id)
+      .single();
+    
+    if (company) {
+      company_name = company.name;
+      company_creci = company.creci;
+      company_address = company.address;
+      company_phone = company.phone;
+      company_logo_url = company.logo_url;
+    }
 
     if (visit.client_id) {
       const { data: client } = await this.supabase
@@ -133,10 +149,12 @@ export class VisitService {
     if (visit.broker_id) {
       const { data: broker } = await this.supabase
         .from('users')
-        .select('name, email')
+        .select('name, email, creci, phone')
         .eq('id', visit.broker_id)
         .single();
       broker_name = broker?.name || broker?.email;
+      broker_creci = broker?.creci;
+      broker_phone = broker?.phone;
     }
 
     if (visit.owner_id) {
@@ -154,7 +172,14 @@ export class VisitService {
       evaluations,
       client_name,
       broker_name,
-      owner_name
+      broker_creci,
+      broker_phone,
+      owner_name,
+      company_name,
+      company_creci,
+      company_address,
+      company_phone,
+      company_logo_url
     } as VisitWithDetails;
   }
 

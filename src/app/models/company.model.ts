@@ -4,6 +4,9 @@ export interface Company {
   document?: string;
   email?: string;
   phone?: string;
+  creci?: string;
+  address?: string;
+  logo_url?: string;
   active: boolean;
   custom_domain?: string;
   website_enabled?: boolean;
