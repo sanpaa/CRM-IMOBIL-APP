@@ -125,7 +125,7 @@ export class VisitService {
     // Get company information
     const { data: company } = await this.supabase
       .from('companies')
-      .select('name, creci, address, phone, logo_url')
+      .select('name, creci, address, phone, logo_url, header_config')
       .eq('id', visit.company_id)
       .single();
     
@@ -134,7 +134,8 @@ export class VisitService {
       company_creci = company.creci;
       company_address = company.address;
       company_phone = company.phone;
-      company_logo_url = company.logo_url;
+      // Prioritize logo from header_config (settings), fallback to logo_url
+      company_logo_url = (company.header_config as any)?.logoUrl || company.logo_url;
     }
 
     if (visit.client_id) {
