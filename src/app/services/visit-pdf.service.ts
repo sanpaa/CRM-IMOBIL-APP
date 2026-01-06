@@ -432,11 +432,12 @@ export class VisitPdfService {
       doc.setLineWidth(0.3);
       doc.rect(currentX, y - boxSize / 2, boxSize, boxSize);
       
-      // Check if selected
+      // Check if selected - draw X instead of checkmark for better compatibility
       if (interestLevel === option.value) {
-        doc.setFontSize(10);
-        doc.text('✓', currentX + boxSize / 2, y + 1, { align: 'center' });
-        doc.setFontSize(9);
+        doc.setLineWidth(0.5);
+        doc.line(currentX + 0.5, y - boxSize / 2 + 0.5, currentX + boxSize - 0.5, y + boxSize / 2 - 0.5);
+        doc.line(currentX + 0.5, y + boxSize / 2 - 0.5, currentX + boxSize - 0.5, y - boxSize / 2 + 0.5);
+        doc.setLineWidth(0.3);
       }
       
       // Label
