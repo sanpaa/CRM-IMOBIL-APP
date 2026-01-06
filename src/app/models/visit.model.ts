@@ -40,7 +40,6 @@ export interface VisitEvaluation {
   property_value_rating?: number;
   interest_level?: InterestLevel;
   created_at?: string;
-  updated_at?: string;
 }
 
 export interface VisitWithDetails extends Visit {

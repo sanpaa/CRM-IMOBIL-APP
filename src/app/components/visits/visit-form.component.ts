@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VisitService } from '../../services/visit.service';
 import { ClientService } from '../../services/client.service';
+import { PropertyService } from '../../services/property.service';
 import { SupabaseService } from '../../services/supabase.service';
 import { Visit, VisitProperty, VisitEvaluation, InterestLevel } from '../../models/visit.model';
 import { Client } from '../../models/client.model';
+import { Property } from '../../models/property.model';
 import { User } from '../../models/user.model';
 import { AuthService } from '../../services/auth.service';
 
@@ -93,6 +95,18 @@ import { AuthService } from '../../services/auth.service';
                 <div class="property-header">
                   <h4>Imóvel {{ i + 1 }}</h4>
                   <button type="button" (click)="removeProperty(i)" class="btn-remove">Remover</button>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Selecionar Imóvel Cadastrado (opcional)</label>
+                    <select (change)="onPropertySelect(i, $any($event.target).value)" [name]="'select_prop_' + i" class="form-control">
+                      <option value="">-- Ou preencher manualmente abaixo --</option>
+                      <option *ngFor="let availProp of availableProperties" [value]="availProp.id">
+                        {{ availProp.title }} - {{ availProp.city }} (R$ {{ availProp.price | number:'1.2-2' }})
+                      </option>
+                    </select>
+                  </div>
                 </div>
 
                 <div class="form-row">
@@ -508,11 +522,13 @@ export class VisitFormComponent implements OnInit, OnChanges {
   evaluations: VisitEvaluation[] = [];
   clients: Client[] = [];
   brokers: User[] = [];
+  availableProperties: Property[] = [];
   saving = false;
 
   constructor(
     private visitService: VisitService,
     private clientService: ClientService,
+    private propertyService: PropertyService,
     private authService: AuthService,
     private supabaseService: SupabaseService
   ) {}
@@ -520,6 +536,7 @@ export class VisitFormComponent implements OnInit, OnChanges {
   async ngOnInit() {
     await this.loadClients();
     await this.loadBrokers();
+    await this.loadAvailableProperties();
     this.resetForm();
   }
 
@@ -554,6 +571,14 @@ export class VisitFormComponent implements OnInit, OnChanges {
       this.brokers = data || [];
     } catch (error) {
       console.error('Error loading brokers:', error);
+    }
+  }
+
+  async loadAvailableProperties() {
+    try {
+      this.availableProperties = await this.propertyService.getAll();
+    } catch (error) {
+      console.error('Error loading properties:', error);
     }
   }
 
@@ -597,7 +622,8 @@ export class VisitFormComponent implements OnInit, OnChanges {
       parking_spaces: undefined,
       total_area: undefined,
       built_area: undefined,
-      suggested_sale_value: undefined
+      suggested_sale_value: undefined,
+      selected_property_id: undefined
     });
 
     // Add corresponding evaluation placeholder
@@ -607,6 +633,32 @@ export class VisitFormComponent implements OnInit, OnChanges {
       property_value_rating: undefined,
       interest_level: undefined
     });
+  }
+
+  onPropertySelect(index: number, propertyId: string) {
+    const selectedProperty = this.availableProperties.find(p => p.id === propertyId);
+    if (selectedProperty && this.properties[index]) {
+      // Populate fields from selected property
+      this.properties[index].property_reference = selectedProperty.title || '';
+      this.properties[index].full_address = this.formatAddress(selectedProperty);
+      this.properties[index].bedrooms = selectedProperty.bedrooms;
+      this.properties[index].bathrooms = selectedProperty.bathrooms;
+      this.properties[index].parking_spaces = selectedProperty.parking;
+      this.properties[index].total_area = selectedProperty.area;
+      this.properties[index].suggested_sale_value = Number(selectedProperty.price);
+      (this.properties[index] as any).selected_property_id = propertyId;
+    }
+  }
+
+  formatAddress(property: Property): string {
+    const parts = [
+      property.street,
+      property.neighborhood,
+      property.city,
+      property.state,
+      property.zip_code
+    ].filter(part => part);
+    return parts.join(', ');
   }
 
   removeProperty(index: number) {
