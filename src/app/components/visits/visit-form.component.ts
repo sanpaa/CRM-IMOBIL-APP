@@ -635,6 +635,11 @@ export class VisitFormComponent implements OnInit, OnChanges {
   }
 
   onPropertySelect(index: number, propertyId: string) {
+    if (index < 0 || index >= this.properties.length) {
+      console.error('Invalid property index:', index);
+      return;
+    }
+
     const selectedProperty = this.availableProperties.find(p => p.id === propertyId);
     if (selectedProperty && this.properties[index]) {
       // Populate fields from selected property
@@ -655,7 +660,7 @@ export class VisitFormComponent implements OnInit, OnChanges {
       property.city,
       property.state,
       property.zip_code
-    ].filter(part => part);
+    ].filter(part => part != null && part !== '');
     return parts.join(', ');
   }
 
