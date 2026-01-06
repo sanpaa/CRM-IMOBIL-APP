@@ -187,13 +187,23 @@ export class PropertyListComponent implements OnInit {
     if (!files) return;
 
     const maxDocuments = 10;
-    const remainingSlots = maxDocuments - this.documentFiles.length;
+    const totalCurrent = this.getDocumentCount();
+    const remainingSlots = maxDocuments - totalCurrent;
     const filesToAdd = Math.min(files.length, remainingSlots);
 
     for (let i = 0; i < filesToAdd; i++) {
+      const file = files[i];
+      
+      // Validate file extension
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
+      if (!fileExt) {
+        console.warn('Arquivo sem extensão ignorado:', file.name);
+        continue;
+      }
+      
       this.documentFiles.push({
-        name: files[i].name,
-        file: files[i]
+        name: file.name,
+        file: file
       });
     }
 
@@ -205,7 +215,16 @@ export class PropertyListComponent implements OnInit {
   }
 
   removeDocument(index: number) {
-    this.documentFiles.splice(index, 1);
+    const existingCount = this.formData.document_urls?.length || 0;
+    
+    if (index < existingCount) {
+      // Remove from existing documents
+      this.formData.document_urls.splice(index, 1);
+    } else {
+      // Remove from new documents
+      const newIndex = index - existingCount;
+      this.documentFiles.splice(newIndex, 1);
+    }
   }
 
   getDocumentCount(): number {

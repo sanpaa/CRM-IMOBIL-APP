@@ -58,7 +58,12 @@ export class PropertyService {
     const user = this.auth.getCurrentUser();
     if (!user) throw new Error('User not authenticated');
 
-    const fileExt = file.name.split('.').pop();
+    // Validate file extension
+    const fileExt = file.name.split('.').pop()?.toLowerCase();
+    if (!fileExt) {
+      throw new Error(`Arquivo "${file.name}" não possui extensão válida`);
+    }
+
     const fileName = `${propertyId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `${user.company_id}/${fileName}`;
 
@@ -67,6 +72,11 @@ export class PropertyService {
       .upload(filePath, file);
 
     if (error) throw error;
+    
+    // Validate upload was successful
+    if (!data || !data.path) {
+      throw new Error(`Falha ao fazer upload do arquivo "${file.name}"`);
+    }
 
     const { data: urlData } = this.supabase.storage
       .from('property-documents')

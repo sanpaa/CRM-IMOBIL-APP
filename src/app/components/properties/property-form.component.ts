@@ -130,8 +130,21 @@ import { Property } from '../../models/property.model';
             class="form-control" 
             accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
             multiple>
-          <small class="form-hint">{{ documentFiles.length }}/{{ maxDocuments }} documentos adicionados. Formatos aceitos: PDF, DOC, DOCX, XLS, XLSX, TXT</small>
+          <small class="form-hint">{{ getTotalDocumentCount() }}/{{ maxDocuments }} documentos. Formatos aceitos: PDF, DOC, DOCX, XLS, XLSX, TXT</small>
+          
+          <!-- Existing documents -->
+          <div class="document-list" *ngIf="documentUrls.length > 0">
+            <div class="document-list-title">Documentos anexados:</div>
+            <div *ngFor="let url of documentUrls; let i = index" class="document-item">
+              <span class="document-icon">{{ getFileIcon(extractFileName(url) || '') }}</span>
+              <span class="document-name">{{ extractFileName(url) || 'Documento ' + (i + 1) }}</span>
+              <button type="button" (click)="removeExistingDocument(i)" class="remove-btn-doc">×</button>
+            </div>
+          </div>
+          
+          <!-- New documents to upload -->
           <div class="document-list" *ngIf="documentFiles.length > 0">
+            <div class="document-list-title" *ngIf="documentUrls.length > 0">Novos documentos:</div>
             <div *ngFor="let doc of documentFiles; let i = index" class="document-item">
               <span class="document-icon">{{ getFileIcon(doc.name) }}</span>
               <span class="document-name">{{ doc.name }}</span>
@@ -281,6 +294,13 @@ import { Property } from '../../models/property.model';
       margin-top: 1rem;
     }
 
+    .document-list-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 0.25rem;
+    }
+
     .document-item {
       display: flex;
       align-items: center;
@@ -414,10 +434,8 @@ export class PropertyFormComponent implements OnInit {
       this.formData = { ...this.editingProperty };
       this.imageUrls = this.editingProperty.image_urls || [];
       this.documentUrls = this.editingProperty.document_urls || [];
-      this.documentFiles = this.documentUrls.map((url, index) => ({
-        name: this.extractFileName(url) || `Documento ${index + 1}`,
-        url: url
-      }));
+      // Note: existing documents don't have File objects, only URLs
+      // They will be displayed but can't be re-uploaded
       // this.videoUrls = this.editingProperty.video_urls || [];
     }
   }
@@ -560,11 +578,20 @@ export class PropertyFormComponent implements OnInit {
   onDocumentSelect(event: any) {
     const files = event.target.files;
     if (files) {
-      const remainingSlots = PropertyFormComponent.MAX_DOCUMENTS - this.documentFiles.length;
+      const totalCurrent = this.documentUrls.length + this.documentFiles.length;
+      const remainingSlots = PropertyFormComponent.MAX_DOCUMENTS - totalCurrent;
       const filesToAdd = Math.min(files.length, remainingSlots);
       
       for (let i = 0; i < filesToAdd; i++) {
         const file = files[i];
+        
+        // Validate file extension
+        const fileExt = file.name.split('.').pop()?.toLowerCase();
+        if (!fileExt) {
+          console.warn('Arquivo sem extensão ignorado:', file.name);
+          continue;
+        }
+        
         const reader = new FileReader();
         reader.onload = (e: any) => {
           this.documentFiles.push({
@@ -585,6 +612,14 @@ export class PropertyFormComponent implements OnInit {
 
   removeDocument(index: number) {
     this.documentFiles.splice(index, 1);
+  }
+
+  removeExistingDocument(index: number) {
+    this.documentUrls.splice(index, 1);
+  }
+
+  getTotalDocumentCount(): number {
+    return this.documentUrls.length + this.documentFiles.length;
   }
 
   extractFileName(url: string): string | null {
@@ -622,7 +657,7 @@ export class PropertyFormComponent implements OnInit {
     
     this.formData.image_urls = this.imageUrls;
     this.formData.document_files = this.documentFiles.map(d => d.file);
-    this.formData.document_urls = this.editingProperty?.document_urls || [];
+    this.formData.document_urls = this.documentUrls;
     this.save.emit(this.formData);
   }
 
