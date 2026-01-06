@@ -80,6 +80,7 @@ CREATE TABLE properties (
     image_url TEXT,
     image_urls TEXT[] DEFAULT '{}',
     video_urls TEXT[] DEFAULT '{}',
+    document_urls TEXT[] DEFAULT '{}',
     street VARCHAR(255),
     neighborhood VARCHAR(255),
     city VARCHAR(255),
@@ -94,7 +95,8 @@ CREATE TABLE properties (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT max_images_check CHECK (array_length(image_urls, 1) IS NULL OR array_length(image_urls, 1) <= 20),
-    CONSTRAINT max_videos_check CHECK (array_length(video_urls, 1) IS NULL OR array_length(video_urls, 1) <= 3)
+    CONSTRAINT max_videos_check CHECK (array_length(video_urls, 1) IS NULL OR array_length(video_urls, 1) <= 3),
+    CONSTRAINT max_documents_check CHECK (array_length(document_urls, 1) IS NULL OR array_length(document_urls, 1) <= 10)
 );
 
 -- ============================================

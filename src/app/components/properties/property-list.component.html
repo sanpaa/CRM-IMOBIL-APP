@@ -150,6 +150,28 @@
         </div>
 
         <div class="form-section">
+          <h3>Documentos</h3>
+          <div class="form-group">
+            <label>Anexar Documentos (PDF, DOC, DOCX, XLS, XLSX, TXT - até 10)</label>
+            <input 
+              type="file" 
+              (change)="onDocumentSelect($event)" 
+              class="form-control" 
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
+              multiple
+              #documentInput>
+            <small class="form-hint">{{ getDocumentCount() }}/10 documentos</small>
+          </div>
+          <div class="document-list" *ngIf="getDocumentCount() > 0">
+            <div *ngFor="let doc of getDocumentList(); let i = index" class="document-item">
+              <span class="document-icon">{{ getFileIcon(doc.name) }}</span>
+              <span class="document-name">{{ doc.name }}</span>
+              <button type="button" (click)="removeDocument(i)" class="btn-remove">×</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
           <h3>Status</h3>
           <div class="form-row">
             <div class="form-group checkbox-group">

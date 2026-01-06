@@ -122,6 +122,23 @@ import { Property } from '../../models/property.model';
         </div>
         
 
+        <div class="form-group">
+          <label>Documentos (até {{ maxDocuments }})</label>
+          <input 
+            type="file" 
+            (change)="onDocumentSelect($event)" 
+            class="form-control" 
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
+            multiple>
+          <small class="form-hint">{{ documentFiles.length }}/{{ maxDocuments }} documentos adicionados. Formatos aceitos: PDF, DOC, DOCX, XLS, XLSX, TXT</small>
+          <div class="document-list" *ngIf="documentFiles.length > 0">
+            <div *ngFor="let doc of documentFiles; let i = index" class="document-item">
+              <span class="document-icon">{{ getFileIcon(doc.name) }}</span>
+              <span class="document-name">{{ doc.name }}</span>
+              <button type="button" (click)="removeDocument(i)" class="remove-btn-doc">×</button>
+            </div>
+          </div>
+        </div>
         
         <div class="form-actions">
           <button type="button" (click)="onCancel()" class="btn-secondary">Cancelar</button>
@@ -257,6 +274,66 @@ import { Property } from '../../models/property.model';
       transform: scale(1.1);
     }
 
+    .document-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .document-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem;
+      background: #f8fafc;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .document-item:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .document-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .document-name {
+      flex: 1;
+      color: #475569;
+      font-size: 0.9rem;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .remove-btn-doc {
+      width: 28px;
+      height: 28px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.25rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .remove-btn-doc:hover {
+      background: #dc2626;
+      transform: scale(1.1);
+    }
+
     .form-actions {
       display: flex;
       gap: 1rem;
@@ -320,11 +397,14 @@ export class PropertyFormComponent implements OnInit {
 
   private static readonly MAX_IMAGES = 20;
   private static readonly MAX_VIDEOS = 3;
+  private static readonly MAX_DOCUMENTS = 10;
   private static readonly CEP_REGEX = /\D/g;
 
   formData: any = {};
   imageUrls: string[] = [];
   videoUrls: string[] = [];
+  documentUrls: string[] = [];
+  documentFiles: { name: string; url: string; file: File }[] = [];
   loading = false;
   loadingCep = false;
 
@@ -333,6 +413,11 @@ export class PropertyFormComponent implements OnInit {
     if (this.editingProperty) {
       this.formData = { ...this.editingProperty };
       this.imageUrls = this.editingProperty.image_urls || [];
+      this.documentUrls = this.editingProperty.document_urls || [];
+      this.documentFiles = this.documentUrls.map((url, index) => ({
+        name: this.extractFileName(url) || `Documento ${index + 1}`,
+        url: url
+      }));
       // this.videoUrls = this.editingProperty.video_urls || [];
     }
   }
@@ -343,6 +428,10 @@ export class PropertyFormComponent implements OnInit {
 
   get maxVideos(): number {
     return PropertyFormComponent.MAX_VIDEOS;
+  }
+
+  get maxDocuments(): number {
+    return PropertyFormComponent.MAX_DOCUMENTS;
   }
 
   resetForm() {
@@ -363,6 +452,8 @@ export class PropertyFormComponent implements OnInit {
       contact: ''
     };
     this.imageUrls = [];
+    this.documentUrls = [];
+    this.documentFiles = [];
   }
 
   async fetchAddressFromCep() {
@@ -466,6 +557,63 @@ export class PropertyFormComponent implements OnInit {
     this.imageUrls.splice(index, 1);
   }
 
+  onDocumentSelect(event: any) {
+    const files = event.target.files;
+    if (files) {
+      const remainingSlots = PropertyFormComponent.MAX_DOCUMENTS - this.documentFiles.length;
+      const filesToAdd = Math.min(files.length, remainingSlots);
+      
+      for (let i = 0; i < filesToAdd; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.documentFiles.push({
+            name: file.name,
+            url: e.target.result,
+            file: file
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+      
+      if (files.length > remainingSlots) {
+        alert(`Limite de ${PropertyFormComponent.MAX_DOCUMENTS} documentos. Apenas ${filesToAdd} documentos foram adicionados.`);
+      }
+    }
+    event.target.value = '';
+  }
+
+  removeDocument(index: number) {
+    this.documentFiles.splice(index, 1);
+  }
+
+  extractFileName(url: string): string | null {
+    try {
+      const parts = url.split('/');
+      return parts[parts.length - 1];
+    } catch {
+      return null;
+    }
+  }
+
+  getFileIcon(fileName: string): string {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    switch (extension) {
+      case 'pdf':
+        return '📄';
+      case 'doc':
+      case 'docx':
+        return '📝';
+      case 'xls':
+      case 'xlsx':
+        return '📊';
+      case 'txt':
+        return '📃';
+      default:
+        return '📎';
+    }
+  }
+
   async onSubmit() {
     // Ensure coordinates are set before saving
     if (!this.formData.latitude || !this.formData.longitude) {
@@ -473,6 +621,8 @@ export class PropertyFormComponent implements OnInit {
     }
     
     this.formData.image_urls = this.imageUrls;
+    this.formData.document_files = this.documentFiles.map(d => d.file);
+    this.formData.document_urls = this.editingProperty?.document_urls || [];
     this.save.emit(this.formData);
   }
 

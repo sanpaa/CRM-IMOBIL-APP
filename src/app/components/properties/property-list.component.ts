@@ -22,6 +22,7 @@ export class PropertyListComponent implements OnInit {
   showForm = false;
   editingProperty: Property | null = null;
   formData: any = {};
+  documentFiles: { name: string; file: File }[] = [];
   
   // Filters
   searchTerm = '';
@@ -100,12 +101,14 @@ export class PropertyListComponent implements OnInit {
       featured: false,
       sold: false
     };
+    this.documentFiles = [];
   }
 
   openModal(property?: Property) {
     if (property) {
       this.editingProperty = property;
       this.formData = { ...property };
+      this.documentFiles = [];
     } else {
       this.editingProperty = null;
       this.resetForm();
@@ -121,11 +124,33 @@ export class PropertyListComponent implements OnInit {
 
   async saveProperty() {
     try {
+      let propertyId: string;
+      
       if (this.editingProperty) {
-        await this.propertyService.update(this.editingProperty.id, this.formData);
+        const updated = await this.propertyService.update(this.editingProperty.id, this.formData);
+        propertyId = updated.id;
       } else {
-        await this.propertyService.create(this.formData);
+        const created = await this.propertyService.create(this.formData);
+        propertyId = created.id;
       }
+      
+      // Upload documents if any
+      if (this.documentFiles.length > 0) {
+        const files = this.documentFiles.map(d => d.file);
+        const documentUrls = await this.propertyService.uploadDocuments(files, propertyId);
+        
+        // Merge with existing document URLs
+        const allDocumentUrls = [
+          ...(this.formData.document_urls || []),
+          ...documentUrls
+        ];
+        
+        // Update property with document URLs
+        await this.propertyService.update(propertyId, {
+          document_urls: allDocumentUrls
+        });
+      }
+      
       this.closeModal();
       await this.loadProperties();
     } catch (error) {
@@ -155,5 +180,65 @@ export class PropertyListComponent implements OnInit {
     if (!ownerId) return '-';
     const owner = this.owners.find(o => o.id === ownerId);
     return owner ? owner.name : '-';
+  }
+
+  onDocumentSelect(event: any) {
+    const files = event.target.files;
+    if (!files) return;
+
+    const maxDocuments = 10;
+    const remainingSlots = maxDocuments - this.documentFiles.length;
+    const filesToAdd = Math.min(files.length, remainingSlots);
+
+    for (let i = 0; i < filesToAdd; i++) {
+      this.documentFiles.push({
+        name: files[i].name,
+        file: files[i]
+      });
+    }
+
+    if (files.length > remainingSlots) {
+      alert(`Limite de ${maxDocuments} documentos. Apenas ${filesToAdd} foram adicionados.`);
+    }
+
+    event.target.value = '';
+  }
+
+  removeDocument(index: number) {
+    this.documentFiles.splice(index, 1);
+  }
+
+  getDocumentCount(): number {
+    const existingDocs = this.formData.document_urls?.length || 0;
+    return existingDocs + this.documentFiles.length;
+  }
+
+  getDocumentList(): { name: string }[] {
+    const existing = (this.formData.document_urls || []).map((url: string) => ({
+      name: this.extractFileName(url)
+    }));
+    return [...existing, ...this.documentFiles];
+  }
+
+  extractFileName(url: string): string {
+    try {
+      const parts = url.split('/');
+      return parts[parts.length - 1];
+    } catch {
+      return 'Documento';
+    }
+  }
+
+  getFileIcon(fileName: string): string {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    switch (extension) {
+      case 'pdf': return '📄';
+      case 'doc':
+      case 'docx': return '📝';
+      case 'xls':
+      case 'xlsx': return '📊';
+      case 'txt': return '📃';
+      default: return '📎';
+    }
   }
 }
