@@ -3,6 +3,7 @@ import { SupabaseService } from './supabase.service';
 import { AuthService } from './auth.service';
 import { Visit, VisitProperty, VisitEvaluation, VisitWithDetails } from '../models/visit.model';
 import { HeaderConfig } from '../models/company.model';
+import { PaginatedResponse, PaginationParams } from '../models/pagination.model';
 
 @Injectable({
   providedIn: 'root'
@@ -271,5 +272,101 @@ export class VisitService {
       .eq('id', id);
 
     if (error) throw error;
+  }
+
+  /**
+   * Get visits with comprehensive filters and optional pagination
+   * Supports 9 filters: search, status, dateFrom, dateTo, client, broker, owner, propertyCode, imobiliaria
+   * If no page/limit params, returns all visits matching filters
+   */
+  async findPaginated(filters: {
+    search?: string;
+    status?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    client?: string;
+    broker?: string;
+    owner?: string;
+    propertyCode?: string;
+    imobiliaria?: string;
+  } & PaginationParams): Promise<PaginatedResponse<Visit> | Visit[]> {
+    const user = this.auth.getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // Check if pagination is requested
+    const isPaginated = filters.page !== undefined || filters.limit !== undefined;
+    const page = filters.page || 1;
+    const limit = filters.limit || 10;
+    const offset = (page - 1) * limit;
+
+    // Build query
+    let query = this.supabase
+      .from('visits')
+      .select('*', { count: 'exact' })
+      .eq('company_id', filters.imobiliaria || user.company_id);
+
+    // Apply filters
+    if (filters.status) {
+      query = query.eq('status', filters.status);
+    }
+
+    if (filters.dateFrom) {
+      query = query.gte('visit_date', filters.dateFrom);
+    }
+
+    if (filters.dateTo) {
+      query = query.lte('visit_date', filters.dateTo);
+    }
+
+    if (filters.client) {
+      query = query.eq('client_id', filters.client);
+    }
+
+    if (filters.broker) {
+      query = query.eq('broker_id', filters.broker);
+    }
+
+    if (filters.owner) {
+      query = query.eq('owner_id', filters.owner);
+    }
+
+    if (filters.propertyCode) {
+      query = query.eq('property_id', filters.propertyCode);
+    }
+
+    // Text search across notes
+    if (filters.search) {
+      query = query.ilike('notes', `%${filters.search}%`);
+    }
+
+    // Apply ordering
+    query = query
+      .order('visit_date', { ascending: false })
+      .order('visit_time', { ascending: false });
+
+    // Apply pagination if requested
+    if (isPaginated) {
+      query = query.range(offset, offset + limit - 1);
+    }
+
+    const { data, error, count } = await query;
+
+    if (error) throw error;
+
+    // If pagination not requested, return all data
+    if (!isPaginated) {
+      return data as Visit[];
+    }
+
+    // Return paginated response
+    const total = count || 0;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: data as Visit[],
+      total,
+      page,
+      totalPages
+    };
   }
 }
