@@ -194,23 +194,24 @@ export class AuthService {
    */
   private isTokenExpired(token: string): boolean {
     try {
-      // Valida estrutura do token JWT
+      // Valida estrutura do token
       if (!token || typeof token !== 'string') {
         console.warn('⚠️ Token inválido: não é uma string');
         return true; // Token inválido é considerado expirado
       }
 
       const parts = token.split('.');
+      // Se não é JWT (não tem 3 partes), aceita como token simples sem expiração
       if (parts.length !== 3) {
-        console.warn('⚠️ Token inválido: estrutura JWT incorreta');
-        return true; // Token malformado é considerado expirado
+        console.log('ℹ️ Token não-JWT detectado (token simples sem expiração)');
+        return false; // Token simples é válido (backend gerencia expiração)
       }
 
       // Decodifica o payload do JWT (parte do meio)
       const payload = JSON.parse(atob(parts[1]));
       
       if (!payload.exp) {
-        console.warn('⚠️ Token não possui campo de expiração');
+        console.warn('⚠️ Token JWT não possui campo de expiração');
         return false; // Se não tem expiração, considera válido
       }
       
@@ -220,13 +221,13 @@ export class AuthService {
       const isExpired = currentTime >= expirationTime;
       
       if (isExpired) {
-        console.warn('⚠️ Token expirou em:', new Date(expirationTime).toISOString());
+        console.warn('⚠️ Token JWT expirou em:', new Date(expirationTime).toISOString());
       }
       
       return isExpired;
     } catch (error) {
       console.error('❌ Erro ao verificar expiração do token:', error);
-      // Em caso de erro, considera o token expirado por segurança
+      // Em caso de erro ao parsear JWT, considera o token expirado por segurança
       return true;
     }
   }
@@ -238,16 +239,17 @@ export class AuthService {
     this.clearTokenExpirationTimer();
     
     try {
-      // Valida estrutura do token JWT
+      // Valida estrutura do token
       if (!token || typeof token !== 'string') {
         console.warn('⚠️ Token inválido para configurar expiração');
         return;
       }
 
       const parts = token.split('.');
+      // Se não é JWT (não tem 3 partes), não configura expiração automática
       if (parts.length !== 3) {
-        console.warn('⚠️ Token malformado para configurar expiração');
-        return;
+        console.log('ℹ️ Token não-JWT detectado - expiração gerenciada pelo backend');
+        return; // Backend gerencia a expiração para tokens simples
       }
 
       const payload = JSON.parse(atob(parts[1]));
@@ -262,10 +264,10 @@ export class AuthService {
         
         if (timeUntilExpiration > 0) {
           const actualTimeout = Math.min(timeUntilExpiration, MAX_TIMEOUT);
-          console.log(`⏰ Token expira em ${Math.round(timeUntilExpiration / 1000 / 60)} minutos`);
+          console.log(`⏰ Token JWT expira em ${Math.round(timeUntilExpiration / 1000 / 60)} minutos`);
           
           this.tokenExpirationTimer = setTimeout(() => {
-            console.warn('⏰ Token expirou! Fazendo logout automático...');
+            console.warn('⏰ Token JWT expirou! Fazendo logout automático...');
             this.signOut();
             this.broadcastAuthMessage({ type: 'SESSION_INVALID', timestamp: Date.now() });
           }, actualTimeout);
