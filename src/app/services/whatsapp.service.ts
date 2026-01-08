@@ -161,8 +161,12 @@ export class WhatsAppService implements OnDestroy {
       const currentUser = localStorage.getItem('currentUser');
       const companyId = this.authService.getValidCompanyId();
       
-      if (!currentUser || !companyId) {
+      if (!currentUser) {
         throw new Error('Dados do usuário não encontrados. Faça login novamente.');
+      }
+      
+      if (!companyId) {
+        throw new Error('ID da empresa inválido. Faça login novamente.');
       }
 
       const user = JSON.parse(currentUser);

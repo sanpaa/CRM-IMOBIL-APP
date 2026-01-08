@@ -6,6 +6,7 @@ import { WebsiteCustomizationService } from '../../services/website-customizatio
 import { PropertyService } from '../../services/property.service';
 import { CompanyService } from '../../services/company.service';
 import { PublicSiteApiService } from '../../services/public-site-api.service';
+import { AuthService } from '../../services/auth.service';
 import { WebsiteLayout, LayoutSection } from '../../models/website-layout.model';
 import { StoreSettings } from '../../models/company.model';
 import { Property } from '../../models/property.model';
@@ -45,7 +46,8 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
     private customizationService: WebsiteCustomizationService,
     private propertyService: PropertyService,
     private companyService: CompanyService,
-    private publicSiteApi: PublicSiteApiService
+    private publicSiteApi: PublicSiteApiService,
+    private authService: AuthService
   ) {}
 
   async ngOnInit() {
@@ -54,13 +56,8 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(async params => {
-        const companyIdFromStorage = localStorage.getItem('company_id');
-        // Validate company_id is not null, 'null', or 'undefined'
-        const validCompanyId = (companyIdFromStorage && 
-                                companyIdFromStorage !== 'null' && 
-                                companyIdFromStorage !== 'undefined')
-                                ? companyIdFromStorage 
-                                : null;
+        // Use AuthService validation for consistency
+        const validCompanyId = this.authService.getValidCompanyId();
         this.companyId = params['companyId'] || validCompanyId;
         if (this.companyId) {
           await this.loadWebsite();
