@@ -39,18 +39,6 @@ export class WhatsAppService implements OnDestroy {
   }
 
   /**
-   * Obtém company_id válido do localStorage
-   * Valida que não seja null, undefined, string 'null' ou vazio
-   */
-  private getValidCompanyId(): string | null {
-    const companyId = localStorage.getItem('company_id');
-    if (!companyId || companyId === 'null' || companyId === 'undefined') {
-      return null;
-    }
-    return companyId;
-  }
-
-  /**
    * Inicializa verificação de conexão existente quando o usuário está autenticado
    */
   private initializeConnectionCheck(): void {
@@ -128,7 +116,7 @@ export class WhatsAppService implements OnDestroy {
     try {
       // Verifica se usuário está logado checando localStorage
       const currentUser = localStorage.getItem('currentUser');
-      const companyId = this.getValidCompanyId();
+      const companyId = this.authService.getValidCompanyId();
       
       console.log('📦 currentUser from localStorage:', currentUser ? 'FOUND' : 'NOT FOUND');
       console.log('📦 company_id from localStorage:', companyId);
@@ -166,7 +154,7 @@ export class WhatsAppService implements OnDestroy {
 
       // Busca user_id e company_id do localStorage
       const currentUser = localStorage.getItem('currentUser');
-      const companyId = this.getValidCompanyId();
+      const companyId = this.authService.getValidCompanyId();
       
       if (!currentUser || !companyId) {
         throw new Error('Dados do usuário não encontrados. Faça login novamente.');
@@ -217,7 +205,7 @@ export class WhatsAppService implements OnDestroy {
   async getConnectionStatus(): Promise<WhatsAppConnectionStatus> {
     try {
       const accessToken = await this.getAccessTokenFromSupabase();
-      const companyId = this.getValidCompanyId();
+      const companyId = this.authService.getValidCompanyId();
       
       if (!accessToken || !companyId) {
         // Retorna status desconectado se não tiver token ou company_id válido
@@ -302,7 +290,7 @@ export class WhatsAppService implements OnDestroy {
   async disconnect(): Promise<void> {
     try {
       const accessToken = await this.getAccessTokenFromSupabase();
-      const companyId = this.getValidCompanyId();
+      const companyId = this.authService.getValidCompanyId();
       
       if (!accessToken) {
         throw new Error('Você precisa estar logado no CRM para desconectar o WhatsApp');
@@ -342,7 +330,7 @@ export class WhatsAppService implements OnDestroy {
   async getMessages(limit: number = 50): Promise<WhatsAppMessage[]> {
     try {
       const accessToken = await this.getAccessTokenFromSupabase();
-      const companyId = this.getValidCompanyId();
+      const companyId = this.authService.getValidCompanyId();
       
       if (!accessToken) {
         throw new Error('Você precisa estar logado no CRM para buscar mensagens');
@@ -374,7 +362,7 @@ export class WhatsAppService implements OnDestroy {
   async sendMessage(to: string, message: string): Promise<void> {
     try {
       const accessToken = await this.getAccessTokenFromSupabase();
-      const companyId = this.getValidCompanyId();
+      const companyId = this.authService.getValidCompanyId();
       
       if (!accessToken) {
         throw new Error('Você precisa estar logado no CRM para enviar mensagens');
@@ -407,7 +395,7 @@ export class WhatsAppService implements OnDestroy {
   async getConversation(phone: string, limit: number = 50): Promise<WhatsAppMessage[]> {
     try {
       const accessToken = await this.getAccessTokenFromSupabase();
-      const companyId = this.getValidCompanyId();
+      const companyId = this.authService.getValidCompanyId();
       
       if (!accessToken) {
         throw new Error('Você precisa estar logado no CRM para buscar conversas');
@@ -443,7 +431,7 @@ export class WhatsAppService implements OnDestroy {
   async getAutoCreatedClients(): Promise<any[]> {
     try {
       const accessToken = await this.getAccessTokenFromSupabase();
-      const companyId = this.getValidCompanyId();
+      const companyId = this.authService.getValidCompanyId();
       
       if (!accessToken) {
         throw new Error('Você precisa estar logado no CRM para buscar clientes');
