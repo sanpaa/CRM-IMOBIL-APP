@@ -81,8 +81,8 @@ import { Subscription } from 'rxjs';
         <!-- Gerando QR Code / Restaurando Sessão -->
         <div *ngIf="connectionStatus.status === 'connecting'" class="status-section connecting">
           <div class="loading-spinner"></div>
-          <h3>{{ connectionStatus.message?.includes('Restaurando') ? 'Restaurando Conexão...' : 'Gerando QR Code...' }}</h3>
-          <p>{{ connectionStatus.message || 'Aguarde enquanto geramos o código de pareamento' }}</p>
+          <h3>{{ getConnectingTitle() }}</h3>
+          <p>{{ getConnectingMessage() }}</p>
         </div>
 
         <!-- Autenticando (após escanear QR) -->
@@ -570,5 +570,28 @@ export class WhatsAppSettingsComponent implements OnInit, OnDestroy {
     } finally {
       this.isLoading = false;
     }
+  }
+
+  /**
+   * Returns the appropriate title for connecting status
+   * Checks if backend is restoring session vs generating new QR code
+   */
+  getConnectingTitle(): string {
+    const message = this.connectionStatus.message || '';
+    // Check for keywords that indicate session restoration
+    if (message.toLowerCase().includes('restaur') || message.toLowerCase().includes('restor')) {
+      return 'Restaurando Conexão...';
+    }
+    return 'Gerando QR Code...';
+  }
+
+  /**
+   * Returns the appropriate message for connecting status
+   */
+  getConnectingMessage(): string {
+    if (this.connectionStatus.message) {
+      return this.connectionStatus.message;
+    }
+    return 'Aguarde enquanto geramos o código de pareamento';
   }
 }
