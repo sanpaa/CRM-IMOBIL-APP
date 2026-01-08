@@ -31,7 +31,8 @@ export class SupabaseService {
         auth: {
           autoRefreshToken: true,
           persistSession: true,
-          detectSessionInUrl: true
+          detectSessionInUrl: true,
+          storage: new CustomStorageAdapter()
         }
       }
     );
