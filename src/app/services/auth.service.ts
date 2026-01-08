@@ -24,7 +24,7 @@ export class AuthService {
     if (storedUser) {
       const user = JSON.parse(storedUser);
       // Validate that user has a valid company_id
-      if (user && user.company_id && user.company_id !== 'null' && user.company_id !== null) {
+      if (user && this.isValidCompanyId(user.company_id)) {
         this.currentUserSubject.next(user);
       } else {
         // Clear invalid session
@@ -52,6 +52,13 @@ export class AuthService {
       console.error('❌ Error getting auth token:', error);
       return null;
     }
+  }
+
+  /**
+   * Valida se o company_id é válido (não null, undefined, ou string 'null')
+   */
+  private isValidCompanyId(companyId: any): boolean {
+    return companyId && companyId !== 'null' && companyId !== null;
   }
 
 
@@ -111,7 +118,7 @@ export class AuthService {
       }
 
       // Validate company_id
-      if (!result.user.company_id || result.user.company_id === 'null' || result.user.company_id === null) {
+      if (!this.isValidCompanyId(result.user.company_id)) {
         console.error('❌ Usuário não tem company_id válido:', result.user);
         return { 
           data: null, 
