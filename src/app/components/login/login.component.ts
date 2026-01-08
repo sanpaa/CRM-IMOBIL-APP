@@ -180,11 +180,14 @@ export class LoginComponent {
       
       if (error) {
         this.errorMessage = error.message || 'Email ou senha inválidos';
+        console.error('❌ Erro no login:', this.errorMessage);
       } else {
+        console.log('✅ Login realizado com sucesso');
         this.router.navigate(['/dashboard']);
       }
     } catch (error: any) {
       this.errorMessage = error?.message || 'Erro ao fazer login. Tente novamente.';
+      console.error('❌ Erro inesperado no login:', error);
     } finally {
       this.loading = false;
     }
