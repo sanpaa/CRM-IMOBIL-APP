@@ -22,7 +22,17 @@ export class AuthService {
   private checkStoredSession() {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
-      this.currentUserSubject.next(JSON.parse(storedUser));
+      const user = JSON.parse(storedUser);
+      // Validate that user has a valid company_id
+      if (user && user.company_id && user.company_id !== 'null' && user.company_id !== null) {
+        this.currentUserSubject.next(user);
+      } else {
+        // Clear invalid session
+        console.warn('⚠️ Sessão inválida detectada (company_id ausente). Limpando localStorage...');
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('company_id');
+        localStorage.removeItem('auth_token');
+      }
     }
   }
 
@@ -98,6 +108,17 @@ export class AuthService {
       if (!result.token || !result.user) {
         console.error('❌ Backend não retornou token ou usuário');
         return { data: null, error: { message: 'Erro ao receber token do servidor' } };
+      }
+
+      // Validate company_id
+      if (!result.user.company_id || result.user.company_id === 'null' || result.user.company_id === null) {
+        console.error('❌ Usuário não tem company_id válido:', result.user);
+        return { 
+          data: null, 
+          error: { 
+            message: 'Erro: Usuário não está associado a nenhuma empresa. Entre em contato com o administrador do sistema.' 
+          } 
+        };
       }
 
       // Store token and user from backend
