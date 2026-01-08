@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +15,11 @@ export class AuthGuard implements CanActivate {
   async canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Promise<boolean> {
+  ): Promise<boolean | UrlTree> {
     // Verifica se o usuário está autenticado
     if (!this.authService.isAuthenticated()) {
       console.warn('🚫 AuthGuard: Usuário não autenticado');
-      this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-      return false;
+      return this.router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
     }
 
     // Valida a sessão (token não expirado, company_id válido, etc.)
@@ -27,8 +27,7 @@ export class AuthGuard implements CanActivate {
     
     if (!isValid) {
       console.warn('🚫 AuthGuard: Sessão inválida');
-      this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-      return false;
+      return this.router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
     }
 
     console.log('✅ AuthGuard: Acesso permitido');

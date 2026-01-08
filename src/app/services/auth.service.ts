@@ -194,8 +194,20 @@ export class AuthService {
    */
   private isTokenExpired(token: string): boolean {
     try {
+      // Valida estrutura do token JWT
+      if (!token || typeof token !== 'string') {
+        console.warn('⚠️ Token inválido: não é uma string');
+        return true; // Token inválido é considerado expirado
+      }
+
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        console.warn('⚠️ Token inválido: estrutura JWT incorreta');
+        return true; // Token malformado é considerado expirado
+      }
+
       // Decodifica o payload do JWT (parte do meio)
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(parts[1]));
       
       if (!payload.exp) {
         console.warn('⚠️ Token não possui campo de expiração');
@@ -214,8 +226,8 @@ export class AuthService {
       return isExpired;
     } catch (error) {
       console.error('❌ Erro ao verificar expiração do token:', error);
-      // Em caso de erro, considera o token válido para não bloquear o usuário
-      return false;
+      // Em caso de erro, considera o token expirado por segurança
+      return true;
     }
   }
 
@@ -226,7 +238,19 @@ export class AuthService {
     this.clearTokenExpirationTimer();
     
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Valida estrutura do token JWT
+      if (!token || typeof token !== 'string') {
+        console.warn('⚠️ Token inválido para configurar expiração');
+        return;
+      }
+
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        console.warn('⚠️ Token malformado para configurar expiração');
+        return;
+      }
+
+      const payload = JSON.parse(atob(parts[1]));
       
       if (payload.exp) {
         const expirationTime = payload.exp * 1000;
@@ -304,6 +328,36 @@ export class AuthService {
   }
 
 
+  /**
+   * Processa resposta do backend de login
+   */
+  private async processLoginResponse(response: Response): Promise<{ data: any; error: any }> {
+    try {
+      const result = await response.json();
+
+      if (!response.ok) {
+        const errorMessage = result.error || 'Email ou senha inválidos';
+        console.error('❌ Backend login error:', errorMessage);
+        return { data: null, error: { message: errorMessage } };
+      }
+
+      if (result.error) {
+        console.error('❌ Backend login error:', result.error);
+        return { data: null, error: { message: result.error || 'Email ou senha inválidos' } };
+      }
+
+      if (!result.token || !result.user) {
+        console.error('❌ Backend não retornou token ou usuário');
+        return { data: null, error: { message: 'Erro ao receber token do servidor' } };
+      }
+
+      return { data: result, error: null };
+    } catch (error) {
+      console.error('❌ Erro ao processar resposta:', error);
+      return { data: null, error: { message: 'Erro ao processar resposta do servidor' } };
+    }
+  }
+
   async signIn(email: string, password: string) {
     try {
       console.log('🔐 Chamando backend login:', `${environment.apiUrl}/auth/login`);
@@ -355,28 +409,10 @@ export class AuthService {
         });
       }
 
-      if (!response.ok) {
-        let errorMessage = 'Email ou senha inválidos';
-        try {
-          const result = await response.json();
-          errorMessage = result.error || errorMessage;
-        } catch (e) {
-          console.error('❌ Erro ao processar resposta de erro:', e);
-        }
-        console.error('❌ Backend login error:', errorMessage);
-        return { data: null, error: { message: errorMessage } };
-      }
-
-      const result = await response.json();
-
-      if (result.error) {
-        console.error('❌ Backend login error:', result.error);
-        return { data: null, error: { message: result.error || 'Email ou senha inválidos' } };
-      }
-
-      if (!result.token || !result.user) {
-        console.error('❌ Backend não retornou token ou usuário');
-        return { data: null, error: { message: 'Erro ao receber token do servidor' } };
+      // Processa resposta
+      const { data: result, error } = await this.processLoginResponse(response);
+      if (error) {
+        return { data: null, error };
       }
 
       // Validate company_id
@@ -412,7 +448,8 @@ export class AuthService {
       return { data: result.user, error: null };
     } catch (error: any) {
       console.error('❌ Erro ao fazer login:', error);
-      return { data: null, error: { message: 'Erro ao conectar com o servidor: ' + (error.message || 'Desconhecido') } };
+      // Não expõe detalhes internos do erro ao usuário
+      return { data: null, error: { message: 'Erro ao conectar com o servidor. Tente novamente.' } };
     } finally {
       this.sessionLock = false;
     }
