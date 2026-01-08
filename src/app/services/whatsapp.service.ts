@@ -277,6 +277,13 @@ export class WhatsAppService implements OnDestroy {
         this.stopStatusPolling();
       }
       
+      // Start polling if backend is connecting/restoring session
+      // This handles the case when backend is restoring from LocalAuth after F5
+      if (status.status === 'connecting' && !this.pollingSubscription) {
+        console.log('🔄 Backend restaurando sessão. Iniciando polling...');
+        this.startStatusPolling();
+      }
+      
       return status;
     } catch (error) {
       this.pollingErrorCount++;

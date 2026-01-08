@@ -78,11 +78,11 @@ import { Subscription } from 'rxjs';
           </div>
         </div>
 
-        <!-- Gerando QR Code -->
+        <!-- Gerando QR Code / Restaurando Sessão -->
         <div *ngIf="connectionStatus.status === 'connecting'" class="status-section connecting">
           <div class="loading-spinner"></div>
-          <h3>Gerando QR Code...</h3>
-          <p>Aguarde enquanto geramos o código de pareamento</p>
+          <h3>{{ connectionStatus.message?.includes('Restaurando') ? 'Restaurando Conexão...' : 'Gerando QR Code...' }}</h3>
+          <p>{{ connectionStatus.message || 'Aguarde enquanto geramos o código de pareamento' }}</p>
         </div>
 
         <!-- Autenticando (após escanear QR) -->
