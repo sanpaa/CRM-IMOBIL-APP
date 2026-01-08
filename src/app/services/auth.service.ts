@@ -58,7 +58,7 @@ export class AuthService {
    * Valida se o company_id é válido (não null, undefined, ou string 'null')
    */
   private isValidCompanyId(companyId: any): boolean {
-    return companyId && companyId !== 'null' && companyId !== null;
+    return companyId !== null && companyId !== undefined && companyId !== 'null' && companyId !== '';
   }
 
 
