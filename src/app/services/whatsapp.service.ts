@@ -5,6 +5,16 @@ import { WhatsAppConnection, WhatsAppConnectionStatus, WhatsAppMessage } from '.
 import { SupabaseService } from './supabase.service';
 import { AuthService } from './auth.service';
 
+/**
+ * Custom error class for HTTP errors from backend
+ */
+class HttpError extends Error {
+  constructor(message: string, public statusCode: number) {
+    super(message);
+    this.name = 'HttpError';
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -43,7 +53,7 @@ export class WhatsAppService implements OnDestroy {
             await this.getConnectionStatus();
           } catch (error) {
             // Suprime erros 401 durante verificação inicial - é normal quando não há conexão ativa
-            if (error instanceof Error && !error.message.includes('401')) {
+            if (error instanceof HttpError && error.statusCode !== 401) {
               console.log('⚠️ Não foi possível verificar conexão WhatsApp:', error);
             }
           }
@@ -70,18 +80,22 @@ export class WhatsAppService implements OnDestroy {
       console.error('⚠️ Backend retornou HTML (Status:', response.status, ')');
       
       if (response.status === 503) {
-        throw new Error('Backend WhatsApp está offline ou não foi buildado. Contate o administrador.');
+        throw new HttpError('Backend WhatsApp está offline ou não foi buildado. Contate o administrador.', 503);
       }
-      throw new Error(`Backend WhatsApp indisponível (${response.status})`);
+      throw new HttpError(`Backend WhatsApp indisponível (${response.status})`, response.status);
     }
 
     // Verifica se a resposta foi bem-sucedida
     if (!response.ok) {
       try {
         const error = await response.json();
-        throw new Error(error.message || `Erro do servidor: ${response.status}`);
+        throw new HttpError(error.message || `Erro do servidor: ${response.status}`, response.status);
       } catch (parseError) {
-        throw new Error(`Erro do servidor: ${response.status}`);
+        // Se parseError for HttpError, relança ele
+        if (parseError instanceof HttpError) {
+          throw parseError;
+        }
+        throw new HttpError(`Erro do servidor: ${response.status}`, response.status);
       }
     }
 
@@ -91,7 +105,7 @@ export class WhatsAppService implements OnDestroy {
     } catch (parseError) {
       const text = await response.text();
       console.error('❌ Resposta não é JSON válido:', text.substring(0, 200));
-      throw new Error('Backend retornou resposta inválida');
+      throw new HttpError('Backend retornou resposta inválida', response.status);
     }
   }
 
@@ -247,12 +261,12 @@ export class WhatsAppService implements OnDestroy {
       return status;
     } catch (error) {
       this.pollingErrorCount++;
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       
       // 401 errors during status check are normal when there's no active WhatsApp session
-      if (errorMessage.includes('401')) {
+      if (error instanceof HttpError && error.statusCode === 401) {
         console.log(`ℹ️ WhatsApp não conectado ou sessão expirada (${this.pollingErrorCount}/${this.maxPollingErrors})`);
       } else {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         console.warn(`⚠️ WhatsApp status check failed (${this.pollingErrorCount}/${this.maxPollingErrors}):`, errorMessage);
       }
       
