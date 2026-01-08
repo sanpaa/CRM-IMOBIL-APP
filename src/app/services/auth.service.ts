@@ -61,6 +61,18 @@ export class AuthService {
     return companyId !== null && companyId !== undefined && companyId !== 'null' && companyId !== '';
   }
 
+  /**
+   * Obtém o company_id válido do usuário atual
+   * @returns company_id válido ou null se inválido
+   */
+  getValidCompanyId(): string | null {
+    const user = this.getCurrentUser();
+    if (!user || !this.isValidCompanyId(user.company_id)) {
+      return null;
+    }
+    return user.company_id;
+  }
+
 
   async signIn(email: string, password: string) {
     try {

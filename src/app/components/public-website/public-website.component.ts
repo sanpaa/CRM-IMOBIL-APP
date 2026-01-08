@@ -54,7 +54,14 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(async params => {
-        this.companyId = params['companyId'] || localStorage.getItem('company_id');
+        const companyIdFromStorage = localStorage.getItem('company_id');
+        // Validate company_id is not null, 'null', or 'undefined'
+        const validCompanyId = companyIdFromStorage && 
+                               companyIdFromStorage !== 'null' && 
+                               companyIdFromStorage !== 'undefined' 
+                               ? companyIdFromStorage 
+                               : null;
+        this.companyId = params['companyId'] || validCompanyId;
         if (this.companyId) {
           await this.loadWebsite();
         }
