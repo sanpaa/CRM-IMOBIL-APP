@@ -23,6 +23,8 @@ export interface Property {
   contact: string;
   featured?: boolean;
   sold?: boolean;
+  status?: string;
+  furnished?: boolean;
   created_at: string;
   updated_at: string;
 }
