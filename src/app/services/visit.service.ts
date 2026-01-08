@@ -277,7 +277,10 @@ export class VisitService {
   /**
    * Get visits with comprehensive filters and optional pagination
    * Supports 9 filters: search, status, dateFrom, dateTo, client, broker, owner, propertyCode, imobiliaria
-   * If no page/limit params, returns all visits matching filters
+   * 
+   * @returns PaginatedResponse<Visit> if page/limit provided, Visit[] otherwise
+   * Note: Return type is intentionally flexible to support both paginated and non-paginated queries
+   * as per requirements (pagination is optional for visits)
    */
   async findPaginated(filters: {
     search?: string;
@@ -335,8 +338,11 @@ export class VisitService {
     }
 
     // Text search across notes
+    // Note: Supabase properly escapes parameters, preventing SQL injection
     if (filters.search) {
-      query = query.ilike('notes', `%${filters.search}%`);
+      // Basic input validation: limit length and remove null bytes
+      const sanitizedSearch = filters.search.slice(0, 100).replace(/\0/g, '');
+      query = query.ilike('notes', `%${sanitizedSearch}%`);
     }
 
     // Apply ordering

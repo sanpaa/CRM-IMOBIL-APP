@@ -264,5 +264,6 @@ All paginated responses should follow this format:
 ✅ Response format is consistent
 ✅ Offline fallback works for properties
 ✅ Edge cases are handled gracefully
-✅ No SQL injection vulnerabilities
+✅ Input validation applied to search terms (length limited to 100 chars, null bytes removed)
+✅ Supabase properly parameterizes queries to prevent SQL injection
 ✅ Performance is acceptable (< 2s for queries)

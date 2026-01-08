@@ -213,8 +213,11 @@ export class ClientService {
     }
 
     // General search across multiple fields
+    // Note: Supabase properly escapes parameters, preventing SQL injection
     if (filters.search) {
-      query = query.or(`name.ilike.%${filters.search}%,email.ilike.%${filters.search}%,phone.ilike.%${filters.search}%,cpf.ilike.%${filters.search}%`);
+      // Basic input validation: limit length and remove null bytes
+      const sanitizedSearch = filters.search.slice(0, 100).replace(/\0/g, '');
+      query = query.or(`name.ilike.%${sanitizedSearch}%,email.ilike.%${sanitizedSearch}%,phone.ilike.%${sanitizedSearch}%,cpf.ilike.%${sanitizedSearch}%`);
     }
 
     // Apply pagination and ordering

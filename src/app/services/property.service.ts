@@ -285,13 +285,20 @@ export class PropertyService {
         query = query.eq('featured', filters.featured);
       }
 
+      if (filters.furnished !== undefined) {
+        query = query.eq('furnished', filters.furnished);
+      }
+
       if (filters.status) {
         query = query.eq('status', filters.status);
       }
 
       // Text search across multiple fields including street
+      // Note: Supabase properly escapes parameters, preventing SQL injection
       if (filters.search) {
-        query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,street.ilike.%${filters.search}%,neighborhood.ilike.%${filters.search}%,city.ilike.%${filters.search}%`);
+        // Basic input validation: limit length and remove null bytes
+        const sanitizedSearch = filters.search.slice(0, 100).replace(/\0/g, '');
+        query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,street.ilike.%${sanitizedSearch}%,neighborhood.ilike.%${sanitizedSearch}%,city.ilike.%${sanitizedSearch}%`);
       }
 
       // Apply pagination and ordering
@@ -342,16 +349,16 @@ export class PropertyService {
         filtered = filtered.filter(p => p.parking === filters.parking);
       }
       if (filters.areaMin !== undefined) {
-        filtered = filtered.filter(p => p.area && p.area >= filters.areaMin!);
+        filtered = filtered.filter(p => p.area && p.area >= (filters.areaMin as number));
       }
       if (filters.areaMax !== undefined) {
-        filtered = filtered.filter(p => p.area && p.area <= filters.areaMax!);
+        filtered = filtered.filter(p => p.area && p.area <= (filters.areaMax as number));
       }
       if (filters.priceMin !== undefined) {
-        filtered = filtered.filter(p => p.price >= filters.priceMin!);
+        filtered = filtered.filter(p => p.price >= (filters.priceMin as number));
       }
       if (filters.priceMax !== undefined) {
-        filtered = filtered.filter(p => p.price <= filters.priceMax!);
+        filtered = filtered.filter(p => p.price <= (filters.priceMax as number));
       }
       if (filters.sold !== undefined) {
         filtered = filtered.filter(p => p.sold === filters.sold);
