@@ -170,6 +170,7 @@ import { Company } from '../../models/company.model';
   `]
 })
 export class WelcomeComponent implements OnInit {
+  private readonly REDIRECT_DELAY_MS = 2500;
   currentUser: User | null = null;
   company: Company | null = null;
 
@@ -186,10 +187,10 @@ export class WelcomeComponent implements OnInit {
       this.company = await this.companyService.getById(this.currentUser.company_id);
     }
 
-    // Redirect to dashboard after 2.5 seconds
+    // Redirect to dashboard after configured delay
     setTimeout(() => {
       this.router.navigate(['/dashboard']);
-    }, 2500);
+    }, this.REDIRECT_DELAY_MS);
   }
 
   getUserFirstName(): string {

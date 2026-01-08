@@ -16,7 +16,6 @@ import { Subscription } from 'rxjs';
         [class.toast-error]="toast.type === 'error'"
         [class.toast-warning]="toast.type === 'warning'"
         [class.toast-info]="toast.type === 'info'"
-        [@slideIn]
       >
         <div class="toast-icon">
           <i class="bi" [ngClass]="getIcon(toast.type)"></i>
@@ -144,7 +143,7 @@ import { Subscription } from 'rxjs';
 export class ToastContainerComponent implements OnInit, OnDestroy {
   toasts: Toast[] = [];
   private subscription?: Subscription;
-  private timeouts: Map<string, any> = new Map();
+  private timeouts: Map<string, ReturnType<typeof setTimeout>> = new Map();
 
   constructor(private toastService: ToastService) {}
 

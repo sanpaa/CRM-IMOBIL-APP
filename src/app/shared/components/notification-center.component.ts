@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
 import { NotificationService } from '../../services/notification.service';
 import { Notification } from '../../models/notification.model';
 
@@ -282,7 +283,7 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
   notifications: Notification[] = [];
   unreadCount = 0;
   showPanel = false;
-  private subscription: any;
+  private subscription?: any;
 
   constructor(private notificationService: NotificationService) {}
 

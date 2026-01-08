@@ -42,6 +42,6 @@ export class ToastService {
   }
 
   private generateId(): string {
-    return `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `toast-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
   }
 }
