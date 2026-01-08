@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { BehaviorSubject, Observable, interval } from 'rxjs';
+import { BehaviorSubject, Observable, interval, Subscription } from 'rxjs';
 import { WhatsAppConnection, WhatsAppConnectionStatus, WhatsAppMessage } from '../models/whatsapp-connection.model';
 import { SupabaseService } from './supabase.service';
 import { AuthService } from './auth.service';
@@ -8,7 +8,7 @@ import { AuthService } from './auth.service';
 @Injectable({
   providedIn: 'root'
 })
-export class WhatsAppService {
+export class WhatsAppService implements OnDestroy {
   private connectionStatusSubject = new BehaviorSubject<WhatsAppConnectionStatus>({
     is_connected: false,
     status: 'disconnected'
@@ -16,13 +16,41 @@ export class WhatsAppService {
   
   public connectionStatus$ = this.connectionStatusSubject.asObservable();
   private pollingSubscription: any;
+  private authSubscription?: Subscription;
   private pollingErrorCount = 0;
   private maxPollingErrors = 5;
 
   constructor(
     private supabaseService: SupabaseService,
     private authService: AuthService
-  ) {}
+  ) {
+    // Inicializa verificação de conexão quando o usuário fizer login
+    this.initializeConnectionCheck();
+  }
+
+  /**
+   * Inicializa verificação de conexão existente quando o usuário está autenticado
+   */
+  private initializeConnectionCheck(): void {
+    // Observa mudanças no estado de autenticação
+    this.authSubscription = this.authService.currentUser$.subscribe(async (user) => {
+      if (user && user.company_id) {
+        // Usuário está autenticado, verifica se há conexão WhatsApp ativa
+        console.log('🔄 Usuário autenticado, verificando conexão WhatsApp existente...');
+        try {
+          await this.getConnectionStatus();
+        } catch (error) {
+          console.log('⚠️ Não foi possível verificar conexão WhatsApp:', error);
+        }
+      } else {
+        // Usuário não está autenticado, reseta o status
+        this.connectionStatusSubject.next({
+          is_connected: false,
+          status: 'disconnected'
+        });
+      }
+    });
+  }
 
   /**
    * Helper para tratar respostas do backend e detectar HTML/erros
@@ -487,5 +515,8 @@ export class WhatsAppService {
    */
   ngOnDestroy(): void {
     this.stopStatusPolling();
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
   }
 }
