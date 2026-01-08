@@ -106,28 +106,16 @@ export class WhatsAppService implements OnDestroy {
         return null;
       }
       
-      // Prioridade 1: Usa o auth_token gerado na autenticação
+      // Prioridade 1: Usa o auth_token gerado na autenticação (evita NavigatorLockAcquireTimeoutError)
       const authToken = this.authService.getAuthToken();
       if (authToken) {
         console.log('✅ Using auth_token from AuthService');
         return authToken;
       }
       
-      // Prioridade 2: Tenta obter a sessão do Supabase
-      try {
-        const { data: { session } } = await this.supabaseService.client.auth.getSession();
-        if (session?.access_token) {
-          console.log('✅ Using Supabase session access_token');
-          return session.access_token;
-        }
-      } catch (supabaseError) {
-        console.warn('⚠️ Could not get Supabase session');
-      }
-      
-      // Prioridade 3: Fallback para anonKey
-      const token = environment.supabase.anonKey;
-      console.log('⚠️ Using Supabase anonKey as token (fallback)');
-      return token;
+      // Prioridade 2: Fallback para anonKey (não tenta getSession() para evitar race condition)
+      console.warn('⚠️ No auth_token found, using Supabase anonKey as fallback');
+      return environment.supabase.anonKey;
     } catch (error) {
       console.error('❌ Error getting token:', error);
       return null;
