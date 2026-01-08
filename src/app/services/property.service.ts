@@ -359,6 +359,9 @@ export class PropertyService {
       if (filters.featured !== undefined) {
         filtered = filtered.filter(p => p.featured === filters.featured);
       }
+      if (filters.furnished !== undefined) {
+        filtered = filtered.filter(p => p.furnished === filters.furnished);
+      }
       if (filters.status) {
         filtered = filtered.filter(p => p.status === filters.status);
       }
