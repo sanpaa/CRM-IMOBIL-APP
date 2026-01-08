@@ -11,12 +11,18 @@ import { AuthService } from '../../services/auth.service';
   template: `
     <div class="login-container">
       <div class="login-card">
-        <h1>CRM Imobiliário</h1>
-        <h2>Login</h2>
+        <div class="logo-section">
+          <i class="bi bi-building"></i>
+          <h1>CRM Imobiliário</h1>
+        </div>
+        <h2>Acesse sua conta</h2>
         
         <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
           <div class="form-group">
-            <label for="email">Email</label>
+            <label for="email" class="form-label">
+              <i class="bi bi-envelope"></i>
+              Email
+            </label>
             <input
               type="email"
               id="email"
@@ -25,11 +31,15 @@ import { AuthService } from '../../services/auth.service';
               required
               email
               class="form-control"
+              placeholder="seu@email.com"
             >
           </div>
 
           <div class="form-group">
-            <label for="password">Senha</label>
+            <label for="password" class="form-label">
+              <i class="bi bi-lock"></i>
+              Senha
+            </label>
             <input
               type="password"
               id="password"
@@ -37,15 +47,24 @@ import { AuthService } from '../../services/auth.service';
               [(ngModel)]="password"
               required
               class="form-control"
+              placeholder="Digite sua senha"
             >
           </div>
 
-          <div class="error-message" *ngIf="errorMessage">
+          <div class="alert alert-danger" *ngIf="errorMessage">
+            <i class="bi bi-exclamation-triangle"></i>
             {{ errorMessage }}
           </div>
 
-          <button type="submit" [disabled]="!loginForm.form.valid || loading" class="btn-primary">
-            {{ loading ? 'Entrando...' : 'Entrar' }}
+          <button type="submit" [disabled]="!loginForm.form.valid || loading" class="btn btn-primary btn-lg">
+            <span *ngIf="!loading">
+              <i class="bi bi-box-arrow-in-right"></i>
+              Entrar
+            </span>
+            <span *ngIf="loading" class="d-flex align-items-center justify-content-center">
+              <span class="spinner"></span>
+              Entrando...
+            </span>
           </button>
         </form>
 
@@ -61,102 +80,88 @@ import { AuthService } from '../../services/auth.service';
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #1F2937 0%, #374151 100%);
+      padding: 1rem;
     }
 
     .login-card {
       background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
     }
 
-    h1 {
+    .logo-section {
       text-align: center;
-      color: #667eea;
+      margin-bottom: 1.5rem;
+    }
+
+    .logo-section i {
+      font-size: 3rem;
+      color: #1F2937;
       margin-bottom: 0.5rem;
-      font-size: 1.8rem;
+    }
+
+    .logo-section h1 {
+      color: #1F2937;
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 700;
     }
 
     h2 {
       text-align: center;
-      color: #333;
+      color: #374151;
       margin-bottom: 2rem;
-      font-size: 1.3rem;
+      font-size: 1.25rem;
+      font-weight: 600;
     }
 
-    .form-group {
-      margin-bottom: 1.5rem;
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: #555;
-      font-weight: 500;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 1rem;
-      box-sizing: border-box;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: #667eea;
+    .form-label i {
+      color: #6B7280;
     }
 
     .btn-primary {
-      width: 100%;
-      padding: 0.75rem;
-      background: #667eea;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: #5568d3;
-    }
-
-    .btn-primary:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-
-    .error-message {
-      color: #dc3545;
-      margin-bottom: 1rem;
-      padding: 0.75rem;
-      background: #f8d7da;
-      border-radius: 5px;
-      font-size: 0.9rem;
+      margin-top: 0.5rem;
     }
 
     .register-link {
       text-align: center;
       margin-top: 1.5rem;
-      color: #666;
+      color: #6B7280;
+      font-size: 0.95rem;
     }
 
     .register-link a {
-      color: #667eea;
+      color: #1F2937;
       text-decoration: none;
       font-weight: 600;
     }
 
     .register-link a:hover {
       text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 2rem 1.5rem;
+      }
+
+      .logo-section i {
+        font-size: 2.5rem;
+      }
+
+      .logo-section h1 {
+        font-size: 1.5rem;
+      }
     }
   `]
 })
@@ -183,7 +188,7 @@ export class LoginComponent {
         console.error('❌ Erro no login:', this.errorMessage);
       } else {
         console.log('✅ Login realizado com sucesso');
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/welcome']);
       }
     } catch (error: any) {
       this.errorMessage = error?.message || 'Erro ao fazer login. Tente novamente.';
