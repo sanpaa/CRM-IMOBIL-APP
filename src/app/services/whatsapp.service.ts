@@ -36,12 +36,18 @@ export class WhatsAppService implements OnDestroy {
     this.authSubscription = this.authService.currentUser$.subscribe(async (user) => {
       if (user && user.company_id) {
         // Usuário está autenticado, verifica se há conexão WhatsApp ativa
-        console.log('🔄 Usuário autenticado, verificando conexão WhatsApp existente...');
-        try {
-          await this.getConnectionStatus();
-        } catch (error) {
-          console.log('⚠️ Não foi possível verificar conexão WhatsApp:', error);
-        }
+        // Adiciona um pequeno delay para garantir que o auth_token está completamente configurado
+        console.log('🔄 Usuário autenticado, agendando verificação de conexão WhatsApp...');
+        setTimeout(async () => {
+          try {
+            await this.getConnectionStatus();
+          } catch (error) {
+            // Suprime erros 401 durante verificação inicial - é normal quando não há conexão ativa
+            if (error instanceof Error && !error.message.includes('401')) {
+              console.log('⚠️ Não foi possível verificar conexão WhatsApp:', error);
+            }
+          }
+        }, 500); // 500ms de delay para garantir que tudo está inicializado
       } else {
         // Usuário não está autenticado, reseta o status
         this.connectionStatusSubject.next({
@@ -241,7 +247,14 @@ export class WhatsAppService implements OnDestroy {
       return status;
     } catch (error) {
       this.pollingErrorCount++;
-      console.warn(`⚠️ WhatsApp status check failed (${this.pollingErrorCount}/${this.maxPollingErrors}):`, error instanceof Error ? error.message : 'Unknown error');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      // 401 errors during status check are normal when there's no active WhatsApp session
+      if (errorMessage.includes('401')) {
+        console.log(`ℹ️ WhatsApp não conectado ou sessão expirada (${this.pollingErrorCount}/${this.maxPollingErrors})`);
+      } else {
+        console.warn(`⚠️ WhatsApp status check failed (${this.pollingErrorCount}/${this.maxPollingErrors}):`, errorMessage);
+      }
       
       // Stop polling after max errors
       if (this.pollingErrorCount >= this.maxPollingErrors) {
