@@ -179,12 +179,12 @@ export class LoginComponent {
       const { error } = await this.authService.signIn(this.email, this.password);
       
       if (error) {
-        this.errorMessage = 'Email ou senha inválidos';
+        this.errorMessage = error.message || 'Email ou senha inválidos';
       } else {
         this.router.navigate(['/dashboard']);
       }
     } catch (error: any) {
-      this.errorMessage = 'Erro ao fazer login. Tente novamente.';
+      this.errorMessage = error?.message || 'Erro ao fazer login. Tente novamente.';
     } finally {
       this.loading = false;
     }
