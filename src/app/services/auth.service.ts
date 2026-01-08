@@ -55,10 +55,30 @@ export class AuthService {
   }
 
   /**
-   * Valida se o company_id é válido (não null, undefined, ou string 'null')
+   * Valida se o company_id é válido (não null, undefined, ou string 'null'/'undefined')
    */
   private isValidCompanyId(companyId: any): boolean {
-    return companyId !== null && companyId !== undefined && companyId !== 'null' && companyId !== '';
+    return companyId !== null && companyId !== undefined && companyId !== 'null' && companyId !== 'undefined' && companyId !== '';
+  }
+
+  /**
+   * Valida se uma string de company_id é válida
+   * Método público para uso em componentes
+   */
+  isValidCompanyIdString(companyId: string | null | undefined): boolean {
+    return this.isValidCompanyId(companyId);
+  }
+
+  /**
+   * Obtém o company_id válido do usuário atual
+   * @returns company_id válido ou null se inválido
+   */
+  getValidCompanyId(): string | null {
+    const user = this.getCurrentUser();
+    if (!user || !this.isValidCompanyId(user.company_id)) {
+      return null;
+    }
+    return user.company_id;
   }
 
 

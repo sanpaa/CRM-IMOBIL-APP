@@ -55,14 +55,16 @@ export class PublicSiteSettingsComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.companyId = localStorage.getItem('company_id');
-    console.log('🟢 Company ID do localStorage:', this.companyId);
-    
-    if (!this.companyId) {
-      console.error('🔴 Company ID não encontrado no localStorage!');
-      alert('Erro: Company ID não encontrado. Faça login novamente.');
+    const companyId = localStorage.getItem('company_id');
+    // Validate company_id is not null, 'null', or 'undefined'
+    if (!companyId || companyId === 'null' || companyId === 'undefined') {
+      console.error('🔴 Company ID inválido ou não encontrado no localStorage!');
+      alert('Erro: Sessão inválida. Faça login novamente.');
       return;
     }
+    
+    this.companyId = companyId;
+    console.log('🟢 Company ID do localStorage:', this.companyId);
     
     await this.loadSettings();
   }

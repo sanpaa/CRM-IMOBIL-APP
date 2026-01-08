@@ -6,6 +6,7 @@ import { WebsiteCustomizationService } from '../../services/website-customizatio
 import { PropertyService } from '../../services/property.service';
 import { CompanyService } from '../../services/company.service';
 import { PublicSiteApiService } from '../../services/public-site-api.service';
+import { AuthService } from '../../services/auth.service';
 import { WebsiteLayout, LayoutSection } from '../../models/website-layout.model';
 import { StoreSettings } from '../../models/company.model';
 import { Property } from '../../models/property.model';
@@ -45,7 +46,8 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
     private customizationService: WebsiteCustomizationService,
     private propertyService: PropertyService,
     private companyService: CompanyService,
-    private publicSiteApi: PublicSiteApiService
+    private publicSiteApi: PublicSiteApiService,
+    private authService: AuthService
   ) {}
 
   async ngOnInit() {
@@ -54,7 +56,16 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(async params => {
-        this.companyId = params['companyId'] || localStorage.getItem('company_id');
+        // Prioritize query param but validate it first
+        const queryCompanyId = params['companyId'];
+        const validFromQuery = queryCompanyId && this.authService.isValidCompanyIdString(queryCompanyId) 
+                                ? queryCompanyId 
+                                : null;
+        
+        // Fallback to validated company_id from current user
+        const validFromAuth = this.authService.getValidCompanyId();
+        
+        this.companyId = validFromQuery || validFromAuth;
         if (this.companyId) {
           await this.loadWebsite();
         }
