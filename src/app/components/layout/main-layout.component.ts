@@ -6,73 +6,87 @@ import { CompanyService } from '../../services/company.service';
 import { WhatsAppService } from '../../services/whatsapp.service';
 import { User } from '../../models/user.model';
 import { Company } from '../../models/company.model';
+import { NotificationCenterComponent } from '../../shared/components/notification-center.component';
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, NotificationCenterComponent],
   template: `
     <div class="layout-container">
-      <!-- Sidebar - Always visible -->
-      <aside class="sidebar">
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" *ngIf="!sidebarOpen">
+        <i class="bi bi-list"></i>
+      </button>
+
+      <!-- Sidebar Overlay for Mobile -->
+      <div class="sidebar-overlay" *ngIf="sidebarOpen" (click)="closeMobileMenu()"></div>
+
+      <!-- Sidebar -->
+      <aside class="sidebar" [class.sidebar-open]="sidebarOpen">
         <div class="sidebar-header">
           <div class="logo">
-            <div class="logo-icon">🏢</div>
+            <i class="bi bi-building"></i>
             <div class="logo-text">
               <h2>CRM Imobiliário</h2>
               <p>Sistema de Gestão</p>
             </div>
           </div>
+          <button class="mobile-close-btn" (click)="closeMobileMenu()">
+            <i class="bi bi-x-lg"></i>
+          </button>
         </div>
 
         <nav class="sidebar-nav">
-          <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
-            <span class="nav-icon">📊</span>
+          <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item" (click)="closeMobileMenu()">
+            <i class="bi bi-speedometer2"></i>
             <span class="nav-label">Dashboard</span>
           </a>
-          <a routerLink="/clients" routerLinkActive="active" class="nav-item">
-            <span class="nav-icon">👥</span>
+          <a routerLink="/clients" routerLinkActive="active" class="nav-item" (click)="closeMobileMenu()">
+            <i class="bi bi-people"></i>
             <span class="nav-label">Clientes</span>
           </a>
-          <a routerLink="/properties" routerLinkActive="active" class="nav-item">
-            <span class="nav-icon">🏠</span>
+          <a routerLink="/properties" routerLinkActive="active" class="nav-item" (click)="closeMobileMenu()">
+            <i class="bi bi-house-door"></i>
             <span class="nav-label">Imóveis</span>
           </a>
-          <a routerLink="/owners" routerLinkActive="active" class="nav-item">
-            <span class="nav-icon">👤</span>
+          <a routerLink="/owners" routerLinkActive="active" class="nav-item" (click)="closeMobileMenu()">
+            <i class="bi bi-person-badge"></i>
             <span class="nav-label">Proprietários</span>
           </a>
-          <a routerLink="/visits" routerLinkActive="active" class="nav-item">
-            <span class="nav-icon">📅</span>
+          <a routerLink="/visits" routerLinkActive="active" class="nav-item" (click)="closeMobileMenu()">
+            <i class="bi bi-calendar-check"></i>
             <span class="nav-label">Visitas</span>
           </a>
-          <a routerLink="/deals" routerLinkActive="active" class="nav-item">
-            <span class="nav-icon">💼</span>
+          <a routerLink="/deals" routerLinkActive="active" class="nav-item" (click)="closeMobileMenu()">
+            <i class="bi bi-briefcase"></i>
             <span class="nav-label">Negócios</span>
           </a>
-          <a routerLink="/settings" routerLinkActive="active" class="nav-item">
-            <span class="nav-icon">⚙️</span>
+          <a routerLink="/settings" routerLinkActive="active" class="nav-item" (click)="closeMobileMenu()">
+            <i class="bi bi-gear"></i>
             <span class="nav-label">Configurações</span>
           </a>
-          <a routerLink="/public-site-settings" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()">
-            <span class="nav-icon">🌐</span>
+          <a routerLink="/public-site-settings" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
+            <i class="bi bi-globe"></i>
             <span class="nav-label">Site Público</span>
           </a>
-          <a routerLink="/website-builder" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()">
-            <span class="nav-icon">🎨</span>
+          <a routerLink="/website-builder" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
+            <i class="bi bi-palette"></i>
             <span class="nav-label">Construtor de Sites</span>
           </a>
-          <a routerLink="/domain-settings" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()">
-            <span class="nav-icon">🔗</span>
+          <a routerLink="/domain-settings" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
+            <i class="bi bi-link-45deg"></i>
             <span class="nav-label">Domínios</span>
           </a>
-          <a routerLink="/whatsapp" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()">
-            <span class="nav-icon">💬</span>
+          <a routerLink="/whatsapp" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
+            <i class="bi bi-whatsapp"></i>
             <span class="nav-label">WhatsApp</span>
           </a>
         </nav>
 
         <div class="sidebar-footer">
+          <app-notification-center></app-notification-center>
+          
           <div class="user-section" *ngIf="currentUser">
             <div class="user-avatar">
               {{ getUserInitials(currentUser.name) }}
@@ -84,12 +98,15 @@ import { Company } from '../../models/company.model';
           </div>
           
           <div class="company-info" *ngIf="company">
-            <div class="company-name">{{ company.name }}</div>
-            <div class="company-label">Empresa</div>
+            <i class="bi bi-building-fill"></i>
+            <div class="company-details">
+              <div class="company-name">{{ company.name }}</div>
+              <div class="company-label">Empresa</div>
+            </div>
           </div>
 
           <button (click)="logout()" class="btn-logout">
-            <span class="logout-icon">🚪</span>
+            <i class="bi bi-box-arrow-right"></i>
             <span>Sair</span>
           </button>
         </div>
@@ -105,7 +122,52 @@ import { Company } from '../../models/company.model';
     .layout-container {
       display: flex;
       min-height: 100vh;
-      background: #f8f9fa;
+      background: #F5F7FA;
+    }
+
+    /* Mobile Menu Toggle Button */
+    .mobile-menu-toggle {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 999;
+      background: #1F2937;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem;
+      cursor: pointer;
+      display: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-toggle i {
+      font-size: 1.5rem;
+      display: block;
+    }
+
+    .mobile-menu-toggle:hover {
+      background: #374151;
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Sidebar Overlay for Mobile */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1001;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .sidebar {
@@ -119,23 +181,38 @@ import { Company } from '../../models/company.model';
       left: 0;
       top: 0;
       box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
+      z-index: 1002;
+      transition: transform 0.3s ease;
+    }
+
+    .mobile-close-btn {
+      display: none;
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
     }
 
     .sidebar-header {
       padding: 1.5rem;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .logo {
       display: flex;
       align-items: center;
       gap: 1rem;
+      flex: 1;
     }
 
-    .logo-icon {
-      font-size: 2.5rem;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    .logo i {
+      font-size: 2rem;
+      color: white;
     }
 
     .logo-text h2 {
@@ -171,6 +248,14 @@ import { Company } from '../../models/company.model';
       font-weight: 500;
     }
 
+    .nav-item i {
+      font-size: 1.25rem;
+      width: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .nav-item::before {
       content: '';
       position: absolute;
@@ -204,14 +289,6 @@ import { Company } from '../../models/company.model';
       background: #60a5fa;
     }
 
-    .nav-icon {
-      font-size: 1.5rem;
-      width: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
     .nav-label {
       font-size: 0.95rem;
     }
@@ -236,7 +313,7 @@ import { Company } from '../../models/company.model';
       width: 45px;
       height: 45px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #1F2937 0%, #374151 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -275,8 +352,20 @@ import { Company } from '../../models/company.model';
       background: rgba(255, 255, 255, 0.03);
       border-radius: 6px;
       margin-bottom: 0.75rem;
-      text-align: center;
       border: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .company-info i {
+      font-size: 1.25rem;
+      color: #60a5fa;
+    }
+
+    .company-details {
+      flex: 1;
+      min-width: 0;
     }
 
     .company-name {
@@ -320,7 +409,7 @@ import { Company } from '../../models/company.model';
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    .logout-icon {
+    .btn-logout i {
       font-size: 1.2rem;
     }
 
@@ -328,17 +417,40 @@ import { Company } from '../../models/company.model';
       margin-left: 280px;
       flex: 1;
       min-height: 100vh;
-      background: #f8f9fa;
+      background: #F5F7FA;
+      transition: margin-left 0.3s ease;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
+    /* Responsive Design for Tablets and Mobile */
+    @media (max-width: 1024px) {
+      .mobile-menu-toggle {
+        display: block;
+      }
+
       .sidebar {
-        width: 240px;
+        transform: translateX(-100%);
+      }
+
+      .sidebar.sidebar-open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay {
+        display: block;
+      }
+
+      .mobile-close-btn {
+        display: block;
       }
 
       .main-content {
-        margin-left: 240px;
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 260px;
       }
 
       .logo-text h2 {
@@ -348,12 +460,30 @@ import { Company } from '../../models/company.model';
       .nav-label {
         font-size: 0.9rem;
       }
+
+      .mobile-menu-toggle {
+        top: 0.75rem;
+        left: 0.75rem;
+        padding: 0.625rem;
+      }
+
+      .mobile-menu-toggle i {
+        font-size: 1.25rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .sidebar {
+        width: 85%;
+        max-width: 300px;
+      }
     }
   `]
 })
 export class MainLayoutComponent implements OnInit {
   currentUser: User | null = null;
   company: Company | null = null;
+  sidebarOpen = false;
 
   constructor(
     private authService: AuthService,
@@ -369,6 +499,14 @@ export class MainLayoutComponent implements OnInit {
         this.company = await this.companyService.getById(user.company_id);
       }
     });
+  }
+
+  toggleMobileMenu() {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  closeMobileMenu() {
+    this.sidebarOpen = false;
   }
 
   getUserInitials(name: string): string {
