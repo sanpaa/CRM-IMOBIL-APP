@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS whatsapp_connections (
   UNIQUE(company_id)
 );
 
--- Índices
+-- Indexes
 CREATE INDEX IF NOT EXISTS idx_whatsapp_connections_company ON whatsapp_connections(company_id);
 CREATE INDEX IF NOT EXISTS idx_whatsapp_connections_user ON whatsapp_connections(user_id);
 CREATE INDEX IF NOT EXISTS idx_whatsapp_connections_connected ON whatsapp_connections(is_connected);
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS whatsapp_messages (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Índices
+-- Indexes
 CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_connection ON whatsapp_messages(connection_id);
 CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_company ON whatsapp_messages(company_id);
 CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_from ON whatsapp_messages(from_number);
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS whatsapp_auto_clients (
   UNIQUE(connection_id, phone_number)
 );
 
--- Índice
+-- Indexes
 CREATE INDEX IF NOT EXISTS idx_whatsapp_auto_clients_connection ON whatsapp_auto_clients(connection_id);
 CREATE INDEX IF NOT EXISTS idx_whatsapp_auto_clients_client ON whatsapp_auto_clients(client_id);
 
@@ -71,26 +71,9 @@ CREATE INDEX IF NOT EXISTS idx_whatsapp_auto_clients_client ON whatsapp_auto_cli
 -- 4. Add has_keywords column if table already exists
 -- ============================================
 -- This handles the case where the table was already created without the has_keywords column
-DO $$ 
-BEGIN
-    IF EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_name = 'whatsapp_messages'
-    ) THEN
-        -- Add column if it doesn't exist
-        IF NOT EXISTS (
-            SELECT FROM information_schema.columns 
-            WHERE table_name = 'whatsapp_messages' 
-            AND column_name = 'has_keywords'
-        ) THEN
-            ALTER TABLE whatsapp_messages ADD COLUMN has_keywords BOOLEAN DEFAULT false;
-            CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_keywords ON whatsapp_messages(has_keywords);
-            RAISE NOTICE 'Added has_keywords column to whatsapp_messages table';
-        ELSE
-            RAISE NOTICE 'has_keywords column already exists in whatsapp_messages table';
-        END IF;
-    END IF;
-END $$;
+-- The CREATE TABLE IF NOT EXISTS above will only create the table if it doesn't exist
+-- This ALTER TABLE will add the column if the table exists but doesn't have the column
+ALTER TABLE whatsapp_messages ADD COLUMN IF NOT EXISTS has_keywords BOOLEAN DEFAULT false;
 
 -- ============================================
 -- 5. TRIGGERS for updated_at
