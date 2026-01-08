@@ -56,11 +56,11 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
       .subscribe(async params => {
         const companyIdFromStorage = localStorage.getItem('company_id');
         // Validate company_id is not null, 'null', or 'undefined'
-        const validCompanyId = companyIdFromStorage && 
-                               companyIdFromStorage !== 'null' && 
-                               companyIdFromStorage !== 'undefined' 
-                               ? companyIdFromStorage 
-                               : null;
+        const validCompanyId = (companyIdFromStorage && 
+                                companyIdFromStorage !== 'null' && 
+                                companyIdFromStorage !== 'undefined')
+                                ? companyIdFromStorage 
+                                : null;
         this.companyId = params['companyId'] || validCompanyId;
         if (this.companyId) {
           await this.loadWebsite();

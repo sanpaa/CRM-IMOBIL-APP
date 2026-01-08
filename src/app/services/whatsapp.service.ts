@@ -121,8 +121,13 @@ export class WhatsAppService implements OnDestroy {
       console.log('📦 currentUser from localStorage:', currentUser ? 'FOUND' : 'NOT FOUND');
       console.log('📦 company_id from localStorage:', companyId);
       
-      if (!currentUser || !companyId) {
-        console.log('❌ User not logged in or invalid company_id');
+      if (!currentUser) {
+        console.log('❌ User not logged in');
+        return null;
+      }
+      
+      if (!companyId) {
+        console.log('❌ Invalid company_id');
         return null;
       }
       
@@ -207,8 +212,20 @@ export class WhatsAppService implements OnDestroy {
       const accessToken = await this.getAccessTokenFromSupabase();
       const companyId = this.authService.getValidCompanyId();
       
-      if (!accessToken || !companyId) {
-        // Retorna status desconectado se não tiver token ou company_id válido
+      // Return disconnected status if missing token
+      if (!accessToken) {
+        console.log('ℹ️ No access token available');
+        const status: WhatsAppConnectionStatus = {
+          is_connected: false,
+          status: 'disconnected'
+        };
+        this.connectionStatusSubject.next(status);
+        return status;
+      }
+      
+      // Return disconnected status if invalid company_id
+      if (!companyId) {
+        console.log('ℹ️ Invalid company_id');
         const status: WhatsAppConnectionStatus = {
           is_connected: false,
           status: 'disconnected'
