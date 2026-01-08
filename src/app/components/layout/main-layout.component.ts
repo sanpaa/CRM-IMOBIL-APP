@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CompanyService } from '../../services/company.service';
+import { WhatsAppService } from '../../services/whatsapp.service';
 import { User } from '../../models/user.model';
 import { Company } from '../../models/company.model';
 
@@ -357,6 +358,7 @@ export class MainLayoutComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private companyService: CompanyService,
+    private whatsappService: WhatsAppService, // Injeta para inicializar o serviço
     private router: Router
   ) {}
 
