@@ -29,7 +29,9 @@ Chart.register(...registerables);
         <!-- Stats Cards -->
         <div class="stats-grid">
           <div class="stat-card stat-card-primary">
-            <div class="stat-icon">👥</div>
+            <div class="stat-icon">
+              <i class="bi bi-people-fill"></i>
+            </div>
             <div class="stat-content">
               <div class="stat-label">Total de Clientes</div>
               <div class="stat-value">{{ stats.clients }}</div>
@@ -37,7 +39,9 @@ Chart.register(...registerables);
           </div>
 
           <div class="stat-card stat-card-success">
-            <div class="stat-icon">🏠</div>
+            <div class="stat-icon">
+              <i class="bi bi-house-door-fill"></i>
+            </div>
             <div class="stat-content">
               <div class="stat-label">Imóveis Cadastrados</div>
               <div class="stat-value">{{ stats.properties }}</div>
@@ -45,7 +49,9 @@ Chart.register(...registerables);
           </div>
 
           <div class="stat-card stat-card-warning">
-            <div class="stat-icon">📅</div>
+            <div class="stat-icon">
+              <i class="bi bi-calendar-check-fill"></i>
+            </div>
             <div class="stat-content">
               <div class="stat-label">Visitas Agendadas</div>
               <div class="stat-value">{{ stats.visits }}</div>
@@ -53,7 +59,9 @@ Chart.register(...registerables);
           </div>
 
           <div class="stat-card stat-card-info">
-            <div class="stat-icon">💼</div>
+            <div class="stat-icon">
+              <i class="bi bi-briefcase-fill"></i>
+            </div>
             <div class="stat-content">
               <div class="stat-label">Negócios Ativos</div>
               <div class="stat-value">{{ stats.deals }}</div>
@@ -99,19 +107,19 @@ Chart.register(...registerables);
           <h3>Ações Rápidas</h3>
           <div class="actions-grid">
             <a routerLink="/clients" class="action-card">
-              <span class="action-icon">➕</span>
+              <i class="bi bi-person-plus-fill"></i>
               <span class="action-label">Novo Cliente</span>
             </a>
             <a routerLink="/properties" class="action-card">
-              <span class="action-icon">🏡</span>
+              <i class="bi bi-house-add-fill"></i>
               <span class="action-label">Novo Imóvel</span>
             </a>
             <a routerLink="/visits" class="action-card">
-              <span class="action-icon">📆</span>
+              <i class="bi bi-calendar-plus-fill"></i>
               <span class="action-label">Agendar Visita</span>
             </a>
             <a routerLink="/deals" class="action-card">
-              <span class="action-icon">💰</span>
+              <i class="bi bi-cash-stack"></i>
               <span class="action-label">Novo Negócio</span>
             </a>
           </div>
@@ -179,9 +187,15 @@ Chart.register(...registerables);
     .stat-card-info { border-left: 4px solid #4B5563; }
 
     .stat-icon {
-      font-size: 3rem;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+      font-size: 2.5rem;
+      color: currentColor;
+      opacity: 0.9;
     }
+
+    .stat-card-primary .stat-icon { color: #374151; }
+    .stat-card-success .stat-icon { color: #059669; }
+    .stat-card-warning .stat-icon { color: #D97706; }
+    .stat-card-info .stat-icon { color: #4B5563; }
 
     .stat-content {
       flex: 1;
@@ -289,9 +303,8 @@ Chart.register(...registerables);
       box-shadow: 0 4px 12px rgba(55, 65, 81, 0.3);
     }
 
-    .action-icon {
+    .action-card i {
       font-size: 2.5rem;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
     }
 
     .action-label {

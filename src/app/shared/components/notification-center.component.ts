@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NotificationService } from '../../../services/notification.service';
-import { Notification } from '../../../models/notification.model';
+import { NotificationService } from '../../services/notification.service';
+import { Notification } from '../../models/notification.model';
 
 @Component({
   selector: 'app-notification-center',
