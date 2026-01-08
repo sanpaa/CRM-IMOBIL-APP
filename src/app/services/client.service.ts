@@ -157,7 +157,14 @@ export class ClientService {
 
   /**
    * Get clients with comprehensive filters and pagination
-   * Supports 7 filters: search, name, email, phone, companyId, createdAfter, createdBefore
+   * Supports 9 filters:
+   * - Text search: search (across name, email, phone, CPF)
+   * - Specific fields: name, email, phone, companyId
+   * - Date range: createdAfter, createdBefore
+   * - Status fields: status, assignedUserId
+   * 
+   * @param filters Object containing filter criteria and pagination params
+   * @returns PaginatedResponse with data, total count, page number, and total pages
    */
   async findPaginated(filters: {
     search?: string;

@@ -276,8 +276,14 @@ export class VisitService {
 
   /**
    * Get visits with comprehensive filters and optional pagination
-   * Supports 9 filters: search, status, dateFrom, dateTo, client, broker, owner, propertyCode, imobiliaria
+   * Supports 9 filters:
+   * - Text search: search (in notes field)
+   * - Status: status
+   * - Date range: dateFrom, dateTo
+   * - Relationships: client (client_id), broker (broker_id), owner (owner_id), 
+   *   propertyCode (property_id), imobiliaria (company_id)
    * 
+   * @param filters Object containing filter criteria and optional pagination params
    * @returns PaginatedResponse<Visit> if page/limit provided, Visit[] otherwise
    * Note: Return type is intentionally flexible to support both paginated and non-paginated queries
    * as per requirements (pagination is optional for visits)

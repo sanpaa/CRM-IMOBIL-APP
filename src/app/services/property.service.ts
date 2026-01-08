@@ -198,7 +198,17 @@ export class PropertyService {
 
   /**
    * Get properties with comprehensive filters and pagination
-   * Supports 13+ filters including state, neighborhood, bathrooms, parking, areaMin/Max, sold, featured, status
+   * Supports 16 filters:
+   * - Location: state, neighborhood, city
+   * - Property details: type, bedrooms, bathrooms, parking
+   * - Area range: areaMin, areaMax
+   * - Price range: priceMin, priceMax
+   * - Boolean flags: sold, featured, furnished
+   * - Status: status
+   * - Text search: search (across title, description, street, neighborhood, city)
+   * 
+   * @param filters Object containing filter criteria and pagination params
+   * @returns PaginatedResponse with data, total count, page number, and total pages
    */
   async findPaginated(filters: {
     type?: string;
