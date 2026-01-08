@@ -257,14 +257,18 @@ export class AuthService {
         const currentTime = Date.now();
         const timeUntilExpiration = expirationTime - currentTime;
         
+        // Limite máximo de 24 horas para o timeout (JavaScript setTimeout tem limite de ~24.8 dias)
+        const MAX_TIMEOUT = 24 * 60 * 60 * 1000; // 24 horas em ms
+        
         if (timeUntilExpiration > 0) {
+          const actualTimeout = Math.min(timeUntilExpiration, MAX_TIMEOUT);
           console.log(`⏰ Token expira em ${Math.round(timeUntilExpiration / 1000 / 60)} minutos`);
           
           this.tokenExpirationTimer = setTimeout(() => {
             console.warn('⏰ Token expirou! Fazendo logout automático...');
             this.signOut();
             this.broadcastAuthMessage({ type: 'SESSION_INVALID', timestamp: Date.now() });
-          }, timeUntilExpiration);
+          }, actualTimeout);
         }
       }
     } catch (error) {
@@ -331,7 +335,10 @@ export class AuthService {
   /**
    * Processa resposta do backend de login
    */
-  private async processLoginResponse(response: Response): Promise<{ data: any; error: any }> {
+  private async processLoginResponse(response: Response): Promise<{ 
+    data: { token: string; user: any } | null; 
+    error: { message: string } | null 
+  }> {
     try {
       const result = await response.json();
 
@@ -411,8 +418,8 @@ export class AuthService {
 
       // Processa resposta
       const { data: result, error } = await this.processLoginResponse(response);
-      if (error) {
-        return { data: null, error };
+      if (error || !result) {
+        return { data: null, error: error || { message: 'Erro desconhecido ao processar resposta' } };
       }
 
       // Validate company_id
