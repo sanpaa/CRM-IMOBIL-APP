@@ -56,9 +56,16 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(async params => {
-        // Use AuthService validation for consistency
-        const validCompanyId = this.authService.getValidCompanyId();
-        this.companyId = params['companyId'] || validCompanyId;
+        // Prioritize query param but validate it first
+        const queryCompanyId = params['companyId'];
+        const validFromQuery = queryCompanyId && this.authService.isValidCompanyIdString(queryCompanyId) 
+                                ? queryCompanyId 
+                                : null;
+        
+        // Fallback to validated company_id from current user
+        const validFromAuth = this.authService.getValidCompanyId();
+        
+        this.companyId = validFromQuery || validFromAuth;
         if (this.companyId) {
           await this.loadWebsite();
         }

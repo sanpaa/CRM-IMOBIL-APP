@@ -62,6 +62,14 @@ export class AuthService {
   }
 
   /**
+   * Valida se uma string de company_id é válida
+   * Método público para uso em componentes
+   */
+  isValidCompanyIdString(companyId: string | null | undefined): boolean {
+    return this.isValidCompanyId(companyId);
+  }
+
+  /**
    * Obtém o company_id válido do usuário atual
    * @returns company_id válido ou null se inválido
    */
