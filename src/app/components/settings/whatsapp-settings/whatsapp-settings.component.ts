@@ -626,12 +626,13 @@ export class WhatsAppSettingsComponent implements OnInit, OnDestroy {
       return `+${countryCode} (${areaCode}) ${firstPart}-${secondPart}`;
     }
     
-    // For other international numbers, add + and split into groups
+    // For other international numbers, just add + prefix and some basic spacing
+    // We keep it simple since different countries have different formats
     // Example: 1234567890 -> +1 234 567 890
     if (phone.length >= 10) {
-      const countryCode = phone.substring(0, phone.length - 9);
-      const rest = phone.substring(phone.length - 9);
-      return `+${countryCode} ${rest.substring(0, 3)} ${rest.substring(3, 6)} ${rest.substring(6)}`;
+      // Add spaces every 3-4 digits for readability
+      const formatted = phone.match(/.{1,3}/g)?.join(' ') || phone;
+      return `+${formatted}`;
     }
     
     // Fallback: just add + prefix
