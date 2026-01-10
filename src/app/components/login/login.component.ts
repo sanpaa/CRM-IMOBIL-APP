@@ -71,6 +71,13 @@ import { AuthService } from '../../services/auth.service';
         <div class="register-link">
           Não tem conta? <a routerLink="/register">Cadastre-se</a>
         </div>
+
+        <div class="pricing-link">
+          <a routerLink="/pricing">
+            <i class="bi bi-tag"></i>
+            Ver planos e preços
+          </a>
+        </div>
       </div>
     </div>
   `,
@@ -148,6 +155,27 @@ import { AuthService } from '../../services/auth.service';
 
     .register-link a:hover {
       text-decoration: underline;
+    }
+
+    .pricing-link {
+      text-align: center;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #E5E7EB;
+    }
+
+    .pricing-link a {
+      color: #3B82F6;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pricing-link a:hover {
+      text-decoration: underline;
+      color: #2563EB;
     }
 
     @media (max-width: 480px) {

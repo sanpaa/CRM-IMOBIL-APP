@@ -21,6 +21,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/register/register.component').then(m => m.RegisterComponent)
   },
   {
+    path: 'pricing',
+    loadComponent: () => import('./components/pricing/pricing.component').then(m => m.PricingComponent)
+  },
+  {
     path: 'public/:companyId',
     loadComponent: () => import('./components/public-website/public-website.component').then(m => m.PublicWebsiteComponent)
   },
