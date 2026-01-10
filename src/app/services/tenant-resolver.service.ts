@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from './supabase.service';
-import { DomainManagementService } from './domain-management.service';
 import { environment } from '../../environments/environment';
 
 /**
@@ -20,8 +19,7 @@ export class TenantResolverService {
   private readonly baseHostname = environment.tenant.baseDomain;
 
   constructor(
-    private supabase: SupabaseService,
-    private domainService: DomainManagementService
+    private supabase: SupabaseService
   ) {}
 
   /**
@@ -101,21 +99,7 @@ export class TenantResolverService {
    */
   private async getCompanyBySubdomain(subdomain: string): Promise<string | null> {
     try {
-      // First, check in custom_domains table for automatic subdomains
-      const { data: domainData, error: domainError } = await this.supabase.client
-        .from('custom_domains')
-        .select('company_id')
-        .eq('domain', `${subdomain}.${this.baseHostname}`)
-        .eq('is_subdomain_auto', true)
-        .eq('status', 'active')
-        .single();
-
-      if (domainData && !domainError) {
-        return domainData.company_id;
-      }
-
-      // Fallback: check companies table if it has a subdomain_slug field
-      // You may need to add this field to the companies table
+      // Check companies table if it has a subdomain_slug field
       const { data: companyData, error: companyError } = await this.supabase.client
         .from('companies')
         .select('id')
@@ -136,38 +120,15 @@ export class TenantResolverService {
   }
 
   /**
-   * Get company by custom domain
+   * Get company by custom domain - simplified version without custom domains table
    * Example: www.company1.com.br
    */
   private async getCompanyByCustomDomain(hostname: string): Promise<string | null> {
     try {
-      // Remove www. prefix for matching
-      const domainToMatch = hostname.replace(/^www\./, '');
-      
-      // Try exact match first
-      let { data, error } = await this.supabase.client
-        .from('custom_domains')
-        .select('company_id')
-        .eq('domain', hostname)
-        .eq('status', 'active')
-        .single();
-
-      // If not found, try without www
-      if (!data && hostname.startsWith('www.')) {
-        ({ data, error } = await this.supabase.client
-          .from('custom_domains')
-          .select('company_id')
-          .eq('domain', domainToMatch)
-          .eq('status', 'active')
-          .single());
-      }
-
-      if (error) {
-        console.error('Error fetching company by custom domain:', error);
-        return null;
-      }
-
-      return data?.company_id || null;
+      // Since we removed custom domains functionality, this returns null
+      // In the future, you could implement a simpler custom domain mapping
+      console.warn('Custom domain resolution is not available. Use subdomain instead.');
+      return null;
     } catch (error) {
       console.error('Error in getCompanyByCustomDomain:', error);
       return null;
@@ -179,13 +140,6 @@ export class TenantResolverService {
    */
   async getCompanyUrl(companyId: string): Promise<string> {
     try {
-      // Get primary domain for the company
-      const domain = await this.domainService.getPrimaryDomain(companyId);
-      
-      if (domain && domain.status === 'active') {
-        return `https://${domain.domain}`;
-      }
-
       // Fallback to subdomain (if available)
       const { data } = await this.supabase.client
         .from('companies')
