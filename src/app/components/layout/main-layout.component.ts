@@ -62,6 +62,10 @@ import { NotificationCenterComponent } from '../../shared/components/notificatio
             <i class="bi bi-briefcase"></i>
             <span class="nav-label">Negócios</span>
           </a>
+          <a routerLink="/subscription" routerLinkActive="active" class="nav-item nav-item-highlight" (click)="closeMobileMenu()">
+            <i class="bi bi-gem"></i>
+            <span class="nav-label">Meu Plano</span>
+          </a>
           <a routerLink="/settings" routerLinkActive="active" class="nav-item" (click)="closeMobileMenu()">
             <i class="bi bi-gear"></i>
             <span class="nav-label">Configurações</span>
@@ -283,6 +287,29 @@ import { NotificationCenterComponent } from '../../shared/components/notificatio
     .nav-item.active::before {
       height: 100%;
       background: #60a5fa;
+    }
+
+    .nav-item-highlight {
+      background: linear-gradient(90deg, rgba(147, 51, 234, 0.1) 0%, rgba(96, 165, 250, 0.1) 100%);
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .nav-item-highlight i {
+      color: #a78bfa;
+    }
+
+    .nav-item-highlight:hover {
+      background: linear-gradient(90deg, rgba(147, 51, 234, 0.2) 0%, rgba(96, 165, 250, 0.2) 100%);
+      color: #fff;
+    }
+
+    .nav-item-highlight.active {
+      background: linear-gradient(90deg, rgba(147, 51, 234, 0.25) 0%, rgba(96, 165, 250, 0.25) 100%);
+      color: #a78bfa;
+    }
+
+    .nav-item-highlight.active::before {
+      background: linear-gradient(180deg, #9333ea 0%, #60a5fa 100%);
     }
 
     .nav-label {
