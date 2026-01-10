@@ -74,10 +74,6 @@ import { NotificationCenterComponent } from '../../shared/components/notificatio
             <i class="bi bi-palette"></i>
             <span class="nav-label">Construtor de Sites</span>
           </a>
-          <a routerLink="/domain-settings" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
-            <i class="bi bi-link-45deg"></i>
-            <span class="nav-label">Domínios</span>
-          </a>
           <a routerLink="/whatsapp" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
             <i class="bi bi-whatsapp"></i>
             <span class="nav-label">WhatsApp</span>
