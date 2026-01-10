@@ -17,6 +17,7 @@ Em vez disso:
 - ✅ Tokens seguros e renovação automática
 - ✅ Logout em todos os dispositivos
 - ✅ Reset de senha seguro
+- ✅ Timeout automático por inatividade (15 minutos)
 
 ### Autorização
 - ✅ Row Level Security (RLS) no banco
