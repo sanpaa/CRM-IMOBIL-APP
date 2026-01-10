@@ -7,11 +7,12 @@ import { OwnerService } from '../../services/owner.service';
 import { AuthService } from '../../services/auth.service';
 import { Property } from '../../models/property.model';
 import { Owner } from '../../models/owner.model';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner.component';
 
 @Component({
   selector: 'app-property-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, LoadingSpinnerComponent],
   templateUrl: './property-list.component.html',
   styleUrls: ['./property-list.component.scss']
 })
@@ -23,6 +24,7 @@ export class PropertyListComponent implements OnInit {
   editingProperty: Property | null = null;
   formData: any = {};
   documentFiles: { name: string; file: File }[] = [];
+  isLoading = false;
   
   // Filters
   searchTerm = '';
@@ -45,10 +47,13 @@ export class PropertyListComponent implements OnInit {
 
   async loadProperties() {
     try {
+      this.isLoading = true;
       this.properties = await this.propertyService.getAll();
       this.filteredProperties = [...this.properties];
     } catch (error) {
       console.error('Error loading properties:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -62,6 +67,7 @@ export class PropertyListComponent implements OnInit {
 
   async applyFilters() {
     try {
+      this.isLoading = true;
       this.filteredProperties = await this.propertyService.getFiltered({
         type: this.filterType || undefined,
         city: this.filterCity || undefined,
@@ -70,6 +76,8 @@ export class PropertyListComponent implements OnInit {
       });
     } catch (error) {
       console.error('Error applying filters:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 

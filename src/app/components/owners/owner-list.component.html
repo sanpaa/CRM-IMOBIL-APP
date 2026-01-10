@@ -6,6 +6,24 @@
     </button>
   </div>
 
+  <!-- Filters Section -->
+  <div class="filters-card">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label>Buscar</label>
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          placeholder="Nome, email, telefone, CPF..." 
+          class="filter-input">
+      </div>
+      <div class="filter-actions">
+        <button (click)="applyFilters()" class="btn-primary">Buscar</button>
+        <button (click)="clearFilters()" class="btn-secondary">Limpar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Form -->
   <div class="modal-overlay" *ngIf="showForm" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
@@ -77,7 +95,8 @@
 
   <!-- Table -->
   <div class="table-card">
-    <table class="data-table">
+    <app-loading-spinner *ngIf="isLoading" message="Carregando proprietários..."></app-loading-spinner>
+    <table class="data-table" *ngIf="!isLoading">
       <thead>
         <tr>
           <th>Nome</th>
@@ -89,7 +108,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let owner of owners">
+        <tr *ngFor="let owner of filteredOwners">
           <td>
             <span class="owner-name">{{ owner.name }}</span>
           </td>
@@ -108,7 +127,7 @@
             </button>
           </td>
         </tr>
-        <tr *ngIf="owners.length === 0">
+        <tr *ngIf="filteredOwners.length === 0">
           <td colspan="6" class="text-center">Nenhum proprietário cadastrado</td>
         </tr>
       </tbody>
