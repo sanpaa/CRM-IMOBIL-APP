@@ -180,6 +180,8 @@ export class PricingComponent implements OnInit {
     return feature?.tooltip || '';
   }
 
+  private readonly CONTACT_EMAIL = 'contato@crmimobiliario.com.br';
+
   scrollToComparison() {
     const element = document.getElementById('comparison-table');
     if (element) {
@@ -189,6 +191,6 @@ export class PricingComponent implements OnInit {
 
   contactExpert() {
     // In a real scenario, this would open a contact form or chat
-    window.location.href = 'mailto:contato@crmimobiliario.com.br?subject=Consulta sobre planos';
+    window.location.href = `mailto:${this.CONTACT_EMAIL}?subject=Consulta sobre planos`;
   }
 }

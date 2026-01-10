@@ -1,3 +1,6 @@
+// Note: This component uses CSS custom properties defined in src/styles.scss
+// Ensure that global styles are loaded before this component
+
 .pricing-container {
   width: 100%;
   background: var(--color-bg-primary);
