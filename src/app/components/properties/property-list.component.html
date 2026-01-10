@@ -14,13 +14,12 @@
         <input 
           type="text" 
           [(ngModel)]="searchTerm" 
-          (ngModelChange)="applyFilters()"
           placeholder="Título, endereço, bairro..." 
           class="filter-input">
       </div>
       <div class="filter-group">
         <label>Tipo</label>
-        <select [(ngModel)]="filterType" (ngModelChange)="applyFilters()" class="filter-input">
+        <select [(ngModel)]="filterType" class="filter-input">
           <option value="">Todos</option>
           <option value="apartamento">Apartamento</option>
           <option value="casa">Casa</option>
@@ -33,19 +32,19 @@
         <input 
           type="text" 
           [(ngModel)]="filterCity" 
-          (ngModelChange)="applyFilters()"
           placeholder="Filtrar por cidade" 
           class="filter-input">
       </div>
       <div class="filter-group">
         <label>Status</label>
-        <select [(ngModel)]="filterSold" (ngModelChange)="applyFilters()" class="filter-input">
+        <select [(ngModel)]="filterSold" class="filter-input">
           <option value="">Todos</option>
           <option value="false">Disponível</option>
           <option value="true">Vendido</option>
         </select>
       </div>
       <div class="filter-actions">
+        <button (click)="applyFilters()" class="btn-primary">Buscar</button>
         <button (click)="clearFilters()" class="btn-secondary">Limpar</button>
       </div>
     </div>
@@ -199,7 +198,8 @@
 
   <!-- Table -->
   <div class="table-card">
-    <table class="data-table">
+    <app-loading-spinner *ngIf="isLoading" message="Carregando imóveis..."></app-loading-spinner>
+    <table class="data-table" *ngIf="!isLoading">
       <thead>
         <tr>
           <th>Título</th>

@@ -7,19 +7,25 @@ import { PropertyService } from '../../services/property.service';
 import { AuthService } from '../../services/auth.service';
 import { Owner } from '../../models/owner.model';
 import { Property } from '../../models/property.model';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner.component';
 
 @Component({
   selector: 'app-owner-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, LoadingSpinnerComponent],
   templateUrl: './owner-list.component.html',
   styleUrls: ['./owner-list.component.scss']
 })
 export class OwnerListComponent implements OnInit {
   owners: Owner[] = [];
+  filteredOwners: Owner[] = [];
   showForm = false;
   editingOwner: Owner | null = null;
   formData: any = {};
+  isLoading = false;
+  
+  // Filters
+  searchTerm = '';
   
   // Properties linked to owner
   ownerProperties: Property[] = [];
@@ -40,10 +46,34 @@ export class OwnerListComponent implements OnInit {
 
   async loadOwners() {
     try {
+      this.isLoading = true;
       this.owners = await this.ownerService.getAll();
+      this.filteredOwners = [...this.owners];
     } catch (error) {
       console.error('Error loading owners:', error);
+    } finally {
+      this.isLoading = false;
     }
+  }
+
+  applyFilters() {
+    if (!this.searchTerm.trim()) {
+      this.filteredOwners = [...this.owners];
+      return;
+    }
+    
+    const term = this.searchTerm.toLowerCase();
+    this.filteredOwners = this.owners.filter(owner => 
+      owner.name.toLowerCase().includes(term) ||
+      owner.email?.toLowerCase().includes(term) ||
+      owner.phone?.includes(term) ||
+      owner.cpf?.includes(term)
+    );
+  }
+
+  clearFilters() {
+    this.searchTerm = '';
+    this.filteredOwners = [...this.owners];
   }
 
   resetForm() {

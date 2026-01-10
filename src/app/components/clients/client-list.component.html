@@ -14,13 +14,12 @@
         <input 
           type="text" 
           [(ngModel)]="searchTerm" 
-          (ngModelChange)="applyFilters()"
           placeholder="Nome, email, telefone, CPF..." 
           class="filter-input">
       </div>
       <div class="filter-group">
         <label>Status</label>
-        <select [(ngModel)]="filterStatus" (ngModelChange)="applyFilters()" class="filter-input">
+        <select [(ngModel)]="filterStatus" class="filter-input">
           <option value="">Todos</option>
           <option value="lead">Lead</option>
           <option value="interessado">Interessado</option>
@@ -29,6 +28,7 @@
         </select>
       </div>
       <div class="filter-actions">
+        <button (click)="applyFilters()" class="btn-primary">Buscar</button>
         <button (click)="clearFilters()" class="btn-secondary">Limpar Filtros</button>
       </div>
     </div>
@@ -133,7 +133,8 @@
 
   <!-- Table -->
   <div class="table-card">
-    <table class="data-table">
+    <app-loading-spinner *ngIf="isLoading" message="Carregando clientes..."></app-loading-spinner>
+    <table class="data-table" *ngIf="!isLoading">
       <thead>
         <tr>
           <th>Nome</th>

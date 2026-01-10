@@ -6,6 +6,7 @@ import { ClientService } from '../../services/client.service';
 import { ClientNoteService } from '../../services/client-note.service';
 import { AuthService } from '../../services/auth.service';
 import { Client, ClientNote } from '../../models/client.model';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner.component';
 
 /**
  * ClientListComponent
@@ -22,7 +23,7 @@ import { Client, ClientNote } from '../../models/client.model';
 @Component({
   selector: 'app-client-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, LoadingSpinnerComponent],
   templateUrl: './client-list.component.html',
   styleUrls: ['./client-list.component.scss']
 })
@@ -32,6 +33,7 @@ export class ClientListComponent implements OnInit {
   showForm = false;
   editingClient: Client | null = null;
   formData: any = {};
+  isLoading = false;
   
   // Filters
   searchTerm = '';
@@ -57,21 +59,27 @@ export class ClientListComponent implements OnInit {
 
   async loadClients() {
     try {
+      this.isLoading = true;
       this.clients = await this.clientService.getAll();
       this.filteredClients = [...this.clients];
     } catch (error) {
       console.error('Error loading clients:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 
   async applyFilters() {
     try {
+      this.isLoading = true;
       this.filteredClients = await this.clientService.getFiltered({
         status: this.filterStatus || undefined,
         searchTerm: this.searchTerm || undefined
       });
     } catch (error) {
       console.error('Error applying filters:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 
