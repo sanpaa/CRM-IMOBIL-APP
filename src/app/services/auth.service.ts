@@ -20,6 +20,8 @@ export class AuthService {
   private broadcastChannel: BroadcastChannel | null = null;
   private sessionLock = false;
   private tokenExpirationTimer: any = null;
+  private sessionValidationInterval: any = null;
+  private isDestroyed = false;
 
   constructor(
     private supabase: SupabaseService,
@@ -28,6 +30,36 @@ export class AuthService {
     this.initializeCrossTabSync();
     this.checkStoredSession();
     this.setupStorageListener();
+    this.setupPeriodicSessionValidation();
+    this.setupVisibilityChangeListener();
+  }
+
+  /**
+   * Cleanup quando o serviço é destruído
+   */
+  ngOnDestroy() {
+    this.isDestroyed = true;
+    this.cleanup();
+  }
+
+  /**
+   * Limpa todos os recursos e timers
+   */
+  private cleanup() {
+    // Limpa o BroadcastChannel
+    if (this.broadcastChannel) {
+      try {
+        this.broadcastChannel.close();
+        console.log('✅ BroadcastChannel fechado');
+      } catch (error) {
+        console.error('❌ Erro ao fechar BroadcastChannel:', error);
+      }
+      this.broadcastChannel = null;
+    }
+
+    // Limpa os timers
+    this.clearTokenExpirationTimer();
+    this.clearSessionValidationInterval();
   }
 
   /**
@@ -93,6 +125,89 @@ export class AuthService {
   }
 
   /**
+   * Configura validação periódica da sessão (a cada 30 segundos)
+   */
+  private setupPeriodicSessionValidation() {
+    // Valida sessão a cada 30 segundos
+    this.sessionValidationInterval = setInterval(() => {
+      if (this.isDestroyed) {
+        this.clearSessionValidationInterval();
+        return;
+      }
+
+      // Só valida se o usuário estiver logado
+      if (this.isAuthenticated()) {
+        this.validateSession().then(isValid => {
+          if (!isValid) {
+            console.warn('⚠️ Sessão inválida detectada na validação periódica');
+            this.handleInvalidSession();
+          }
+        });
+      }
+    }, 30000); // 30 segundos
+
+    console.log('✅ Validação periódica de sessão configurada (30s)');
+  }
+
+  /**
+   * Limpa intervalo de validação periódica
+   */
+  private clearSessionValidationInterval() {
+    if (this.sessionValidationInterval) {
+      clearInterval(this.sessionValidationInterval);
+      this.sessionValidationInterval = null;
+      console.log('✅ Intervalo de validação periódica limpo');
+    }
+  }
+
+  /**
+   * Configura listener para mudanças de visibilidade da aba
+   */
+  private setupVisibilityChangeListener() {
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && this.isAuthenticated()) {
+        // Aba ficou visível e usuário está logado - valida sessão
+        console.log('👁️ Aba ficou visível, validando sessão...');
+        this.validateSession().then(isValid => {
+          if (!isValid) {
+            console.warn('⚠️ Sessão inválida detectada ao focar na aba');
+            this.handleInvalidSession();
+          }
+        });
+      }
+    });
+
+    // Também escuta eventos de focus na janela
+    window.addEventListener('focus', () => {
+      if (this.isAuthenticated()) {
+        console.log('👁️ Janela focada, validando sessão...');
+        this.validateSession().then(isValid => {
+          if (!isValid) {
+            console.warn('⚠️ Sessão inválida detectada ao focar na janela');
+            this.handleInvalidSession();
+          }
+        });
+      }
+    });
+
+    console.log('✅ Listener de mudança de visibilidade configurado');
+  }
+
+  /**
+   * Trata sessão inválida (centraliza lógica)
+   */
+  private handleInvalidSession() {
+    this.clearSession();
+    this.broadcastAuthMessage({ type: 'SESSION_INVALID', timestamp: Date.now() });
+    
+    // Redireciona apenas se não estiver já na página de login
+    if (this.router.url !== '/login') {
+      console.log('🔄 Redirecionando para login devido a sessão inválida');
+      this.router.navigate(['/login']);
+    }
+  }
+
+  /**
    * Trata logout iniciado em outra aba
    */
   private handleLogoutFromAnotherTab() {
@@ -111,11 +226,7 @@ export class AuthService {
    */
   private handleInvalidSessionFromAnotherTab() {
     console.warn('⚠️ Sessão inválida detectada em outra aba');
-    this.clearSession();
-    
-    if (this.router.url !== '/login') {
-      this.router.navigate(['/login']);
-    }
+    this.handleInvalidSession();
   }
 
   /**
@@ -156,8 +267,7 @@ export class AuthService {
           // Verifica se o token não expirou
           if (this.isTokenExpired(authToken)) {
             console.warn('⚠️ Token expirado detectado. Limpando sessão...');
-            this.clearSession();
-            this.broadcastAuthMessage({ type: 'SESSION_INVALID', timestamp: Date.now() });
+            this.handleInvalidSession();
           } else {
             this.currentUserSubject.next(user);
             this.setupTokenExpiration(authToken);
@@ -166,8 +276,7 @@ export class AuthService {
         } else {
           // Clear invalid session
           console.warn('⚠️ Sessão inválida detectada (company_id ausente). Limpando localStorage...');
-          this.clearSession();
-          this.broadcastAuthMessage({ type: 'SESSION_INVALID', timestamp: Date.now() });
+          this.handleInvalidSession();
         }
       }
     } catch (error) {
@@ -187,6 +296,17 @@ export class AuthService {
     localStorage.removeItem('auth_token');
     this.currentUserSubject.next(null);
     this.clearTokenExpirationTimer();
+    this.clearSessionValidationInterval();
+  }
+
+  /**
+   * Limpa timer de expiração do token
+   */
+  private clearTokenExpirationTimer() {
+    if (this.tokenExpirationTimer) {
+      clearTimeout(this.tokenExpirationTimer);
+      this.tokenExpirationTimer = null;
+    }
   }
 
   /**
@@ -268,23 +388,12 @@ export class AuthService {
           
           this.tokenExpirationTimer = setTimeout(() => {
             console.warn('⏰ Token JWT expirou! Fazendo logout automático...');
-            this.signOut();
-            this.broadcastAuthMessage({ type: 'SESSION_INVALID', timestamp: Date.now() });
+            this.handleInvalidSession();
           }, actualTimeout);
         }
       }
     } catch (error) {
       console.error('❌ Erro ao configurar timer de expiração:', error);
-    }
-  }
-
-  /**
-   * Limpa timer de expiração do token
-   */
-  private clearTokenExpirationTimer() {
-    if (this.tokenExpirationTimer) {
-      clearTimeout(this.tokenExpirationTimer);
-      this.tokenExpirationTimer = null;
     }
   }
 
@@ -447,6 +556,10 @@ export class AuthService {
       this.currentUserSubject.next(result.user as User);
       this.setupTokenExpiration(result.token);
       
+      // Reinicia a validação periódica após login bem-sucedido
+      this.clearSessionValidationInterval();
+      this.setupPeriodicSessionValidation();
+      
       // Notifica outras abas sobre o login
       this.broadcastAuthMessage({ 
         type: 'LOGIN', 
@@ -513,15 +626,14 @@ export class AuthService {
     
     if (this.isTokenExpired(token)) {
       console.warn('⚠️ Sessão inválida: token expirado');
-      this.clearSession();
-      this.broadcastAuthMessage({ type: 'SESSION_INVALID', timestamp: Date.now() });
+      // Não chama handleInvalidSession aqui para evitar redirecionamento duplo
+      // O caller (guard ou periodic check) irá tratar
       return false;
     }
     
     if (!this.isValidCompanyId(user.company_id)) {
       console.warn('⚠️ Sessão inválida: company_id inválido');
-      this.clearSession();
-      this.broadcastAuthMessage({ type: 'SESSION_INVALID', timestamp: Date.now() });
+      // Não chama handleInvalidSession aqui para evitar redirecionamento duplo
       return false;
     }
     
