@@ -25,6 +25,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/pricing/pricing.component').then(m => m.PricingComponent)
   },
   {
+    path: 'planos',
+    loadComponent: () => import('./components/pricing/pricing.component').then(m => m.PricingComponent)
+  },
+  {
     path: 'public/:companyId',
     loadComponent: () => import('./components/public-website/public-website.component').then(m => m.PublicWebsiteComponent)
   },
@@ -36,6 +40,10 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () => import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
+      {
+        path: 'subscription',
+        loadComponent: () => import('./components/subscription-management/subscription-management.component').then(m => m.SubscriptionManagementComponent)
       },
       {
         path: 'clients',

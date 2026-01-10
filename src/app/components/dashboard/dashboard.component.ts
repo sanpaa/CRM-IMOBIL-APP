@@ -9,13 +9,14 @@ import { DealService } from '../../services/deal.service';
 import { User } from '../../models/user.model';
 import { RouterModule } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
+import { UsageWidgetComponent } from '../usage-widget/usage-widget.component';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterModule],
+  imports: [CommonModule, RouterLink, RouterModule, UsageWidgetComponent],
   template: `
     <div class="dashboard-wrapper">
       <header class="page-header">
@@ -67,6 +68,11 @@ Chart.register(...registerables);
               <div class="stat-value">{{ stats.deals }}</div>
             </div>
           </div>
+        </div>
+
+        <!-- Usage Widget -->
+        <div class="usage-widget-section">
+          <app-usage-widget></app-usage-widget>
         </div>
 
         <!-- Charts Section -->
@@ -161,6 +167,10 @@ Chart.register(...registerables);
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .usage-widget-section {
       margin-bottom: 2rem;
     }
 

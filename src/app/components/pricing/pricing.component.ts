@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PricingPlan, PlanFeature } from '../../models/pricing-plan.model';
+import { SubscriptionService, SubscriptionPlan } from '../../services/subscription.service';
 
 @Component({
   selector: 'app-pricing',
@@ -13,13 +14,116 @@ import { PricingPlan, PlanFeature } from '../../models/pricing-plan.model';
 export class PricingComponent implements OnInit {
   plans: PricingPlan[] = [];
   allFeatures: { name: string; description?: string; tooltip?: string }[] = [];
+  loading = true;
+  error: string | null = null;
+
+  constructor(private subscriptionService: SubscriptionService) {}
 
   ngOnInit() {
-    this.initializePlans();
+    this.loadPlansFromAPI();
     this.initializeFeatures();
   }
 
+  private loadPlansFromAPI() {
+    this.loading = true;
+    this.error = null;
+
+    this.subscriptionService.getPlans().subscribe({
+      next: (response) => {
+        if (response.success && response.plans) {
+          // Mapear planos da API para o formato do componente
+          this.plans = response.plans.map(apiPlan => this.mapApiPlanToPricingPlan(apiPlan));
+          this.loading = false;
+        } else {
+          // Fallback para planos estáticos se API falhar
+          this.initializePlans();
+          this.loading = false;
+        }
+      },
+      error: (err) => {
+        console.error('Error loading plans from API, using fallback:', err);
+        // Fallback para planos estáticos
+        this.initializePlans();
+        this.loading = false;
+      }
+    });
+  }
+
+  private mapApiPlanToPricingPlan(apiPlan: SubscriptionPlan): PricingPlan {
+    return {
+      id: apiPlan.id,
+      name: apiPlan.name,
+      displayName: apiPlan.display_name,
+      price: apiPlan.price_monthly,
+      yearlyPrice: apiPlan.price_yearly,
+      monthlyEquivalent: apiPlan.price_monthly,
+      isPopular: apiPlan.name === 'k', // K é o mais popular
+      description: apiPlan.description,
+      users: apiPlan.max_users,
+      additionalUserPrice: apiPlan.additional_user_price,
+      freeTrainings: apiPlan.features.treinamentos_gratuitos || 0,
+      activationFee: apiPlan.activation_fee,
+      trainingPrice: 999,
+      features: [
+        { 
+          name: 'users', 
+          included: true, 
+          value: `${apiPlan.max_users} usuários` 
+        },
+        { 
+          name: 'properties',
+          included: true,
+          value: apiPlan.max_properties === 0 ? 'Imóveis ilimitados' : `Até ${apiPlan.max_properties} imóveis`
+        },
+        { 
+          name: 'service_management', 
+          included: apiPlan.features.gestao_atendimentos 
+        },
+        { 
+          name: 'lead_transfer', 
+          included: apiPlan.features.transferencia_leads 
+        },
+        { 
+          name: 'mobile_app', 
+          included: apiPlan.features.app_mobile 
+        },
+        { 
+          name: 'landing_page', 
+          included: apiPlan.features.landing_page 
+        },
+        { 
+          name: 'online_training', 
+          included: apiPlan.features.treinamento_online,
+          value: apiPlan.features.treinamentos_gratuitos ? 
+            `${apiPlan.features.treinamentos_gratuitos} treinamento${apiPlan.features.treinamentos_gratuitos > 1 ? 's' : ''} gratuito${apiPlan.features.treinamentos_gratuitos > 1 ? 's' : ''}` : 
+            'Pago (R$ 999)'
+        },
+        { 
+          name: 'blog', 
+          included: apiPlan.features.blog 
+        },
+        { 
+          name: 'vip_support', 
+          included: apiPlan.features.suporte_vip 
+        },
+        { 
+          name: 'customer_success', 
+          included: apiPlan.features.customer_success 
+        },
+        { 
+          name: 'api_access', 
+          included: apiPlan.features.api_imoveis 
+        },
+        { 
+          name: 'client_portal', 
+          included: apiPlan.features.portal_corretor 
+        }
+      ]
+    };
+  }
+
   private initializePlans() {
+    // Fallback: planos estáticos caso a API falhe
     this.plans = [
       {
         id: 'prime',
@@ -36,6 +140,7 @@ export class PricingComponent implements OnInit {
         trainingPrice: 999,
         features: [
           { name: 'users', included: true, value: '2 usuários' },
+          { name: 'properties', included: true, value: 'Até 100 imóveis' },
           { name: 'service_management', included: true },
           { name: 'lead_transfer', included: false },
           { name: 'mobile_app', included: true },
@@ -64,6 +169,7 @@ export class PricingComponent implements OnInit {
         trainingPrice: 999,
         features: [
           { name: 'users', included: true, value: '5 usuários' },
+          { name: 'properties', included: true, value: 'Até 500 imóveis' },
           { name: 'service_management', included: true },
           { name: 'lead_transfer', included: true },
           { name: 'mobile_app', included: true },
@@ -80,17 +186,18 @@ export class PricingComponent implements OnInit {
         id: 'k2',
         name: 'K2',
         displayName: 'K2',
-        price: 697,
-        yearlyPrice: 8364,
-        monthlyEquivalent: 697,
+        price: 597,
+        yearlyPrice: 7164,
+        monthlyEquivalent: 597,
         description: 'Solução completa para imobiliárias estruturadas',
         users: 12,
         additionalUserPrice: 27,
         freeTrainings: 2,
-        activationFee: 197,
+        activationFee: 0,
         trainingPrice: 999,
         features: [
           { name: 'users', included: true, value: '12 usuários' },
+          { name: 'properties', included: true, value: 'Imóveis ilimitados' },
           { name: 'service_management', included: true },
           { name: 'lead_transfer', included: true },
           { name: 'mobile_app', included: true },
@@ -181,6 +288,7 @@ export class PricingComponent implements OnInit {
   }
 
   private readonly CONTACT_EMAIL = 'contato@crmimobiliario.com.br';
+  private readonly WHATSAPP_NUMBER = '5535997383030'; // WhatsApp do problema statement
 
   scrollToComparison() {
     const element = document.getElementById('comparison-table');
@@ -190,7 +298,9 @@ export class PricingComponent implements OnInit {
   }
 
   contactExpert() {
-    // In a real scenario, this would open a contact form or chat
-    window.location.href = `mailto:${this.CONTACT_EMAIL}?subject=Consulta sobre planos`;
+    // Abre WhatsApp com mensagem pré-definida
+    const message = encodeURIComponent('Olá! Gostaria de saber mais sobre os planos do CRM Imobiliário.');
+    const whatsappUrl = `https://wa.me/${this.WHATSAPP_NUMBER}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
   }
 }

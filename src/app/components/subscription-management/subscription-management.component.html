@@ -1,0 +1,287 @@
+<div class="subscription-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>
+        <i class="bi bi-credit-card-2-front"></i>
+        Gerenciamento de Assinatura
+      </h1>
+      <p class="header-subtitle">Gerencie seu plano e monitore o uso de recursos</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-back" routerLink="/dashboard">
+        <i class="bi bi-arrow-left"></i>
+        Voltar ao Dashboard
+      </button>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Carregando informações...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-message">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <p>{{ error }}</p>
+    <button class="btn-retry" (click)="loadSubscriptionData()">Tentar Novamente</button>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error" class="content-wrapper">
+    
+    <!-- Current Subscription Info -->
+    <div *ngIf="currentSubscription" class="current-plan-section">
+      <div class="current-plan-card">
+        <div class="plan-header">
+          <div class="plan-info">
+            <span class="plan-label">Plano Atual</span>
+            <h2>{{ currentSubscription.subscription_plans.display_name }}</h2>
+            <p class="plan-description">{{ currentSubscription.subscription_plans.description }}</p>
+          </div>
+          <div class="plan-price">
+            <span class="price-amount">R$ {{ formatPrice(currentSubscription.subscription_plans.price_monthly) }}</span>
+            <span class="price-period">/mês</span>
+          </div>
+        </div>
+        
+        <div class="plan-meta">
+          <div class="meta-item">
+            <span class="meta-label">Status:</span>
+            <span class="meta-value" [ngClass]="getStatusClass(currentSubscription.status)">
+              {{ getStatusText(currentSubscription.status) }}
+            </span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Início:</span>
+            <span class="meta-value">{{ formatDate(currentSubscription.started_at) }}</span>
+          </div>
+          <div class="meta-item" *ngIf="currentSubscription.expires_at">
+            <span class="meta-label">Vencimento:</span>
+            <span class="meta-value">{{ formatDate(currentSubscription.expires_at) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Usage Stats -->
+    <div *ngIf="usageStats" class="usage-section">
+      <h3 class="section-title">
+        <i class="bi bi-bar-chart-fill"></i>
+        Uso Atual dos Recursos
+      </h3>
+      
+      <div class="usage-grid">
+        <div class="usage-card">
+          <div class="usage-icon users-icon">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div class="usage-info">
+            <h4>Usuários</h4>
+            <div class="usage-numbers">
+              <span class="current">{{ usageStats.users.current }}</span>
+              <span class="separator">/</span>
+              <span class="max">{{ usageStats.users.max }}</span>
+            </div>
+            <div class="progress-bar">
+              <div 
+                class="progress-fill" 
+                [style.width.%]="usageStats.users.percentage"
+                [style.background-color]="getProgressBarColor(usageStats.users.percentage)">
+              </div>
+            </div>
+            <p class="usage-percentage">{{ usageStats.users.percentage }}% utilizado</p>
+            <p *ngIf="usageStats.users.percentage >= 90" class="usage-warning">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              Você está próximo do limite! Considere fazer upgrade.
+            </p>
+          </div>
+        </div>
+
+        <div class="usage-card">
+          <div class="usage-icon properties-icon">
+            <i class="bi bi-house-door-fill"></i>
+          </div>
+          <div class="usage-info">
+            <h4>Imóveis</h4>
+            <div class="usage-numbers">
+              <span class="current">{{ usageStats.properties.current }}</span>
+              <span class="separator">/</span>
+              <span class="max" *ngIf="usageStats.properties.max !== 'unlimited'">{{ usageStats.properties.max }}</span>
+              <span class="max unlimited" *ngIf="usageStats.properties.max === 'unlimited'">
+                <i class="bi bi-infinity"></i>
+              </span>
+            </div>
+            <div class="progress-bar" *ngIf="usageStats.properties.max !== 'unlimited'">
+              <div 
+                class="progress-fill" 
+                [style.width.%]="usageStats.properties.percentage"
+                [style.background-color]="getProgressBarColor(usageStats.properties.percentage)">
+              </div>
+            </div>
+            <p class="usage-percentage" *ngIf="usageStats.properties.max !== 'unlimited'">
+              {{ usageStats.properties.percentage }}% utilizado
+            </p>
+            <p class="unlimited-text" *ngIf="usageStats.properties.max === 'unlimited'">
+              <i class="bi bi-check-circle-fill"></i>
+              Imóveis ilimitados
+            </p>
+            <p *ngIf="usageStats.properties.percentage >= 90 && usageStats.properties.max !== 'unlimited'" class="usage-warning">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              Você está próximo do limite! Considere fazer upgrade.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Available Plans -->
+    <div *ngIf="availablePlans.length > 0" class="plans-section">
+      <h3 class="section-title">
+        <i class="bi bi-grid-3x3-gap-fill"></i>
+        Planos Disponíveis
+      </h3>
+      
+      <div class="plans-grid">
+        <div 
+          *ngFor="let plan of availablePlans" 
+          class="plan-card" 
+          [class.current]="isCurrentPlan(plan.id)"
+          [class.popular]="plan.name === 'k'">
+          
+          <div class="plan-badge" *ngIf="plan.name === 'k'">
+            <i class="bi bi-star-fill"></i>
+            Mais Popular
+          </div>
+          
+          <div class="plan-card-header">
+            <h4>{{ plan.display_name }}</h4>
+            <span *ngIf="isCurrentPlan(plan.id)" class="current-badge">
+              <i class="bi bi-check-circle-fill"></i>
+              Seu Plano
+            </span>
+          </div>
+          
+          <p class="plan-description">{{ plan.description }}</p>
+          
+          <div class="plan-price-section">
+            <div class="price-main">
+              <span class="currency">R$</span>
+              <span class="amount">{{ formatPrice(plan.price_monthly) }}</span>
+              <span class="period">/mês</span>
+            </div>
+            <div class="price-yearly">
+              ou R$ {{ formatPrice(plan.price_yearly) }}/ano
+            </div>
+          </div>
+          
+          <ul class="plan-features-list">
+            <li class="feature-item">
+              <i class="bi bi-people-fill"></i>
+              <span><strong>{{ plan.max_users }}</strong> usuários inclusos</span>
+            </li>
+            <li class="feature-item">
+              <i class="bi bi-house-door-fill"></i>
+              <span *ngIf="plan.max_properties > 0"><strong>Até {{ plan.max_properties }}</strong> imóveis</span>
+              <span *ngIf="plan.max_properties === 0"><strong>Imóveis ilimitados</strong></span>
+            </li>
+            <li class="feature-item">
+              <i class="bi bi-person-plus-fill"></i>
+              <span>Usuário adicional: <strong>R$ {{ formatPrice(plan.additional_user_price) }}</strong></span>
+            </li>
+            <li class="feature-item" *ngIf="plan.activation_fee > 0">
+              <i class="bi bi-credit-card"></i>
+              <span>Taxa de ativação: <strong>R$ {{ formatPrice(plan.activation_fee) }}</strong></span>
+            </li>
+            <li class="feature-item feature-highlight" *ngIf="plan.activation_fee === 0">
+              <i class="bi bi-check-circle-fill"></i>
+              <span><strong>Ativação gratuita</strong></span>
+            </li>
+          </ul>
+
+          <div class="plan-features-detailed">
+            <h5>Recursos do Plano:</h5>
+            <ul class="features-list">
+              <li [class.included]="plan.features.gestao_atendimentos">
+                <i [class]="plan.features.gestao_atendimentos ? 'bi bi-check-circle-fill' : 'bi bi-x-circle'"></i>
+                Gestão de atendimentos
+              </li>
+              <li [class.included]="plan.features.transferencia_leads">
+                <i [class]="plan.features.transferencia_leads ? 'bi bi-check-circle-fill' : 'bi bi-x-circle'"></i>
+                Transferência automática de leads
+              </li>
+              <li [class.included]="plan.features.app_mobile">
+                <i [class]="plan.features.app_mobile ? 'bi bi-check-circle-fill' : 'bi bi-x-circle'"></i>
+                Aplicativo mobile
+              </li>
+              <li [class.included]="plan.features.landing_page">
+                <i [class]="plan.features.landing_page ? 'bi bi-check-circle-fill' : 'bi bi-x-circle'"></i>
+                Landing page integrada
+              </li>
+              <li [class.included]="plan.features.treinamento_online">
+                <i [class]="plan.features.treinamento_online ? 'bi bi-check-circle-fill' : 'bi bi-x-circle'"></i>
+                Treinamento online
+              </li>
+              <li [class.included]="plan.features.blog">
+                <i [class]="plan.features.blog ? 'bi bi-check-circle-fill' : 'bi bi-x-circle'"></i>
+                Blog institucional
+              </li>
+              <li [class.included]="plan.features.suporte_vip">
+                <i [class]="plan.features.suporte_vip ? 'bi bi-check-circle-fill' : 'bi bi-x-circle'"></i>
+                Suporte VIP
+              </li>
+              <li [class.included]="plan.features.customer_success">
+                <i [class]="plan.features.customer_success ? 'bi bi-check-circle-fill' : 'bi bi-x-circle'"></i>
+                Customer Success dedicado
+              </li>
+              <li [class.included]="plan.features.api_imoveis">
+                <i [class]="plan.features.api_imoveis ? 'bi bi-check-circle-fill' : 'bi bi-x-circle'"></i>
+                API de imóveis
+              </li>
+              <li [class.included]="plan.features.portal_corretor">
+                <i [class]="plan.features.portal_corretor ? 'bi bi-check-circle-fill' : 'bi bi-x-circle'"></i>
+                Portal do Corretor
+              </li>
+            </ul>
+          </div>
+
+          <button 
+            *ngIf="!isCurrentPlan(plan.id)"
+            (click)="changePlan(plan.id, plan.display_name)"
+            class="btn-change-plan"
+            [class.upgrade]="isUpgrade(plan.id)"
+            [class.downgrade]="!isUpgrade(plan.id)">
+            <i [class]="isUpgrade(plan.id) ? 'bi bi-arrow-up-circle' : 'bi bi-arrow-down-circle'"></i>
+            {{ getPlanActionText(plan.id) }}
+          </button>
+
+          <button 
+            *ngIf="isCurrentPlan(plan.id)"
+            class="btn-current-plan"
+            disabled>
+            <i class="bi bi-check-circle-fill"></i>
+            Plano Atual
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancel Subscription -->
+    <div *ngIf="currentSubscription?.status === 'active'" class="cancel-section">
+      <div class="cancel-card">
+        <div class="cancel-info">
+          <h4>
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Cancelar Assinatura
+          </h4>
+          <p>Ao cancelar, você perderá acesso aos recursos do seu plano. Essa ação não poderá ser desfeita.</p>
+        </div>
+        <button (click)="cancelSubscription()" class="btn-cancel">
+          <i class="bi bi-x-circle"></i>
+          Cancelar Assinatura
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
