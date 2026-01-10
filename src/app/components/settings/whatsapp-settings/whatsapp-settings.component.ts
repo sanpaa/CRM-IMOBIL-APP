@@ -101,7 +101,7 @@ import { Subscription } from 'rxjs';
             </svg>
           </div>
           <h3>✅ WhatsApp Conectado com Sucesso!</h3>
-          <p class="phone-number">{{ connectionStatus.phone_number || 'Número não disponível' }}</p>
+          <p class="phone-number">{{ getFormattedPhoneNumber() }}</p>
           <div class="connected-info">
             <div class="info-item">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -593,5 +593,49 @@ export class WhatsAppSettingsComponent implements OnInit, OnDestroy {
       return this.connectionStatus.message;
     }
     return 'Aguarde enquanto geramos o código de pareamento';
+  }
+
+  /**
+   * Formats the phone number for better display
+   * Handles Brazilian phone numbers and international formats
+   */
+  getFormattedPhoneNumber(): string {
+    const phone = this.connectionStatus.phone_number;
+    
+    if (!phone) {
+      return 'Número não disponível';
+    }
+    
+    // If it's a Brazilian number (starts with 55) and has 13 digits (55 + 11 digits)
+    if (phone.startsWith('55') && phone.length === 13) {
+      // Format as: +55 (11) 91234-5678
+      const countryCode = phone.substring(0, 2);
+      const areaCode = phone.substring(2, 4);
+      const firstPart = phone.substring(4, 9);
+      const secondPart = phone.substring(9);
+      return `+${countryCode} (${areaCode}) ${firstPart}-${secondPart}`;
+    }
+    
+    // If it's a Brazilian number (starts with 55) and has 12 digits (55 + 10 digits) - old format
+    if (phone.startsWith('55') && phone.length === 12) {
+      // Format as: +55 (11) 1234-5678
+      const countryCode = phone.substring(0, 2);
+      const areaCode = phone.substring(2, 4);
+      const firstPart = phone.substring(4, 8);
+      const secondPart = phone.substring(8);
+      return `+${countryCode} (${areaCode}) ${firstPart}-${secondPart}`;
+    }
+    
+    // For other international numbers, just add + prefix and some basic spacing
+    // We keep it simple since different countries have different formats
+    // Example: 1234567890 -> +1 234 567 890
+    if (phone.length >= 10) {
+      // Add spaces every 3-4 digits for readability
+      const formatted = phone.match(/.{1,3}/g)?.join(' ') || phone;
+      return `+${formatted}`;
+    }
+    
+    // Fallback: just add + prefix
+    return `+${phone}`;
   }
 }
