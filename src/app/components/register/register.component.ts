@@ -81,6 +81,13 @@ import { AuthService } from '../../services/auth.service';
         <div class="login-link">
           Já tem conta? <a routerLink="/login">Faça login</a>
         </div>
+
+        <div class="pricing-link">
+          <a routerLink="/pricing">
+            <i class="bi bi-tag"></i>
+            Ver planos e preços
+          </a>
+        </div>
       </div>
     </div>
   `,
@@ -196,6 +203,27 @@ import { AuthService } from '../../services/auth.service';
 
     .login-link a:hover {
       text-decoration: underline;
+    }
+
+    .pricing-link {
+      text-align: center;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #E5E7EB;
+    }
+
+    .pricing-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pricing-link a:hover {
+      text-decoration: underline;
+      color: #5568d3;
     }
   `]
 })

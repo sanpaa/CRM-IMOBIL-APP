@@ -1,0 +1,361 @@
+<div class="pricing-container">
+  <!-- Hero Section -->
+  <section class="pricing-hero">
+    <div class="hero-content">
+      <h1 class="hero-title">Encontre o plano ideal para sua imobiliária</h1>
+      <p class="hero-subtitle">
+        Sistemas completos para imobiliárias de pequeno, médio e grande porte
+      </p>
+      <p class="hero-price">
+        A partir de <span class="price-highlight">R$ 247/mês</span> no plano anual*
+      </p>
+      <p class="hero-note">
+        *Valor equivalente à média mensal do plano Prime anual, totalizando R$ 2.964, com parcelamento em até 3x no cartão ou boleto.
+      </p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" (click)="scrollToComparison()">
+          <i class="bi bi-grid-3x3-gap"></i>
+          Compare os planos
+        </button>
+        <button class="btn btn-secondary" (click)="contactExpert()">
+          <i class="bi bi-chat-dots"></i>
+          Fale com um especialista
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Cards -->
+  <section class="pricing-cards">
+    <div class="cards-container">
+      <div 
+        *ngFor="let plan of plans" 
+        class="pricing-card"
+        [class.popular]="plan.isPopular">
+        
+        <div class="popular-badge" *ngIf="plan.isPopular">
+          <i class="bi bi-star-fill"></i>
+          Mais Vendido
+        </div>
+
+        <div class="card-header">
+          <h3 class="plan-name">{{ plan.displayName }}</h3>
+          <p class="plan-description">{{ plan.description }}</p>
+        </div>
+
+        <div class="card-pricing">
+          <div class="price-main">
+            <span class="currency">R$</span>
+            <span class="amount">{{ plan.price }}</span>
+            <span class="period">/mês</span>
+          </div>
+          <p class="price-detail">
+            Plano anual: R$ {{ plan.yearlyPrice | number: '1.0-0' }}
+          </p>
+        </div>
+
+        <div class="card-features">
+          <ul class="features-list">
+            <li class="feature-item highlight">
+              <i class="bi bi-people-fill"></i>
+              <span>{{ plan.users }} usuários inclusos</span>
+            </li>
+            <li class="feature-item" *ngIf="plan.freeTrainings > 0">
+              <i class="bi bi-mortarboard-fill"></i>
+              <span>{{ plan.freeTrainings }} treinamento(s) gratuito(s)</span>
+            </li>
+            <li class="feature-item">
+              <i class="bi bi-person-plus"></i>
+              <span>Usuário adicional: R$ {{ plan.additionalUserPrice }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-card" [class.btn-popular]="plan.isPopular">
+            Começar agora
+          </button>
+          <p class="activation-fee">
+            <i class="bi bi-info-circle"></i>
+            Ativação: R$ {{ plan.activationFee }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="benefits-section">
+    <div class="benefits-content">
+      <h2 class="section-title">Conheça todos os benefícios</h2>
+      <p class="section-subtitle">
+        Sistema multi-tenant, escalável e seguro, com API aberta para integrações futuras
+      </p>
+      
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h3>Segurança Avançada</h3>
+          <p>Dados isolados por empresa com Row Level Security (RLS)</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+          <h3>Escalável</h3>
+          <p>Cresce junto com o seu negócio, sem limites</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="bi bi-plug"></i>
+          </div>
+          <h3>API Aberta</h3>
+          <p>Integre com seus sistemas favoritos</p>
+        </div>
+
+        <div class="benefit-card">
+          <div class="benefit-icon">
+            <i class="bi bi-headset"></i>
+          </div>
+          <h3>Suporte Dedicado</h3>
+          <p>Equipe pronta para ajudar quando precisar</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison Table -->
+  <section class="comparison-section" id="comparison-table">
+    <div class="comparison-content">
+      <h2 class="section-title">Comparação detalhada de recursos</h2>
+      <p class="section-subtitle">
+        Veja todos os recursos inclusos em cada plano
+      </p>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th class="feature-column">Recursos</th>
+              <th *ngFor="let plan of plans" [class.popular-column]="plan.isPopular">
+                {{ plan.displayName }}
+                <span class="popular-tag" *ngIf="plan.isPopular">★</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let feature of allFeatures">
+              <td class="feature-name">
+                <span [attr.title]="getFeatureTooltip(feature.name)">
+                  {{ getFeatureDescription(feature.name) }}
+                  <i class="bi bi-info-circle-fill tooltip-icon" *ngIf="feature.tooltip"></i>
+                </span>
+              </td>
+              <td *ngFor="let plan of plans" [class.popular-column]="plan.isPopular" class="feature-value">
+                <ng-container *ngIf="getFeatureValue(plan, feature.name) as featureData">
+                  <span *ngIf="featureData.included && !featureData.value" class="check-icon">
+                    <i class="bi bi-check-circle-fill"></i>
+                  </span>
+                  <span *ngIf="!featureData.included" class="cross-icon">
+                    <i class="bi bi-x-circle"></i>
+                  </span>
+                  <span *ngIf="featureData.value" class="feature-text">
+                    {{ featureData.value }}
+                  </span>
+                </ng-container>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- User Policy Section -->
+  <section class="user-policy-section">
+    <div class="policy-content">
+      <h2 class="section-title">Política de usuários adicionais</h2>
+      <p class="section-subtitle">
+        Adicione mais usuários conforme sua equipe cresce
+      </p>
+
+      <div class="policy-cards">
+        <div class="policy-card" *ngFor="let plan of plans">
+          <div class="policy-header" [class.popular-header]="plan.isPopular">
+            <h3>{{ plan.displayName }}</h3>
+          </div>
+          <div class="policy-body">
+            <div class="policy-item">
+              <i class="bi bi-people"></i>
+              <div class="policy-info">
+                <strong>{{ plan.users }} usuários inclusos</strong>
+                <p>No plano base</p>
+              </div>
+            </div>
+            <div class="policy-item">
+              <i class="bi bi-person-plus-fill"></i>
+              <div class="policy-info">
+                <strong>R$ {{ plan.additionalUserPrice }}/usuário adicional</strong>
+                <p>Por mês</p>
+              </div>
+            </div>
+            <div class="policy-item">
+              <i class="bi bi-mortarboard"></i>
+              <div class="policy-info">
+                <strong>
+                  {{ plan.freeTrainings > 0 ? plan.freeTrainings + ' treinamento(s) gratuito(s)' : 'Treinamento pago' }}
+                </strong>
+                <p *ngIf="plan.freeTrainings === 0">R$ {{ plan.trainingPrice }}</p>
+                <p *ngIf="plan.freeTrainings > 0">Inclusos no plano</p>
+              </div>
+            </div>
+            <div class="policy-item">
+              <i class="bi bi-check-circle"></i>
+              <div class="policy-info">
+                <strong>Ativação: R$ {{ plan.activationFee }}</strong>
+                <p>Taxa única de implantação</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Support Section -->
+  <section class="support-section">
+    <div class="support-content">
+      <h2 class="section-title">Suporte e Customer Success</h2>
+      <p class="section-subtitle">
+        Conheça as diferenças entre os tipos de atendimento
+      </p>
+
+      <div class="support-grid">
+        <div class="support-card">
+          <div class="support-icon standard">
+            <i class="bi bi-headset"></i>
+          </div>
+          <h3>Suporte Padrão</h3>
+          <ul class="support-features">
+            <li><i class="bi bi-check"></i> Email e chat</li>
+            <li><i class="bi bi-check"></i> Horário comercial</li>
+            <li><i class="bi bi-check"></i> Resposta em até 24h</li>
+            <li><i class="bi bi-check"></i> Base de conhecimento</li>
+          </ul>
+          <p class="support-plans">Incluído em todos os planos</p>
+        </div>
+
+        <div class="support-card">
+          <div class="support-icon vip">
+            <i class="bi bi-star-fill"></i>
+          </div>
+          <h3>Suporte VIP</h3>
+          <ul class="support-features">
+            <li><i class="bi bi-check"></i> Email, chat e telefone</li>
+            <li><i class="bi bi-check"></i> Atendimento prioritário</li>
+            <li><i class="bi bi-check"></i> Resposta em até 4h</li>
+            <li><i class="bi bi-check"></i> Suporte técnico avançado</li>
+          </ul>
+          <p class="support-plans">Disponível no plano K2</p>
+        </div>
+
+        <div class="support-card">
+          <div class="support-icon cs">
+            <i class="bi bi-person-badge"></i>
+          </div>
+          <h3>Customer Success</h3>
+          <ul class="support-features">
+            <li><i class="bi bi-check"></i> Especialista dedicado</li>
+            <li><i class="bi bi-check"></i> Reuniões mensais</li>
+            <li><i class="bi bi-check"></i> Análise de performance</li>
+            <li><i class="bi bi-check"></i> Planejamento estratégico</li>
+          </ul>
+          <p class="support-plans">Exclusivo do plano K2</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Onboarding Section -->
+  <section class="onboarding-section">
+    <div class="onboarding-content">
+      <h2 class="section-title">Sua jornada de sucesso</h2>
+      <p class="section-subtitle">
+        Processo completo de implantação e treinamento
+      </p>
+
+      <div class="onboarding-timeline">
+        <div class="timeline-item">
+          <div class="timeline-icon">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <div class="timeline-content">
+            <h3>1. Ativação</h3>
+            <p>Configuração inicial do sistema e personalização para sua imobiliária</p>
+            <span class="timeline-badge">Taxa única: R$ 197</span>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-icon">
+            <i class="bi bi-mortarboard-fill"></i>
+          </div>
+          <div class="timeline-content">
+            <h3>2. Treinamento</h3>
+            <p>Capacitação completa da equipe para aproveitar todos os recursos</p>
+            <span class="timeline-badge">Incluído conforme plano</span>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-icon">
+            <i class="bi bi-rocket-takeoff-fill"></i>
+          </div>
+          <div class="timeline-content">
+            <h3>3. Acompanhamento</h3>
+            <p>Suporte contínuo e monitoramento do uso para garantir seu sucesso</p>
+            <span class="timeline-badge">Suporte contínuo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-content">
+      <h2 class="cta-title">Pronto para transformar sua imobiliária?</h2>
+      <p class="cta-subtitle">
+        Junte-se a centenas de imobiliárias que já confiam no nosso sistema
+      </p>
+      <div class="cta-actions">
+        <button class="btn btn-cta-primary" (click)="contactExpert()">
+          <i class="bi bi-chat-dots-fill"></i>
+          Falar com especialista
+        </button>
+        <a routerLink="/register" class="btn btn-cta-secondary">
+          <i class="bi bi-arrow-right-circle-fill"></i>
+          Criar conta grátis
+        </a>
+      </div>
+      <p class="cta-note">
+        <i class="bi bi-shield-check"></i>
+        Sem compromisso. Cancele quando quiser.
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer Note -->
+  <section class="footer-note">
+    <div class="note-content">
+      <p>
+        <i class="bi bi-info-circle-fill"></i>
+        <strong>Consulte valor de implantação.</strong> Todos os planos possuem taxa de ativação de R$ 197 para configuração e personalização inicial do sistema.
+      </p>
+    </div>
+  </section>
+</div>
