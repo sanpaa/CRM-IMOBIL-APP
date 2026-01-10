@@ -43,6 +43,11 @@ Este sistema foi projetado para ser uma **aplicação SaaS real** que funciona e
 - 👔 **Gestor**: Gerenciar corretores e visualizar todos os dados
 - 🏃 **Corretor**: Visualizar apenas dados vinculados
 
+### Segurança
+- 🔒 **Timeout por Inatividade**: Logout automático após 15 minutos de inatividade
+- 🔄 **Sincronização Multi-Aba**: Atividade em uma aba mantém sessão em todas as abas abertas
+- 🛡️ **Detecção de Inatividade**: Monitora mouse, teclado, cliques e scroll
+
 ## 🛠️ Stack Tecnológica
 
 - **Frontend**: Angular 17 (Standalone Components)

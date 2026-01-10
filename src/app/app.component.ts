@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastContainerComponent } from './shared/components/toast-container.component';
+import { AuthService } from './services/auth.service';
+import { InactivityService } from './services/inactivity.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +15,32 @@ import { ToastContainerComponent } from './shared/components/toast-container.com
   `,
   styles: []
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'CRM Imobiliário';
+  private authSubscription?: Subscription;
+
+  constructor(
+    private authService: AuthService,
+    private inactivityService: InactivityService
+  ) {}
+
+  ngOnInit() {
+    // Subscribe to authentication changes
+    this.authSubscription = this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        // User logged in - start tracking inactivity
+        this.inactivityService.startTracking();
+      } else {
+        // User logged out - stop tracking inactivity
+        this.inactivityService.stopTracking();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+    this.inactivityService.stopTracking();
+  }
 }
