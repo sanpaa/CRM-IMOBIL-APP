@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { NotificationService } from '../../services/notification.service';
 import { Notification } from '../../models/notification.model';
+import { AuthenticationError } from '../../models/errors/auth-error';
 
 @Component({
   selector: 'app-notification-center',
@@ -302,8 +303,13 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
     try {
       this.notifications = await this.notificationService.getAll();
       this.updateUnreadCount();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading notifications:', error);
+      // Don't show notifications if user is not authenticated
+      if (error instanceof AuthenticationError) {
+        this.notifications = [];
+        this.unreadCount = 0;
+      }
     }
   }
 
