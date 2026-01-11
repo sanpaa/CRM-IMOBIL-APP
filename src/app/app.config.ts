@@ -1,8 +1,9 @@
 import { ApplicationConfig, APP_INITIALIZER } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { ComponentInitializerService } from './shared/website-components/component-initializer.service';
+import { authInterceptor } from './interceptors/auth.interceptor';
 
 /**
  * Initialize website components
@@ -16,7 +17,7 @@ function initializeComponents(componentInitializer: ComponentInitializerService)
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
     {
       provide: APP_INITIALIZER,
       useFactory: initializeComponents,

@@ -302,8 +302,13 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
     try {
       this.notifications = await this.notificationService.getAll();
       this.updateUnreadCount();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading notifications:', error);
+      // Don't show notifications if user is not authenticated
+      if (error?.message?.includes('not authenticated')) {
+        this.notifications = [];
+        this.unreadCount = 0;
+      }
     }
   }
 

@@ -22,7 +22,7 @@ export class DealService {
         *,
         client:clients(id, name, phone, email),
         property:properties(id, title, type, price, city),
-        user:users(id, name, email)
+        user:users(id, username, email)
       `)
       .eq('company_id', user.company_id)
       .order('created_at', { ascending: false });
@@ -102,7 +102,7 @@ export class DealService {
         *,
         client:clients(id, name, phone, email),
         property:properties(id, title, type, price, city),
-        user:users(id, name, email)
+        user:users(id, username, email)
       `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
@@ -128,7 +128,7 @@ export class DealService {
         *,
         client:clients(id, name, phone, email),
         property:properties(id, title, type, price, city),
-        user:users(id, name, email)
+        user:users(id, username, email)
       `)
       .eq('company_id', user.company_id);
 

@@ -13,13 +13,13 @@ export class NotificationService {
   ) {}
 
   async getAll(): Promise<Notification[]> {
-    const userId = await this.supabase.getCurrentUserId();
-    if (!userId) throw new Error('User not authenticated');
+    const user = this.auth.getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await this.supabase
       .from('notifications')
       .select('*')
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -27,13 +27,13 @@ export class NotificationService {
   }
 
   async getUnread(): Promise<Notification[]> {
-    const userId = await this.supabase.getCurrentUserId();
-    if (!userId) throw new Error('User not authenticated');
+    const user = this.auth.getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await this.supabase
       .from('notifications')
       .select('*')
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .eq('read', false)
       .order('created_at', { ascending: false });
 
@@ -51,13 +51,13 @@ export class NotificationService {
   }
 
   async markAllAsRead(): Promise<void> {
-    const userId = await this.supabase.getCurrentUserId();
-    if (!userId) throw new Error('User not authenticated');
+    const user = this.auth.getCurrentUser();
+    if (!user) throw new Error('User not authenticated');
 
     const { error } = await this.supabase
       .from('notifications')
       .update({ read: true })
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .eq('read', false);
 
     if (error) throw error;
