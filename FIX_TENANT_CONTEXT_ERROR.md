@@ -9,9 +9,9 @@ API endpoints were returning the following error:
 }
 ```
 
-Affected endpoints:
-- `https://crm-imobil.onrender.com/api/subscriptions/usage`
-- `https://crm-imobil.onrender.com/api/subscriptions/current`
+Affected endpoints (example):
+- `/api/subscriptions/usage`
+- `/api/subscriptions/current`
 
 ## Root Cause
 The HTTP interceptor (`auth.interceptor.ts`) was only adding the `Authorization` Bearer token to backend API requests, but the backend also requires the tenant context (company_id) to identify which company's data to access in a multi-tenant environment.
@@ -67,7 +67,7 @@ The production environment configuration was missing the `apiUrl` property, whic
 ```typescript
 export const environment = {
   production: true,
-  apiUrl: 'https://crm-imobil.onrender.com/api',  // Added this line
+  apiUrl: '<your-backend-api-url>',  // Added this line
   // ... rest of configuration
 };
 ```
