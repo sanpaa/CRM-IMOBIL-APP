@@ -1,0 +1,43 @@
+<section class="about-section" [ngStyle]="getSectionStyles()">
+  <div class="container" [class]="getImagePositionClass()">
+    <div class="about-media">
+      <div class="image-frame">
+        <img *ngIf="config.imageUrl" [src]="config.imageUrl" alt="Foto do corretor" />
+        <div class="image-placeholder" *ngIf="!config.imageUrl">Imagem do corretor</div>
+        <div class="image-highlight" *ngIf="config.highlightText">{{ config.highlightText }}</div>
+      </div>
+    </div>
+
+    <div class="about-content">
+      <span class="eyebrow" *ngIf="config.eyebrow">{{ config.eyebrow }}</span>
+      <h2 *ngIf="config.title">{{ config.title }}</h2>
+      <p class="subtitle" *ngIf="config.subtitle">{{ config.subtitle }}</p>
+      <p class="content" *ngIf="config.content">{{ config.content }}</p>
+
+      <div class="bullet-list" *ngIf="getBullets().length">
+        <div class="bullet-item" *ngFor="let bullet of getBullets(); let i = index" [style.animationDelay.s]="i * 0.08">
+          <div class="bullet-icon" *ngIf="bullet.icon">
+            <i *ngIf="isIconClass(bullet.icon)" [class]="bullet.icon"></i>
+            <span *ngIf="!isIconClass(bullet.icon)">{{ bullet.icon }}</span>
+          </div>
+          <div class="bullet-text">
+            <h4>{{ bullet.title }}</h4>
+            <p *ngIf="bullet.description">{{ bullet.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <a *ngIf="config.buttonText"
+         class="about-button"
+         [href]="config.buttonLink || '#'"
+         [class.edit-mode-link]="editMode"
+         (click)="editMode ? $event.preventDefault() : null">
+        {{ config.buttonText }}
+      </a>
+    </div>
+  </div>
+
+  <div class="edit-overlay" *ngIf="editMode">
+    <span class="edit-badge">About Section</span>
+  </div>
+</section>

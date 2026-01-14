@@ -138,8 +138,11 @@ export class ComponentLibraryService {
     const defaults: Record<string, any> = {
       header: {
         config: {
-          logo: '',
-          showSearch: true,
+          companyName: 'Imobiliária',
+          logoUrl: '',
+          showLogo: true,
+          showMenu: true,
+          phone: '',
           navigation: [
             { label: 'Home', link: '/' },
             { label: 'Imóveis', link: '/properties' },
@@ -153,21 +156,29 @@ export class ComponentLibraryService {
       },
       footer: {
         config: {
-          columns: [
-            {
-              title: 'Sobre Nós',
-              links: [
-                { label: 'Quem Somos', link: '/about' },
-                { label: 'Contato', link: '/contact' }
-              ]
-            }
+          companyName: 'Imobiliária',
+          description: 'Especialistas em imoveis de alto padrao.',
+          logoUrl: '',
+          showLogo: false,
+          address: '',
+          phone: '',
+          email: '',
+          instagram: '',
+          facebook: '',
+          whatsapp: '',
+          quickLinks: [
+            { label: 'Quem Somos', route: '/sobre' },
+            { label: 'Contato', route: '/contato' }
           ],
-          showSocialMedia: true,
-          copyrightText: 'Todos os direitos reservados'
+          services: [
+            { label: 'Venda de imoveis', route: '/imoveis' },
+            { label: 'Locacao', route: '/imoveis?tipo=locacao' }
+          ],
+          showCopyright: true
         },
         style_config: {
-          backgroundColor: '#1a1a1a',
-          textColor: '#ffffff'
+          backgroundColor: '#0f172a',
+          textColor: '#f8fafc'
         }
       },
       hero: {
@@ -175,14 +186,27 @@ export class ComponentLibraryService {
           title: 'Encontre seu imóvel ideal',
           subtitle: 'As melhores opções do mercado',
           backgroundImage: '',
+          overlayColor: '#0f172a',
+          overlayOpacity: 0.55,
           buttonText: 'Ver Imóveis',
           buttonLink: '/properties',
+          secondaryButtonText: 'Fale com um corretor',
+          secondaryButtonLink: '/contato',
+          badges: [
+            { text: 'Atendimento premium' },
+            { text: 'Imoveis exclusivos' }
+          ],
+          highlights: [
+            { value: '320+', label: 'Imoveis vendidos', description: 'Nos ultimos 12 meses' },
+            { value: '98%', label: 'Satisfacao', description: 'Clientes recomendam' }
+          ],
+          contentWidth: '1200px',
           height: 'large',
           alignment: 'center'
         },
         style_config: {
-          backgroundColor: '#004AAD',
-          textColor: '#ffffff'
+          backgroundColor: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)',
+          textColor: '#f8fafc'
         }
       },
       'search-bar': {
@@ -239,16 +263,43 @@ export class ComponentLibraryService {
       },
       'stats-section': {
         config: {
+          title: 'Resultados que comprovam',
+          subtitle: 'Provas sociais que mostram nossa solidez no mercado',
+          badgeText: 'Credibilidade',
+          accentColor: '#0ea5e9',
           stats: [
-            { label: 'Imóveis', value: '100+', icon: '🏠' },
-            { label: 'Clientes', value: '500+', icon: '👥' },
-            { label: 'Anos', value: '10+', icon: '⭐' }
-          ],
-          layout: 'horizontal'
+            { label: 'Imoveis ativos', value: '1200+', description: 'Em carteira exclusiva' },
+            { label: 'Leads qualificados', value: '18k', description: 'Gerados no ultimo ano' },
+            { label: 'Conversao', value: '97%', description: 'Satisfacao comprovada' }
+          ]
         },
         style_config: {
-          backgroundColor: '#f8f9fa',
-          padding: '3rem'
+          backgroundColor: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)',
+          textColor: '#f8fafc',
+          padding: '5rem 0'
+        }
+      },
+      'about-section': {
+        config: {
+          eyebrow: 'Manifesto',
+          title: 'Seu corretor com visao estrategica',
+          subtitle: 'Atendimento direto, dados de mercado e foco em conversao.',
+          content: 'Ha mais de 12 anos conectando familias aos melhores imoveis. Curadoria, transparencia e velocidade para entregar oportunidades reais.',
+          imageUrl: '',
+          bullets: [
+            { icon: 'fa-solid fa-chart-line', title: 'Visao de mercado', description: 'Analises semanais para precificar com seguranca.' },
+            { icon: 'fa-solid fa-star', title: 'Curadoria premium', description: 'Selecao enxuta com imoveis de alta liquidez.' },
+            { icon: 'fa-solid fa-handshake', title: 'Negociacao clara', description: 'Processo transparente ate a assinatura.' }
+          ],
+          buttonText: 'Conheca o corretor',
+          buttonLink: '/sobre',
+          highlightText: 'Atendimento 1:1 com acompanhamento total',
+          imagePosition: 'right'
+        },
+        style_config: {
+          backgroundColor: '#f8fafc',
+          textColor: '#0f172a',
+          padding: '5rem 0'
         }
       },
       divider: {
@@ -321,6 +372,25 @@ export class ComponentLibraryService {
         style_config: {
           backgroundColor: '#f8f9fa',
           padding: '3rem'
+        }
+      },
+      'cta-button': {
+        config: {
+          title: 'Pronto para fechar o seu proximo negocio?',
+          subtitle: 'Agende uma consultoria e tenha acesso a oportunidades fora do mercado.',
+          buttonText: 'Agendar consultoria',
+          buttonLink: '/contato',
+          secondaryButtonText: 'Ver imoveis',
+          secondaryButtonLink: '/imoveis',
+          overlayColor: '#0f172a',
+          overlayOpacity: 0.6,
+          accentColor: '#0ea5e9',
+          badgeText: 'Ultima chance'
+        },
+        style_config: {
+          backgroundColor: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)',
+          textColor: '#f8fafc',
+          padding: '5rem 0'
         }
       },
       newsletter: {
@@ -422,6 +492,13 @@ export class ComponentLibraryService {
         description: 'Display key statistics'
       },
       {
+        type: 'about-section',
+        label: 'About Section',
+        icon: '🧭',
+        category: 'content',
+        description: 'About/manifesto section with image and bullets'
+      },
+      {
         type: 'map-section',
         label: 'Map',
         icon: '🗺️',
@@ -462,6 +539,13 @@ export class ComponentLibraryService {
         icon: '⭐',
         category: 'content',
         description: 'Grid of features/benefits with icons'
+      },
+      {
+        type: 'cta-button',
+        label: 'CTA Button',
+        icon: '🚀',
+        category: 'content',
+        description: 'Final call-to-action section'
       },
       {
         type: 'newsletter',

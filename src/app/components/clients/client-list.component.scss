@@ -1,8 +1,14 @@
+/* Mobile-first adjustments for Clients page.
+   Não mexe no TS. Substitua este arquivo / cole este SCSS no lugar do atual.
+*/
+
+/* Base (mantive suas regras principais - aqui só acrescentei/ajustei onde necessário) */
 .page-container {
   min-height: 100vh;
   background: #f8f9fa;
 }
 
+/* Header */
 .page-header {
   background: white;
   padding: 2rem 2.5rem;
@@ -18,8 +24,13 @@
     font-size: 2rem;
     font-weight: 700;
   }
+
+  .btn-primary {
+    padding: 0.875rem 1.75rem;
+  }
 }
 
+/* Filters */
 .filters-card {
   background: white;
   margin: 2rem 2.5rem;
@@ -67,7 +78,7 @@
   padding-bottom: 0.25rem;
 }
 
-// Modal Styles
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -82,10 +93,7 @@
   animation: fadeIn 0.2s ease;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .modal-content {
   background: white;
@@ -99,14 +107,8 @@
 }
 
 @keyframes slideUp {
-  from { 
-    transform: translateY(50px); 
-    opacity: 0;
-  }
-  to { 
-    transform: translateY(0); 
-    opacity: 1;
-  }
+  from { transform: translateY(50px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
 }
 
 .modal-header {
@@ -116,12 +118,7 @@
   justify-content: space-between;
   align-items: center;
 
-  h2 {
-    margin: 0;
-    color: #1e293b;
-    font-size: 1.5rem;
-    font-weight: 700;
-  }
+  h2 { margin: 0; color: #1e293b; font-size: 1.5rem; font-weight: 700; }
 
   .close-btn {
     background: none;
@@ -138,16 +135,11 @@
     border-radius: 4px;
     transition: all 0.2s ease;
 
-    &:hover {
-      background: #f1f5f9;
-      color: #475569;
-    }
+    &:hover { background: #f1f5f9; color: #475569; }
   }
 }
 
-form {
-  padding: 2rem;
-}
+form { padding: 2rem; }
 
 .form-row {
   display: grid;
@@ -181,19 +173,12 @@ form {
   &:focus {
     outline: none;
     border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
   }
 }
 
-textarea.form-control {
-  resize: vertical;
-  min-height: 100px;
-}
-
-select.form-control {
-  cursor: pointer;
-  background-color: white;
-}
+textarea.form-control { resize: vertical; min-height: 100px; }
+select.form-control { cursor: pointer; background-color: white; }
 
 .modal-footer {
   display: flex;
@@ -204,10 +189,8 @@ select.form-control {
   margin-top: 1.5rem;
 }
 
-// Notes Modal
-.notes-content {
-  padding: 2rem;
-}
+/* Notes Modal */
+.notes-content { padding: 2rem; }
 
 .notes-list {
   max-height: 300px;
@@ -215,54 +198,18 @@ select.form-control {
   margin-bottom: 2rem;
 }
 
-.note-item {
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  border-left: 3px solid #667eea;
+.note-item { padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 1rem; border-left: 3px solid #667eea; }
+.note-date { font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.5rem; }
+.note-text { color: #475569; line-height: 1.5; }
+.no-notes { text-align:center; padding:2rem; color:#94a3b8; font-style:italic; }
+
+.add-note-section { border-top: 2px solid #e5e7eb; padding-top:1.5rem;
+  textarea { margin-bottom:1rem; }
+  button { display:block; width:100%; }
 }
+.note-warning { display:block; margin-top:0.5rem; color:#94a3b8; font-style:italic; }
 
-.note-date {
-  font-size: 0.75rem;
-  color: #94a3b8;
-  margin-bottom: 0.5rem;
-}
-
-.note-text {
-  color: #475569;
-  line-height: 1.5;
-}
-
-.no-notes {
-  text-align: center;
-  padding: 2rem;
-  color: #94a3b8;
-  font-style: italic;
-}
-
-.add-note-section {
-  border-top: 2px solid #e5e7eb;
-  padding-top: 1.5rem;
-
-  textarea {
-    margin-bottom: 1rem;
-  }
-
-  button {
-    display: block;
-    width: 100%;
-  }
-}
-
-.note-warning {
-  display: block;
-  margin-top: 0.5rem;
-  color: #94a3b8;
-  font-style: italic;
-}
-
-// Table
+/* Table / cards */
 .table-card {
   background: white;
   margin: 2rem 2.5rem;
@@ -292,73 +239,38 @@ select.form-control {
     padding: 1.25rem;
     border-bottom: 1px solid #e5e7eb;
     color: #475569;
+    vertical-align: middle;
+    word-break: break-word;
   }
 
   tbody tr {
     transition: background 0.2s ease;
-
-    &:hover {
-      background: #f8f9fa;
-    }
-
-    &:last-child td {
-      border-bottom: none;
-    }
+    &:hover { background: #f8f9fa; }
+    &:last-child td { border-bottom: none; }
   }
 }
 
-.client-name-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.client-name {
-  font-weight: 600;
-  color: #1e293b;
-}
-
+/* client name layout */
+.client-name-cell { display:flex; align-items:center; gap:0.75rem; }
+.client-name { font-weight:600; color:#1e293b; }
 .status-badge {
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.3px;
 }
 
-.badge {
-  padding: 0.35rem 0.85rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  display: inline-block;
-}
+.badge { padding: 0.35rem 0.85rem; border-radius:20px; font-size:0.8rem; font-weight:600; text-transform:uppercase; display:inline-block; }
 
-// Status colors
-.status-lead {
-  background: #dbeafe;
-  color: #1e40af;
-}
+/* status colors */
+.status-lead { background:#dbeafe; color:#1e40af; }
+.status-interessado { background:#fef3c7; color:#92400e; }
+.status-fechamento { background:#fce7f3; color:#9f1239; }
+.status-cliente { background:#d1fae5; color:#065f46; }
 
-.status-interessado {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.status-fechamento {
-  background: #fce7f3;
-  color: #9f1239;
-}
-
-.status-cliente {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-// Buttons
+/* Buttons */
 .btn-primary {
   padding: 0.875rem 1.75rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -369,17 +281,10 @@ select.form-control {
   font-weight: 600;
   font-size: 0.95rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(102,126,234,0.3);
 
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
+  &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(102,126,234,0.4); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
 .btn-secondary {
@@ -392,10 +297,7 @@ select.form-control {
   font-weight: 600;
   font-size: 0.95rem;
   transition: all 0.2s ease;
-
-  &:hover {
-    background: #e2e8f0;
-  }
+  &:hover { background: #e2e8f0; }
 }
 
 .btn-sm {
@@ -409,57 +311,97 @@ select.form-control {
   font-size: 0.85rem;
   font-weight: 500;
   transition: all 0.2s ease;
-
-  &:hover {
-    background: #475569;
-    transform: translateY(-1px);
-  }
+  &:hover { background: #475569; transform: translateY(-1px); }
 }
 
-.btn-info {
-  background: #3b82f6;
+.btn-info { background: #3b82f6; &:hover { background: #2563eb; } }
+.btn-danger { background: #ef4444; &:hover { background: #dc2626; } }
 
-  &:hover {
-    background: #2563eb;
-  }
-}
+.text-center { text-align:center; padding:2rem; color:#94a3b8; font-style:italic; }
 
-.btn-danger {
-  background: #ef4444;
-
-  &:hover {
-    background: #dc2626;
-  }
-}
-
-.text-center {
-  text-align: center;
-  padding: 2rem;
-  color: #94a3b8;
-  font-style: italic;
-}
-
-// Responsive
+/* ---------------- Responsive: transform table into cards on small screens ---------------- */
 @media (max-width: 768px) {
-  .form-row, .filter-row {
+  /* stack header & cards spacing */
+  .page-header, .filters-card, .table-card {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .page-header h1 { font-size: 1.25rem; }
+
+  .filter-row {
     grid-template-columns: 1fr;
   }
 
-  .page-header, .filters-card, .table-card {
-    margin: 1rem;
-    padding: 1.5rem;
-  }
+  /* Modal tweaks */
+  .modal-content { width: 95%; max-height: 90vh; }
+  form { padding: 1.25rem; }
 
-  .data-table {
+  /* Make the data-table behave like a list of cards */
+  .data-table thead { display: none; }            /* hide header */
+  .data-table, .data-table tbody, .data-table tr, .data-table td { display: block; width: 100%; }
+  .data-table tr {
+    background: white;
+    margin-bottom: 0.75rem;
+    border-radius: 10px;
+    padding: 0.75rem 0.85rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    border: 1px solid #eef2f7;
+  }
+  .data-table td {
+    padding: 0.45rem 0;
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  /* label before each cell (readable mobile layout) */
+  .data-table td::before {
+    content: attr(data-label); /* we will set data-label via CSS nth-child below */
+    font-weight: 600;
+    color: #475569;
+    margin-right: 0.75rem;
+    flex: 0 0 auto;
     font-size: 0.85rem;
+    text-transform: none;
   }
 
-  .modal-content {
-    width: 95%;
-    max-height: 90vh;
+  /* Use nth-child to add explicit labels (since HTML not changed) */
+  .data-table tr td:nth-child(1)::before { content: "Nome"; }
+  .data-table tr td:nth-child(2)::before { content: "CPF"; }
+  .data-table tr td:nth-child(3)::before { content: "Email"; }
+  .data-table tr td:nth-child(4)::before { content: "Telefone"; }
+  .data-table tr td:nth-child(5)::before { content: "Status"; }
+  .data-table tr td:nth-child(6)::before { content: "Interesse"; }
+  .data-table tr td:nth-child(7)::before { content: "Ações"; }
+
+  /* make cells wrap and align */
+  .data-table td span, .data-table td .badge, .data-table td .status-badge {
+    display: inline-block;
+    max-width: 60%;
+    text-align: right;
   }
 
-  form {
-    padding: 1.5rem;
+  /* Actions become stacked full-width buttons */
+  .data-table tr td:nth-child(7) {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
   }
+  .data-table tr td:nth-child(7) .btn-sm {
+    width: 100%;
+    margin: 0;
+  }
+
+  /* Adjust footer & spacing inside card so last items not hidden */
+  .sidebar-footer, .table-card .btn-logout { /* keep previous semantics if present */ }
+
+  /* Increase touch targets for inputs/buttons */
+  .filter-input, .btn-primary, .btn-secondary, .btn-sm { min-height: 44px; }
+
+  /* reduce table font-size a bit for density */
+  .data-table { font-size: 0.92rem; }
+
+  /* ensure notes list and modal scroll nicely */
+  .notes-list { max-height: 40vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 }

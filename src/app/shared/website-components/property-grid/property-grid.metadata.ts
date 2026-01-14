@@ -2,32 +2,32 @@ import { ComponentMetadata } from '../component-base.interface';
 
 export const PROPERTY_GRID_METADATA: ComponentMetadata = {
   type: 'property-grid',
-  label: 'Property Grid',
+  label: 'Vitrine de Imoveis',
   icon: '🏘️',
   category: 'properties',
-  description: 'Grid of property listings',
+  description: 'Vitrine com cards de imoveis',
   
   schema: {
     fields: [
       {
         key: 'limit',
-        label: 'Limite de Imóveis',
+        label: 'Quantidade de imoveis',
         type: 'number',
         defaultValue: 6,
         min: 1,
         max: 50,
-        description: 'Número máximo de imóveis a exibir'
+        description: 'Quantos cards aparecem na vitrine'
       },
       {
         key: 'showFeatured',
-        label: 'Apenas Destaques',
+        label: 'Somente destaques',
         type: 'checkbox',
         defaultValue: true,
-        description: 'Mostrar apenas imóveis em destaque'
+        description: 'Mostra apenas imoveis marcados como destaque'
       },
       {
         key: 'columns',
-        label: 'Número de Colunas',
+        label: 'Quantidade de colunas',
         type: 'select',
         defaultValue: 3,
         options: [
@@ -38,20 +38,20 @@ export const PROPERTY_GRID_METADATA: ComponentMetadata = {
       },
       {
         key: 'showFilters',
-        label: 'Mostrar Filtros',
+        label: 'Mostrar filtros',
         type: 'checkbox',
         defaultValue: false,
-        description: 'Exibir barra de filtros'
+        description: 'Exibe a barra de filtros no topo'
       },
       {
         key: 'sortBy',
-        label: 'Ordenar Por',
+        label: 'Ordenacao',
         type: 'select',
         defaultValue: 'date',
         options: [
-          { label: 'Mais Recentes', value: 'date' },
-          { label: 'Maior Preço', value: 'price' },
-          { label: 'Maior Área', value: 'area' }
+          { label: 'Mais recentes', value: 'date' },
+          { label: 'Maior preco', value: 'price' },
+          { label: 'Maior area', value: 'area' }
         ]
       }
     ],
@@ -59,16 +59,16 @@ export const PROPERTY_GRID_METADATA: ComponentMetadata = {
     styleFields: [
       {
         key: 'backgroundColor',
-        label: 'Cor de Fundo',
-        type: 'color',
+        label: 'Fundo (cor ou gradiente)',
+        type: 'text',
         defaultValue: '#ffffff'
       },
       {
         key: 'padding',
-        label: 'Espaçamento',
+        label: 'Espacamento',
         type: 'text',
         defaultValue: '2rem',
-        placeholder: 'ex: 2rem ou 20px'
+        placeholder: 'Ex: 2rem ou 20px'
       }
     ]
   },

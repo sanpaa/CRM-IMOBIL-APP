@@ -21,10 +21,27 @@ export interface HeroConfig {
   title: string;
   subtitle?: string;
   backgroundImage?: string;
+  overlayColor?: string;
+  overlayOpacity?: number;
   buttonText?: string;
   buttonLink?: string;
+  secondaryButtonText?: string;
+  secondaryButtonLink?: string;
+  badges?: HeroBadge[];
+  highlights?: HeroHighlight[];
+  contentWidth?: string;
   height?: 'small' | 'medium' | 'large' | 'full';
   alignment?: 'left' | 'center' | 'right';
+}
+
+export interface HeroBadge {
+  text: string;
+}
+
+export interface HeroHighlight {
+  value: string;
+  label?: string;
+  description?: string;
 }
 
 export interface PropertyGridConfig {
@@ -74,12 +91,17 @@ export interface GalleryImage {
 export interface StatsConfig {
   stats: Stat[];
   layout?: 'horizontal' | 'grid';
+  title?: string;
+  subtitle?: string;
+  badgeText?: string;
+  accentColor?: string;
 }
 
 export interface Stat {
   label: string;
   value: string | number;
   icon?: string;
+  description?: string;
 }
 
 export interface FAQConfig {
@@ -103,6 +125,38 @@ export interface Feature {
   icon: string;
   title: string;
   description: string;
+}
+
+export interface AboutConfig {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  content?: string;
+  imageUrl?: string;
+  bullets?: AboutBullet[];
+  buttonText?: string;
+  buttonLink?: string;
+  highlightText?: string;
+  imagePosition?: 'left' | 'right';
+}
+
+export interface AboutBullet {
+  icon?: string;
+  title: string;
+  description?: string;
+}
+
+export interface CtaButtonConfig {
+  title?: string;
+  subtitle?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  secondaryButtonText?: string;
+  secondaryButtonLink?: string;
+  overlayColor?: string;
+  overlayOpacity?: number;
+  accentColor?: string;
+  badgeText?: string;
 }
 
 export interface NewsletterConfig {

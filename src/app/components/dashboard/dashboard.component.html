@@ -1,0 +1,117 @@
+<div class="dashboard-wrapper">
+  <header class="page-header" role="banner" aria-labelledby="dashboardTitle">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 id="dashboardTitle">Dashboard</h1>
+        <p class="header-subtitle">Visão geral do seu negócio</p>
+      </div>
+
+      <div class="header-actions" role="region" aria-label="Ações da dashboard">
+        <div class="filter-bar">
+          <select aria-label="Intervalo de tempo" class="filter-bar__select">
+            <option>Últimos 30 dias</option>
+            <option>Últimos 90 dias</option>
+            <option>Este ano</option>
+          </select>
+          <button class="btn btn--primary" (click)="loadStats()" title="Atualizar">Atualizar</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-content" role="main">
+    <!-- Stats Cards -->
+    <section class="stats-grid" aria-label="Indicadores principais" aria-live="polite">
+      <article class="stat-card stat-card-primary" title="Total de Clientes">
+        <div class="stat-icon" aria-hidden="true">👥</div>
+        <div class="stat-content">
+          <div class="stat-label">Total de Clientes</div>
+          <div class="stat-value">{{ stats.clients }}</div>
+        </div>
+      </article>
+
+      <article class="stat-card stat-card-success" title="Imóveis Cadastrados">
+        <div class="stat-icon" aria-hidden="true">🏠</div>
+        <div class="stat-content">
+          <div class="stat-label">Imóveis Cadastrados</div>
+          <div class="stat-value">{{ stats.properties }}</div>
+        </div>
+      </article>
+
+      <article class="stat-card stat-card-warning" title="Visitas Agendadas">
+        <div class="stat-icon" aria-hidden="true">📅</div>
+        <div class="stat-content">
+          <div class="stat-label">Visitas Agendadas</div>
+          <div class="stat-value">{{ stats.visits }}</div>
+        </div>
+      </article>
+
+      <article class="stat-card stat-card-info" title="Negócios Ativos">
+        <div class="stat-icon" aria-hidden="true">💼</div>
+        <div class="stat-content">
+          <div class="stat-label">Negócios Ativos</div>
+          <div class="stat-value">{{ stats.deals }}</div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="charts-grid" aria-label="Gráficos e análises">
+      <div class="chart-card" role="region" aria-label="Clientes por status">
+        <div class="chart-header">
+          <h3>Clientes por Status</h3>
+          <p>Distribuição dos clientes no funil</p>
+        </div>
+        <div class="chart-container">
+          <canvas #clientsChart></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card" role="region" aria-label="Pipeline de negócios">
+        <div class="chart-header">
+          <h3>Pipeline de Negócios</h3>
+          <p>Status dos negócios em andamento</p>
+        </div>
+        <div class="chart-container">
+          <canvas #dealsChart></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card chart-card-wide" role="region" aria-label="Atividades últimos 6 meses">
+        <div class="chart-header">
+          <h3>Atividades dos Últimos 6 Meses</h3>
+          <p>Visão histórica de clientes e imóveis</p>
+        </div>
+        <div class="chart-container">
+          <canvas #monthlyChart></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <aside class="quick-actions" aria-label="Ações rápidas">
+      <h3>Ações Rápidas</h3>
+      <div class="actions-grid">
+        <a routerLink="/clients" class="action-card" title="Novo Cliente">
+          <span class="action-icon" aria-hidden="true">➕</span>
+          <span class="action-label">Novo Cliente</span>
+        </a>
+
+        <a routerLink="/properties" class="action-card" title="Novo Imóvel">
+          <span class="action-icon" aria-hidden="true">🏡</span>
+          <span class="action-label">Novo Imóvel</span>
+        </a>
+
+        <a routerLink="/visits" class="action-card" title="Agendar Visita">
+          <span class="action-icon" aria-hidden="true">📆</span>
+          <span class="action-label">Agendar Visita</span>
+        </a>
+
+        <a routerLink="/deals" class="action-card" title="Novo Negócio">
+          <span class="action-icon" aria-hidden="true">💰</span>
+          <span class="action-label">Novo Negócio</span>
+        </a>
+      </div>
+    </aside>
+  </main>
+</div>

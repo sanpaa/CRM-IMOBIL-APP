@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 :host {
   display: block;
   position: relative;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
 }
 
 .hero-container {
@@ -12,6 +15,7 @@
   overflow: hidden;
   background-size: cover;
   background-position: center;
+  color: inherit;
   
   &.hero-small {
     min-height: 300px;
@@ -30,10 +34,16 @@
   }
 }
 
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
 .hero-content {
   position: relative;
   z-index: 1;
-  padding: 2rem;
+  padding: 3rem 2.5rem;
   max-width: 1200px;
   width: 100%;
   
@@ -50,45 +60,123 @@
   }
 }
 
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: inherit;
+  backdrop-filter: blur(6px);
+}
+
 .hero-title {
-  font-size: 3rem;
-  font-weight: bold;
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  font-weight: 700;
   margin: 0 0 1rem 0;
   line-height: 1.2;
-  
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
 }
 
 .hero-subtitle {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   margin: 0 0 2rem 0;
   opacity: 0.9;
-  
-  @media (max-width: 768px) {
-    font-size: 1.2rem;
-  }
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2.5rem;
 }
 
 .hero-button {
-  display: inline-block;
-  padding: 1rem 2rem;
-  background-color: #004AAD;
-  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95rem 2rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
   text-decoration: none;
-  border-radius: 4px;
-  font-size: 1.1rem;
-  font-weight: 500;
-  transition: background-color 0.3s ease;
-  
-  &:hover {
-    background-color: #003580;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &.primary {
+    background: #0ea5e9;
+    color: #0f172a;
+    box-shadow: 0 12px 30px rgba(14, 165, 233, 0.35);
   }
-  
+
+  &.secondary {
+    background: transparent;
+    color: inherit;
+    border: 1px solid rgba(248, 250, 252, 0.5);
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px rgba(14, 165, 233, 0.35);
+  }
+
   &.edit-mode-link {
     pointer-events: none;
     cursor: default;
+  }
+}
+
+.hero-highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.25rem;
+}
+
+.highlight-card {
+  padding: 1.25rem 1.5rem;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  animation: fadeUp 0.5s ease both;
+}
+
+.highlight-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.highlight-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.highlight-description {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-top: 0.35rem;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -127,4 +215,15 @@
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: 0 0 4px 0;
+}
+
+@media (max-width: 768px) {
+  .hero-content {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

@@ -17,6 +17,13 @@ export interface WebsiteLayout {
 export interface LayoutConfig {
   sections?: LayoutSection[];
   components?: LayoutSection[];
+
+  pageRules?: {
+    lockedTypes?: ComponentType[]; // não removíveis
+    requiredTypes?: ComponentType[]; // obrigatórios
+    maxSections?: number;
+  };
+
   visualConfig?: {
     theme?: {
       primaryColor?: string;
@@ -35,9 +42,6 @@ export interface LayoutConfig {
       email?: string;
       phone?: string;
     };
-    socialLinks?: any;
-    businessHours?: any;
-    layout?: any;
   };
 }
 

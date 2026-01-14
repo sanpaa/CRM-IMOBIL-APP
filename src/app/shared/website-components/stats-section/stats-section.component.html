@@ -1,0 +1,25 @@
+<section class="stats-section" [ngStyle]="getSectionStyles()" [style.--accent-color]="getAccentColor()">
+  <div class="container">
+    <div class="stats-header" *ngIf="config.title || config.subtitle || config.badgeText">
+      <span class="stats-badge" *ngIf="config.badgeText">{{ config.badgeText }}</span>
+      <h2 *ngIf="config.title">{{ config.title }}</h2>
+      <p class="stats-subtitle" *ngIf="config.subtitle">{{ config.subtitle }}</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card" *ngFor="let stat of getStats(); let i = index" [style.animationDelay.s]="i * 0.08">
+        <div class="stat-icon" *ngIf="stat.icon">
+          <i *ngIf="isIconClass(stat.icon)" [class]="stat.icon"></i>
+          <span *ngIf="!isIconClass(stat.icon)">{{ stat.icon }}</span>
+        </div>
+        <div class="stat-value">{{ stat.value }}</div>
+        <div class="stat-label">{{ stat.label }}</div>
+        <div class="stat-description" *ngIf="stat.description">{{ stat.description }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="edit-overlay" *ngIf="editMode">
+    <span class="edit-badge">Stats Section</span>
+  </div>
+</section>

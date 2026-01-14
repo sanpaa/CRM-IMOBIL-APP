@@ -1,16 +1,39 @@
 <div class="hero-container" 
      [ngClass]="[getHeightClass(), getAlignmentClass()]"
      [ngStyle]="getBackgroundStyle()">
-  <div class="hero-content">
+  <div class="hero-overlay" [ngStyle]="getOverlayStyles()"></div>
+  <div class="hero-content" [ngStyle]="getContentStyles()">
+    <div class="hero-badges" *ngIf="getBadges().length">
+      <span class="hero-badge" *ngFor="let badge of getBadges()">{{ badge }}</span>
+    </div>
+
     <h1 class="hero-title">{{ config.title }}</h1>
     <p class="hero-subtitle" *ngIf="config.subtitle">{{ config.subtitle }}</p>
-    <a *ngIf="config.buttonText" 
-       [href]="config.buttonLink || '#'" 
-       class="hero-button"
-       [class.edit-mode-link]="editMode"
-       (click)="editMode ? $event.preventDefault() : null">
-      {{ config.buttonText }}
-    </a>
+
+    <div class="hero-actions" *ngIf="config.buttonText || config.secondaryButtonText">
+      <a *ngIf="config.buttonText"
+         [href]="config.buttonLink || '#'" 
+         class="hero-button primary"
+         [class.edit-mode-link]="editMode"
+         (click)="editMode ? $event.preventDefault() : null">
+        {{ config.buttonText }}
+      </a>
+      <a *ngIf="config.secondaryButtonText"
+         [href]="config.secondaryButtonLink || '#'" 
+         class="hero-button secondary"
+         [class.edit-mode-link]="editMode"
+         (click)="editMode ? $event.preventDefault() : null">
+        {{ config.secondaryButtonText }}
+      </a>
+    </div>
+
+    <div class="hero-highlights" *ngIf="getHighlights().length">
+      <div class="highlight-card" *ngFor="let highlight of getHighlights(); let i = index" [style.animationDelay.s]="i * 0.08">
+        <div class="highlight-value">{{ highlight.value }}</div>
+        <div class="highlight-label" *ngIf="highlight.label">{{ highlight.label }}</div>
+        <div class="highlight-description" *ngIf="highlight.description">{{ highlight.description }}</div>
+      </div>
+    </div>
   </div>
   
   <!-- Edit Mode Overlay -->

@@ -2,33 +2,33 @@ import { ComponentMetadata } from '../component-base.interface';
 
 export const FEATURES_GRID_METADATA: ComponentMetadata = {
   type: 'features-grid',
-  label: 'Features Grid',
+  label: 'Diferenciais',
   icon: '⭐',
   category: 'content',
-  description: 'Grid of features/benefits with icons',
+  description: 'Cards com os diferenciais do negocio',
   schema: {
     fields: [
-      { key: 'title', label: 'Título', type: 'text', defaultValue: 'Por que escolher a gente?' },
-      { key: 'subtitle', label: 'Subtítulo', type: 'text', defaultValue: 'Vantagens de trabalhar conosco' },
-      { key: 'titleColor', label: 'Cor do Título', type: 'color', defaultValue: '#1a202c' },
-      { key: 'subtitleColor', label: 'Cor do Subtítulo', type: 'color', defaultValue: '#718096' },
-      { key: 'iconBackground', label: 'Fundo do Ícone (gradiente ou cor)', type: 'text', defaultValue: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-      { key: 'iconSize', label: 'Tamanho do Ícone', type: 'text', defaultValue: '80px' },
-      { key: 'cardTitleColor', label: 'Cor do Título do Card', type: 'color', defaultValue: '#2d3748' },
-      { key: 'cardDescriptionColor', label: 'Cor da Descrição', type: 'color', defaultValue: '#718096' },
-      { key: 'cardBackground', label: 'Fundo do Card', type: 'color', defaultValue: '#ffffff' },
-      { key: 'cardBorderColor', label: 'Cor da Borda do Card', type: 'color', defaultValue: '#ffffff' },
-      { key: 'cardShadow', label: 'Sombra do Card', type: 'text', defaultValue: '0 2px 8px rgba(0,0,0,0.05)' },
-      { key: 'gridGap', label: 'Espaçamento entre Cards', type: 'text', defaultValue: '2rem' },
+      { key: 'title', label: 'Titulo', type: 'text', defaultValue: 'Por que escolher a gente?' },
+      { key: 'subtitle', label: 'Subtitulo', type: 'text', defaultValue: 'Vantagens de trabalhar conosco' },
+      { key: 'titleColor', label: 'Cor do titulo', type: 'color', defaultValue: '#1a202c' },
+      { key: 'subtitleColor', label: 'Cor do subtitulo', type: 'color', defaultValue: '#718096' },
+      { key: 'iconBackground', label: 'Fundo do icone (cor ou gradiente)', type: 'text', defaultValue: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+      { key: 'iconSize', label: 'Tamanho do icone', type: 'text', defaultValue: '80px' },
+      { key: 'cardTitleColor', label: 'Cor do titulo do card', type: 'color', defaultValue: '#2d3748' },
+      { key: 'cardDescriptionColor', label: 'Cor do texto do card', type: 'color', defaultValue: '#718096' },
+      { key: 'cardBackground', label: 'Fundo do card', type: 'color', defaultValue: '#ffffff' },
+      { key: 'cardBorderColor', label: 'Borda do card', type: 'color', defaultValue: '#ffffff' },
+      { key: 'cardShadow', label: 'Sombra do card', type: 'text', defaultValue: '0 2px 8px rgba(0,0,0,0.05)' },
+      { key: 'gridGap', label: 'Espaco entre cards', type: 'text', defaultValue: '2rem' },
       { 
         key: 'features', 
-        label: 'Lista de Features', 
+        label: 'Lista de diferenciais', 
         type: 'array', 
         defaultValue: [],
         schema: {
-          icon: { type: 'text', label: 'Classe do Ícone (FontAwesome)' },
-          title: { type: 'text', label: 'Título' },
-          description: { type: 'textarea', label: 'Descrição' }
+          icon: { type: 'text', label: 'Icone ou emoji' },
+          title: { type: 'text', label: 'Titulo curto' },
+          description: { type: 'textarea', label: 'Descricao' }
         }
       }
     ]

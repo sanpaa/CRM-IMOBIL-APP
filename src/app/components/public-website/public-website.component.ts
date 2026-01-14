@@ -22,23 +22,37 @@ import { FooterComponent } from '../../shared/website-components/footer/footer.c
   styleUrls: ['./public-website.component.scss']
 })
 export class PublicWebsiteComponent implements OnInit, OnDestroy {
-  layout: WebsiteLayout | null = null;
-  sections: LayoutSection[] = [];
+  // Personalização limitada
   headerConfig: any = {
     showLogo: true,
     showMenu: true,
-    logoUrl: 'https://via.placeholder.com/150x50?text=Logo'
+    logoUrl: 'https://via.placeholder.com/150x50?text=Logo',
+    backgroundColor: '#ffffff',
+    textColor: '#333333'
   };
   footerConfig: any = {
     showLogo: false,
     showMenu: true,
-    showCopyright: true
+    showCopyright: true,
+    backgroundColor: '#1a1a1a',
+    textColor: '#ffffff'
   };
-  storeSettings: StoreSettings | null = null;
+  bannerConfig = {
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    imageUrl: '',
+    title: 'Bem-vindo à Imobiliária',
+    subtitle: 'Seu novo imóvel está aqui!',
+    titleColor: '#fff',
+    subtitleColor: '#fff'
+  };
+  highlights = [
+    { title: 'Atendimento Personalizado', text: 'Nossa equipe está pronta para te ajudar a encontrar o imóvel ideal.' },
+    { title: 'Segurança e Facilidade', text: 'Negocie com tranquilidade, com SSL e notificações automáticas.' }
+  ];
   properties: Property[] = [];
   loading = true;
   companyId: string | null = null;
-  
+  whatsappNumber: string | null = null;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -51,20 +65,15 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit() {
-    // In a real implementation, companyId would be determined from the domain
-    // For now, we'll get it from route params or use a default
+    // companyId pode ser determinado do domínio ou query param
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(async params => {
-        // Prioritize query param but validate it first
         const queryCompanyId = params['companyId'];
-        const validFromQuery = queryCompanyId && this.authService.isValidCompanyIdString(queryCompanyId) 
-                                ? queryCompanyId 
-                                : null;
-        
-        // Fallback to validated company_id from current user
+        const validFromQuery = queryCompanyId && this.authService.isValidCompanyIdString(queryCompanyId)
+          ? queryCompanyId
+          : null;
         const validFromAuth = this.authService.getValidCompanyId();
-        
         this.companyId = validFromQuery || validFromAuth;
         if (this.companyId) {
           await this.loadWebsite();
@@ -79,82 +88,45 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
 
   async loadWebsite() {
     if (!this.companyId) return;
-
     this.loading = true;
     try {
-      console.log('🟢 Carregando site público para company:', this.companyId);
-      
-      // Buscar configurações diretamente do banco via CompanyService
+      // Buscar configurações da empresa
       const company = await this.companyService.getById(this.companyId);
-      
       if (!company) {
         console.error('🔴 Empresa não encontrada');
         return;
       }
-      
-      console.log('✅ Company data with footer_config:', company);
-      
-      // Configurar header direto do header_config
+      // Header personalizável
       if (company.header_config) {
         this.headerConfig = {
-          logoUrl: company.header_config.logoUrl,
-          showLogo: company.header_config.showLogo ?? true,
-          showMenu: company.header_config.showMenu ?? true,
-          backgroundColor: company.header_config.backgroundColor || '#ffffff',
-          textColor: company.header_config.textColor || '#333333'
+          ...this.headerConfig,
+          ...company.header_config
         };
       }
-      
-      // Configurar footer direto do footer_config
+      // Footer personalizável
       if (company.footer_config) {
         this.footerConfig = {
-          companyName: company.footer_config.companyName || company.name,
-          description: company.footer_config.description,
-          logoUrl: company.footer_config.logoUrl,
-          showLogo: company.footer_config.showLogo ?? false,
-          
-          // Informações de contato
-          address: company.footer_config.address,
-          phone: company.footer_config.phone || company.phone,
-          email: company.footer_config.email || company.email,
-          
-          // Redes sociais
-          instagram: company.footer_config.instagram,
-          facebook: company.footer_config.facebook,
-          whatsapp: company.footer_config.whatsapp,
-          
-          // Links e serviços
-          quickLinks: company.footer_config.quickLinks || [],
-          services: company.footer_config.services || [],
-          
-          showCopyright: company.footer_config.showCopyright ?? true,
-          backgroundColor: company.footer_config.backgroundColor || '#1a1a1a',
-          textColor: company.footer_config.textColor || '#ffffff'
+          ...this.footerConfig,
+          ...company.footer_config
         };
       }
-      
-      // Carregar componentes do website builder
-      const layoutData = await this.customizationService.getLayout(this.companyId);
-      if (layoutData) {
-        this.layout = layoutData;
-        const sections = layoutData.layout_config?.sections || layoutData.layout_config?.components || [];
-        this.sections = sections
-          .filter((s: any) => s.type !== 'header' && s.type !== 'footer')
-          .sort((a: any, b: any) => a.order - b.order);
-      }
-      
-      console.log('✅ Site carregado com sucesso!');
-      console.log('📋 Header Config:', this.headerConfig);
-      console.log('📋 Footer Config:', this.footerConfig);
-      console.log('📋 Sections:', this.sections);
-      
-      // Load properties for property grid sections
+      const footerWhatsapp = company.footer_config?.whatsapp;
+      const companyWhatsapp = company.whatsapp;
+      this.whatsappNumber = footerWhatsapp || companyWhatsapp || null;
+      // Banner e destaques: personalização futura (ignorar se não existir)
+      // Se desejar, pode buscar de company.custom_data ou similar no futuro
+      // Carregar imóveis para grid
       this.properties = await this.propertyService.getAll();
-      
     } catch (error) {
       console.error('🔴 Error loading website:', error);
     } finally {
       this.loading = false;
     }
+  }
+
+  getWhatsappLink(): string {
+    const raw = this.whatsappNumber || '';
+    const normalized = raw.replace(/\D/g, '');
+    return normalized ? `https://wa.me/${normalized}` : '#';
   }
 }

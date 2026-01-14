@@ -4,6 +4,7 @@ export interface Company {
   document?: string;
   email?: string;
   phone?: string;
+  whatsapp?: string;
   creci?: string;
   address?: string;
   logo_url?: string;
@@ -41,9 +42,12 @@ export interface StoreSettings {
 }
 
 export interface HeaderConfig {
+  companyName?: string;
   logoUrl?: string;              // URL da logo
   showLogo: boolean;             // Mostrar/esconder logo
   showMenu: boolean;             // Mostrar/esconder menu de navegação
+  phone?: string;
+  navigation?: Array<{ label: string; link: string }>;
   backgroundColor?: string;
   textColor?: string;
 }

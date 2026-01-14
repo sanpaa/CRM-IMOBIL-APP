@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:host {
+  display: block;
+  position: relative;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+}
+
+.cta-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-content {
+  text-align: center;
+  padding: 4rem 2.5rem;
+  border-radius: 28px;
+  background: rgba(248, 250, 252, 0.08);
+  border: 1px solid rgba(248, 250, 252, 0.18);
+  backdrop-filter: blur(10px);
+  animation: fadeUp 0.6s ease both;
+}
+
+.cta-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 1.1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(14, 165, 233, 0.22);
+  color: var(--accent-color, #0ea5e9);
+  margin-bottom: 1.25rem;
+}
+
+.cta-content h2 {
+  font-size: clamp(2rem, 3.2vw, 2.8rem);
+  margin: 0 0 1rem 0;
+}
+
+.cta-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.85;
+  margin: 0 auto 2rem auto;
+  max-width: 720px;
+}
+
+.cta-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.cta-button {
+  padding: 0.95rem 2.1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.cta-button.primary {
+  background: var(--accent-color, #0ea5e9);
+  color: #0f172a;
+  box-shadow: 0 14px 32px rgba(14, 165, 233, 0.35);
+}
+
+.cta-button.secondary {
+  border: 1px solid rgba(248, 250, 252, 0.6);
+  color: inherit;
+  background: transparent;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(14, 165, 233, 0.35);
+}
+
+.edit-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.edit-badge {
+  display: inline-block;
+  background: #0ea5e9;
+  color: #0f172a;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 0 0 0 8px;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .cta-content {
+    padding: 3rem 1.75rem;
+  }
+}

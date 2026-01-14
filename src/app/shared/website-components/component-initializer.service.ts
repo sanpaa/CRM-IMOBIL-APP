@@ -14,6 +14,9 @@ import { FeaturesGridComponent } from './features-grid/features-grid.component';
 import { NewsletterComponent } from './newsletter/newsletter.component';
 import { MortgageCalculatorComponent } from './mortgage-calculator/mortgage-calculator.component';
 import { CustomCodeComponent } from './custom-code/custom-code.component';
+import { StatsSectionComponent } from './stats-section/stats-section.component';
+import { AboutSectionComponent } from './about-section/about-section.component';
+import { CtaButtonComponent } from './cta-button/cta-button.component';
 
 // Import all metadata
 import { HERO_METADATA } from './hero/hero.metadata';
@@ -28,6 +31,9 @@ import { FEATURES_GRID_METADATA } from './features-grid/features-grid.metadata';
 import { NEWSLETTER_METADATA } from './newsletter/newsletter.metadata';
 import { MORTGAGE_CALCULATOR_METADATA } from './mortgage-calculator/mortgage-calculator.metadata';
 import { CUSTOM_CODE_METADATA } from './custom-code/custom-code.metadata';
+import { STATS_SECTION_METADATA } from './stats-section/stats-section.metadata';
+import { ABOUT_SECTION_METADATA } from './about-section/about-section.metadata';
+import { CTA_BUTTON_METADATA } from './cta-button/cta-button.metadata';
 
 /**
  * Service to initialize and register all website components
@@ -58,6 +64,9 @@ export class ComponentInitializerService {
     this.registry.register('features-grid', FeaturesGridComponent, FEATURES_GRID_METADATA);
     this.registry.register('newsletter', NewsletterComponent, NEWSLETTER_METADATA);
     this.registry.register('mortgage-calculator', MortgageCalculatorComponent, MORTGAGE_CALCULATOR_METADATA);
+    this.registry.register('stats-section', StatsSectionComponent, STATS_SECTION_METADATA);
+    this.registry.register('about-section', AboutSectionComponent, ABOUT_SECTION_METADATA);
+    this.registry.register('cta-button', CtaButtonComponent, CTA_BUTTON_METADATA);
     
     // Register advanced components
     this.registry.register('custom-code', CustomCodeComponent, CUSTOM_CODE_METADATA);

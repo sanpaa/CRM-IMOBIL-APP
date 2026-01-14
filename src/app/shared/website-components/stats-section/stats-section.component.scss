@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:host {
+  display: block;
+  position: relative;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+}
+
+.stats-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.stats-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  animation: fadeUp 0.5s ease both;
+}
+
+.stats-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(14, 165, 233, 0.2);
+  color: var(--accent-color, #0ea5e9);
+  margin-bottom: 1rem;
+}
+
+.stats-header h2 {
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  margin: 0 0 0.75rem 0;
+}
+
+.stats-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  padding: 1.75rem;
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.05);
+  border: 1px solid rgba(248, 250, 252, 0.12);
+  backdrop-filter: blur(8px);
+  text-align: left;
+  animation: fadeUp 0.55s ease both;
+}
+
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  background: rgba(14, 165, 233, 0.16);
+  color: var(--accent-color, #0ea5e9);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-color, #0ea5e9);
+  margin-bottom: 0.35rem;
+}
+
+.stat-label {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.stat-description {
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.edit-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.edit-badge {
+  display: inline-block;
+  background: #0ea5e9;
+  color: #0f172a;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 0 0 0 8px;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-header {
+    text-align: left;
+  }
+}

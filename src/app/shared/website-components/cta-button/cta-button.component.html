@@ -1,0 +1,30 @@
+<section class="cta-section" [ngStyle]="getSectionStyles()" [style.--accent-color]="getAccentColor()">
+  <div class="cta-overlay" [ngStyle]="getOverlayStyles()"></div>
+  <div class="container">
+    <div class="cta-content">
+      <span class="cta-badge" *ngIf="config.badgeText">{{ config.badgeText }}</span>
+      <h2 *ngIf="config.title">{{ config.title }}</h2>
+      <p class="cta-subtitle" *ngIf="config.subtitle">{{ config.subtitle }}</p>
+      <div class="cta-actions" *ngIf="config.buttonText || config.secondaryButtonText">
+        <a *ngIf="config.buttonText"
+           class="cta-button primary"
+           [href]="config.buttonLink || '#'"
+           [class.edit-mode-link]="editMode"
+           (click)="editMode ? $event.preventDefault() : null">
+          {{ config.buttonText }}
+        </a>
+        <a *ngIf="config.secondaryButtonText"
+           class="cta-button secondary"
+           [href]="config.secondaryButtonLink || '#'"
+           [class.edit-mode-link]="editMode"
+           (click)="editMode ? $event.preventDefault() : null">
+          {{ config.secondaryButtonText }}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="edit-overlay" *ngIf="editMode">
+    <span class="edit-badge">CTA</span>
+  </div>
+</section>
