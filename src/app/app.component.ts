@@ -16,7 +16,7 @@ import { Subscription } from 'rxjs';
   styles: []
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'CRM Imobiliário';
+  title = 'HSP CRM';
   private authSubscription?: Subscription;
 
   constructor(

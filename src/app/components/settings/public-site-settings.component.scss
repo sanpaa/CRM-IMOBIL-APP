@@ -6,6 +6,52 @@
 
 .page-header {
   margin-bottom: 2rem;
+
+  .header-top {
+    margin-bottom: 0.75rem;
+  }
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: #0f172a;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .btn-back:hover {
+    background: #f8fafc;
+    border-color: #cbd5f5;
+    color: #0f172a;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  }
+
+  .btn-back:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+  }
+
+  .btn-back-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 0.8rem;
+    line-height: 1;
+  }
   
   h1 {
     margin: 0 0 0.5rem 0;

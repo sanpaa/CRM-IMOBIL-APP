@@ -65,6 +65,18 @@
       </div>
     </div>
 
+    <div *ngIf="!currentSubscription && usageStats" class="current-plan-section">
+      <div class="current-plan-card">
+        <div class="plan-header">
+          <div class="plan-info">
+            <span class="plan-label">Plano Atual</span>
+            <h2>{{ usageStats.plan }}</h2>
+            <p class="plan-description">Informações detalhadas da assinatura não disponíveis no momento.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Usage Stats -->
     <div *ngIf="usageStats" class="usage-section">
       <h3 class="section-title">

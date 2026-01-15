@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
   template: `
     <div class="register-container">
       <div class="register-card">
-        <h1>CRM Imobiliário</h1>
+          <h1>HSP CRM</h1>
         <h2>Cadastro</h2>
         
         <form (ngSubmit)="onSubmit()" #registerForm="ngForm">

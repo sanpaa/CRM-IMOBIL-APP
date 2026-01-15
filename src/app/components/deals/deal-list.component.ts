@@ -19,104 +19,127 @@ import { User } from '../../models/user.model';
     <div class="page-container">
       <div class="page-header">
         <h1>Negócios / Propostas</h1>
-        <button (click)="showForm = !showForm" class="btn-primary">
-          {{ showForm ? 'Cancelar' : '+ Novo Negócio' }}
-        </button>
+        <div class="header-actions">
+          <button (click)="showFilters = true" class="btn-secondary">
+            Filtros
+          </button>
+          <button (click)="toggleForm()" class="btn-primary">
+            {{ showForm ? 'Cancelar' : '+ Novo Negócio' }}
+          </button>
+        </div>
       </div>
 
-      <!-- Filters Section -->
-      <div class="filters-card">
-        <h3>🔍 Filtros</h3>
-        <div class="filters-row">
-          <div class="filter-group">
-            <label>Status</label>
-            <select [(ngModel)]="filters.status" (change)="applyFilters()" class="form-control">
-              <option value="">Todos</option>
-              <option value="proposta">Proposta</option>
-              <option value="negociacao">Em Negociação</option>
-              <option value="aceito">Aceito</option>
-              <option value="fechado">Fechado</option>
-              <option value="perdido">Perdido</option>
-            </select>
+      <!-- Filters Modal -->
+      <div class="modal-overlay" *ngIf="showFilters" (click)="closeFilters()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>Filtros</h3>
+            <button class="modal-close" (click)="closeFilters()">×</button>
           </div>
-          <div class="filter-group">
-            <label>Cliente</label>
-            <select [(ngModel)]="filters.client_id" (change)="applyFilters()" class="form-control">
-              <option value="">Todos</option>
-              <option *ngFor="let client of clients" [value]="client.id">{{ client.name }}</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label>Imóvel</label>
-            <select [(ngModel)]="filters.property_id" (change)="applyFilters()" class="form-control">
-              <option value="">Todos</option>
-              <option *ngFor="let property of properties" [value]="property.id">{{ property.title }}</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label>Corretor</label>
-            <select [(ngModel)]="filters.user_id" (change)="applyFilters()" class="form-control">
-              <option value="">Todos</option>
-              <option *ngFor="let user of users" [value]="user.id">{{ user.name }}</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <button (click)="clearFilters()" class="btn-secondary">Limpar Filtros</button>
+          <div class="modal-body">
+            <div class="filters-row">
+              <div class="filter-group">
+                <label>Status</label>
+                <select [(ngModel)]="filters.status" (change)="applyFilters()" class="form-control">
+                  <option value="">Todos</option>
+                  <option value="proposta">Proposta</option>
+                  <option value="negociacao">Em Negociação</option>
+                  <option value="aceito">Aceito</option>
+                  <option value="fechado">Fechado</option>
+                  <option value="perdido">Perdido</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Cliente</label>
+                <select [(ngModel)]="filters.client_id" (change)="applyFilters()" class="form-control">
+                  <option value="">Todos</option>
+                  <option *ngFor="let client of clients" [value]="client.id">{{ client.name }}</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Imóvel</label>
+                <select [(ngModel)]="filters.property_id" (change)="applyFilters()" class="form-control">
+                  <option value="">Todos</option>
+                  <option *ngFor="let property of properties" [value]="property.id">{{ property.title }}</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Corretor</label>
+                <select [(ngModel)]="filters.user_id" (change)="applyFilters()" class="form-control">
+                  <option value="">Todos</option>
+                  <option *ngFor="let user of users" [value]="user.id">{{ user.name }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button (click)="clearFilters()" class="btn-secondary">Limpar Filtros</button>
+              <button (click)="closeFilters()" class="btn-primary">Fechar</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Form Section -->
-      <div class="form-card" *ngIf="showForm">
-        <h2>{{ editingDeal ? 'Editar Negócio' : 'Novo Negócio' }}</h2>
-        <form (ngSubmit)="saveDeal()">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Cliente *</label>
-              <select [(ngModel)]="formData.client_id" name="client_id" class="form-control" required>
-                <option value="">Selecione um cliente</option>
-                <option *ngFor="let client of clients" [value]="client.id">{{ client.name }}</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Imóvel</label>
-              <select [(ngModel)]="formData.property_id" name="property_id" class="form-control">
-                <option value="">Selecione um imóvel</option>
-                <option *ngFor="let property of properties" [value]="property.id">{{ property.title }}</option>
-              </select>
-            </div>
+      <!-- Form Modal -->
+      <div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
+        <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>{{ editingDeal ? 'Editar Negócio' : 'Novo Negócio' }}</h3>
+            <button class="modal-close" (click)="closeForm()">×</button>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Corretor Responsável</label>
-              <select [(ngModel)]="formData.user_id" name="user_id" class="form-control">
-                <option value="">Selecione um corretor</option>
-                <option *ngFor="let user of users" [value]="user.id">{{ user.name }}</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Valor Proposto *</label>
-              <input type="number" [(ngModel)]="formData.proposed_value" name="proposed_value" class="form-control" required>
-            </div>
+          <div class="modal-body">
+            <form (ngSubmit)="saveDeal()">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Cliente *</label>
+                  <select [(ngModel)]="formData.client_id" name="client_id" class="form-control" required>
+                    <option value="">Selecione um cliente</option>
+                    <option *ngFor="let client of clients" [value]="client.id">{{ client.name }}</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Imóvel</label>
+                  <select [(ngModel)]="formData.property_id" name="property_id" class="form-control">
+                    <option value="">Selecione um imóvel</option>
+                    <option *ngFor="let property of properties" [value]="property.id">{{ property.title }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Corretor Responsável</label>
+                  <select [(ngModel)]="formData.user_id" name="user_id" class="form-control">
+                    <option value="">Selecione um corretor</option>
+                    <option *ngFor="let user of users" [value]="user.id">{{ user.name }}</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Valor Proposto *</label>
+                  <input type="number" [(ngModel)]="formData.proposed_value" name="proposed_value" class="form-control" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Status *</label>
+                  <select [(ngModel)]="formData.status" name="status" class="form-control" required>
+                    <option value="proposta">Proposta</option>
+                    <option value="negociacao">Em Negociação</option>
+                    <option value="aceito">Aceito</option>
+                    <option value="fechado">Fechado</option>
+                    <option value="perdido">Perdido</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Data de Fechamento</label>
+                  <input type="date" [(ngModel)]="formData.closed_at" name="closed_at" class="form-control">
+                </div>
+              </div>
+              <div class="modal-actions modal-actions-right">
+                <button type="button" (click)="closeForm()" class="btn-secondary">Cancelar</button>
+                <button type="submit" class="btn-primary">Salvar</button>
+              </div>
+            </form>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Status *</label>
-              <select [(ngModel)]="formData.status" name="status" class="form-control" required>
-                <option value="proposta">Proposta</option>
-                <option value="negociacao">Em Negociação</option>
-                <option value="aceito">Aceito</option>
-                <option value="fechado">Fechado</option>
-                <option value="perdido">Perdido</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Data de Fechamento</label>
-              <input type="date" [(ngModel)]="formData.closed_at" name="closed_at" class="form-control">
-            </div>
-          </div>
-          <button type="submit" class="btn-primary">Salvar</button>
-        </form>
+        </div>
       </div>
 
       <!-- Total Summary Section -->
@@ -193,6 +216,12 @@ import { User } from '../../models/user.model';
       border-bottom: 1px solid #E5E7EB;
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
     .page-header h1 {
       margin: 0;
       color: #1F2933;
@@ -235,22 +264,6 @@ import { User } from '../../models/user.model';
       background: #4B5563;
     }
 
-    .filters-card {
-      background: #FFFFFF;
-      margin: 2rem 2.5rem;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border: 1px solid #E5E7EB;
-    }
-
-    .filters-card h3 {
-      margin: 0 0 1.5rem 0;
-      color: #1F2933;
-      font-size: 1.3rem;
-      font-weight: 700;
-    }
-
     .filters-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -270,22 +283,84 @@ import { User } from '../../models/user.model';
       font-size: 0.9rem;
     }
 
-    .form-card {
-      background: #FFFFFF;
-      margin: 2rem 2.5rem;
-      padding: 2.5rem;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border: 1px solid #E5E7EB;
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
     }
 
-    .form-card h2 {
-      margin: 0 0 2rem 0;
-      color: #1F2933;
-      font-size: 1.5rem;
+    .modal-content {
+      background: #FFFFFF;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 760px;
+      max-height: 90vh;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-content.modal-large {
+      max-width: 900px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #E5E7EB;
+      background: #F9FAFB;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1.1rem;
       font-weight: 700;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid #E5E7EB;
+      color: #1F2933;
+    }
+
+    .modal-close {
+      border: none;
+      background: transparent;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6B7280;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+    }
+
+    .modal-close:hover {
+      background: #E5E7EB;
+      color: #111827;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .modal-actions.modal-actions-right {
+      justify-content: flex-end;
     }
 
     .form-row {
@@ -528,9 +603,18 @@ import { User } from '../../models/user.model';
         padding: 1.5rem;
       }
 
-      .page-header, .form-card, .filters-card {
+      .page-header {
         margin: 1rem;
         padding: 1.5rem;
+      }
+
+      .modal-content {
+        width: 94%;
+        max-height: 95vh;
+      }
+
+      .modal-body {
+        padding: 1.25rem;
       }
     }
   `]
@@ -542,6 +626,7 @@ export class DealListComponent implements OnInit {
   properties: Property[] = [];
   users: User[] = [];
   showForm = false;
+  showFilters = false;
   editingDeal: Deal | null = null;
   formData: any = {};
   filters: any = {
@@ -646,6 +731,10 @@ export class DealListComponent implements OnInit {
     this.filteredDeals = [...this.deals];
   }
 
+  closeFilters() {
+    this.showFilters = false;
+  }
+
   getDealsByStatus(status: string): Deal[] {
     return this.filteredDeals.filter(deal => deal.status === status);
   }
@@ -667,6 +756,22 @@ export class DealListComponent implements OnInit {
       status: 'proposta',
       closed_at: ''
     };
+  }
+
+  toggleForm() {
+    if (this.showForm) {
+      this.closeForm();
+      return;
+    }
+    this.editingDeal = null;
+    this.resetForm();
+    this.showForm = true;
+  }
+
+  closeForm() {
+    this.showForm = false;
+    this.editingDeal = null;
+    this.resetForm();
   }
 
   editDeal(deal: Deal) {

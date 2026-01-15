@@ -76,10 +76,6 @@ export const routes: Routes = [
       {
         path: 'website-builder',
         loadComponent: () => import('./components/website-builder/website-builder.component').then(m => m.WebsiteBuilderComponent)
-      },
-      {
-        path: 'whatsapp',
-        loadComponent: () => import('./components/settings/whatsapp-settings/whatsapp-settings.component').then(m => m.WhatsAppSettingsComponent)
       }
     ]
   },

@@ -492,6 +492,17 @@ export class VisitPdfService {
     const visitDate = visit.visit_date ? new Date(visit.visit_date).toLocaleDateString('pt-BR') : '-';
     const visitTime = visit.visit_time || '-';
     const status = this.formatStatus(visit.status);
+    const notes = visit.notes ? this.escapeHtml(visit.notes) : '';
+    const notesRow = notes
+      ? `
+    <tr>
+      <td colspan="3">
+        <span class="label">Observações:</span>
+        <span class="value">${notes}</span>
+      </td>
+    </tr>
+      `
+      : '';
 
     return `
 <div class="section">
@@ -513,6 +524,7 @@ export class VisitPdfService {
         <span class="value">${status}</span>
       </td>
     </tr>
+    ${notesRow}
   </table>
 </div>
     `;

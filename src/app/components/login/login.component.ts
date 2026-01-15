@@ -13,7 +13,7 @@ import { AuthService } from '../../services/auth.service';
       <div class="login-card">
         <div class="logo-section">
           <i class="bi bi-building"></i>
-          <h1>CRM Imobiliário</h1>
+          <h1>HSP CRM - Sistema de Gestão Imobiliário</h1>
         </div>
         <h2>Acesse sua conta</h2>
         
@@ -138,6 +138,11 @@ import { AuthService } from '../../services/auth.service';
 
     .btn-primary {
       margin-top: 0.5rem;
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
     .register-link {

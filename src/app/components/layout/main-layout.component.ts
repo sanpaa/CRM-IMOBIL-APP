@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CompanyService } from '../../services/company.service';
-import { WhatsAppService } from '../../services/whatsapp.service';
 import { User } from '../../models/user.model';
 import { Company } from '../../models/company.model';
 import { NotificationCenterComponent } from '../../shared/components/notification-center.component';
@@ -28,8 +27,8 @@ import { NotificationCenterComponent } from '../../shared/components/notificatio
           <div class="logo">
             <i class="bi bi-building"></i>
             <div class="logo-text">
-              <h2>CRM Imobiliário</h2>
-              <p>Sistema de Gestão</p>
+              <h2>HSP CRM - Gestão Imobiliária</h2>
+              <p>HSP TECH</p>
             </div>
           </div>
           <button class="mobile-close-btn" (click)="closeMobileMenu()">
@@ -70,17 +69,9 @@ import { NotificationCenterComponent } from '../../shared/components/notificatio
             <i class="bi bi-gear"></i>
             <span class="nav-label">Configurações</span>
           </a>
-          <a routerLink="/public-site-settings" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
+          <a routerLink="/website-builder" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
             <i class="bi bi-globe"></i>
             <span class="nav-label">Site Público</span>
-          </a>
-          <a routerLink="/website-builder" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
-            <i class="bi bi-palette"></i>
-            <span class="nav-label">Construtor de Sites</span>
-          </a>
-          <a routerLink="/whatsapp" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
-            <i class="bi bi-whatsapp"></i>
-            <span class="nav-label">WhatsApp</span>
           </a>
         </nav>
 
@@ -511,7 +502,6 @@ export class MainLayoutComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private companyService: CompanyService,
-    private whatsappService: WhatsAppService, // Injeta para inicializar o serviço
     private router: Router
   ) {}
 

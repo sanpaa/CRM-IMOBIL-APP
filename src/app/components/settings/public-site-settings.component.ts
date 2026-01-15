@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { CompanyService } from '../../services/company.service';
 import { AuthService } from '../../services/auth.service';
 import { HeaderConfig, FooterConfig, FooterLink } from '../../models/company.model';
@@ -8,7 +9,7 @@ import { HeaderConfig, FooterConfig, FooterLink } from '../../models/company.mod
 @Component({
   selector: 'app-public-site-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './public-site-settings.component.html',
   styleUrls: ['./public-site-settings.component.scss']
 })

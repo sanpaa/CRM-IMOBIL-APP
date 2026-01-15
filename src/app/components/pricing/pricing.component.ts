@@ -299,7 +299,7 @@ export class PricingComponent implements OnInit {
 
   contactExpert() {
     // Abre WhatsApp com mensagem pré-definida
-    const message = encodeURIComponent('Olá! Gostaria de saber mais sobre os planos do CRM Imobiliário.');
+    const message = encodeURIComponent('Olá! Gostaria de saber mais sobre os planos do HSP CRM.');
     const whatsappUrl = `https://wa.me/${this.WHATSAPP_NUMBER}?text=${message}`;
     window.open(whatsappUrl, '_blank');
   }

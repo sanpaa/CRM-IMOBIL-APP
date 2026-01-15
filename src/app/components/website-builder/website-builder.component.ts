@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { WebsiteCustomizationService } from '../../services/website-customization.service';
@@ -13,7 +14,7 @@ import { ComponentMetadata } from '../../shared/website-components/component-bas
 @Component({
   selector: 'app-website-builder',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule, RenderComponentDirective, PropertyEditorComponent],
+  imports: [CommonModule, FormsModule, DragDropModule, RouterLink, RenderComponentDirective, PropertyEditorComponent],
   templateUrl: './website-builder.component.html',
   styleUrls: ['./website-builder.component.scss']
 })
