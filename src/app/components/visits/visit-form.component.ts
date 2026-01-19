@@ -248,7 +248,7 @@ import { AuthService } from '../../services/auth.service';
 
     .modal-content {
       position: relative;
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 12px;
       width: 90%;
       max-width: 900px;
@@ -261,7 +261,7 @@ import { AuthService } from '../../services/auth.service';
 
     .modal-header {
       padding: 1.5rem 2rem;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid var(--color-border-light);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -304,7 +304,7 @@ import { AuthService } from '../../services/auth.service';
     .form-section {
       margin-bottom: 2rem;
       padding-bottom: 1.5rem;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--color-border-light);
     }
 
     .form-section:last-child {
@@ -313,7 +313,7 @@ import { AuthService } from '../../services/auth.service';
 
     .form-section h3 {
       margin: 0 0 1rem 0;
-      color: #1e293b;
+      color: var(--color-text-primary);
       font-size: 1.1rem;
       font-weight: 600;
     }
@@ -343,7 +343,7 @@ import { AuthService } from '../../services/auth.service';
 
     .form-group label {
       margin-bottom: 0.5rem;
-      color: #475569;
+      color: var(--color-text-secondary);
       font-weight: 600;
       font-size: 0.9rem;
     }
@@ -351,9 +351,11 @@ import { AuthService } from '../../services/auth.service';
     .form-control {
       width: 100%;
       padding: 0.75rem;
-      border: 2px solid #e5e7eb;
+      background: var(--color-bg-secondary);
+      border: 2px solid var(--color-border-light);
       border-radius: 6px;
       font-size: 0.95rem;
+      color: var(--color-text-primary);
       transition: all 0.2s ease;
       box-sizing: border-box;
       font-family: inherit;
@@ -361,13 +363,13 @@ import { AuthService } from '../../services/auth.service';
 
     .form-control:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
     }
 
     select.form-control {
       cursor: pointer;
-      background-color: white;
+      background-color: var(--color-bg-secondary);
     }
 
     textarea.form-control {
@@ -376,11 +378,11 @@ import { AuthService } from '../../services/auth.service';
     }
 
     .property-card {
-      background: #f8f9fa;
+      background: var(--color-bg-tertiary);
       border-radius: 8px;
       padding: 1.5rem;
       margin-bottom: 1rem;
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--color-border-light);
     }
 
     .property-header {
@@ -389,12 +391,12 @@ import { AuthService } from '../../services/auth.service';
       align-items: center;
       margin-bottom: 1rem;
       padding-bottom: 0.75rem;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--color-border-light);
     }
 
     .property-header h4 {
       margin: 0;
-      color: #1e293b;
+      color: var(--color-text-primary);
       font-size: 1rem;
       font-weight: 600;
     }
@@ -402,12 +404,12 @@ import { AuthService } from '../../services/auth.service';
     .evaluation-section {
       margin-top: 1.5rem;
       padding-top: 1.5rem;
-      border-top: 2px dashed #cbd5e1;
+      border-top: 2px dashed var(--color-border-medium);
     }
 
     .evaluation-section h4 {
       margin: 0 0 1rem 0;
-      color: #1e293b;
+      color: var(--color-text-primary);
       font-size: 0.95rem;
       font-weight: 600;
     }
@@ -415,7 +417,7 @@ import { AuthService } from '../../services/auth.service';
     .empty-message {
       text-align: center;
       padding: 2rem;
-      color: #94a3b8;
+      color: var(--color-text-tertiary);
       font-style: italic;
     }
 
@@ -458,7 +460,7 @@ import { AuthService } from '../../services/auth.service';
       gap: 1rem;
       margin-top: 2rem;
       padding-top: 1.5rem;
-      border-top: 2px solid #e5e7eb;
+      border-top: 2px solid var(--color-border-light);
     }
 
     .btn-cancel, .btn-save {
@@ -472,12 +474,12 @@ import { AuthService } from '../../services/auth.service';
     }
 
     .btn-cancel {
-      background: #64748b;
+      background: var(--color-border-dark);
       color: white;
     }
 
     .btn-cancel:hover {
-      background: #475569;
+      background: var(--color-text-secondary);
     }
 
     .btn-save {

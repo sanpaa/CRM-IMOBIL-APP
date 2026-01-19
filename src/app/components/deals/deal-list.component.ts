@@ -203,11 +203,11 @@ import { User } from '../../models/user.model';
   styles: [`
     .page-container {
       min-height: 100vh;
-      background: #F5F7FA;
+      background: var(--color-bg-primary);
     }
 
     .page-header {
-      background: #FFFFFF;
+      background: var(--color-bg-secondary);
       padding: 2rem 2.5rem;
       display: flex;
       justify-content: space-between;
@@ -224,7 +224,7 @@ import { User } from '../../models/user.model';
 
     .page-header h1 {
       margin: 0;
-      color: #1F2933;
+      color: var(--color-text-primary);
       font-size: 2rem;
       font-weight: 700;
     }
@@ -297,7 +297,7 @@ import { User } from '../../models/user.model';
     }
 
     .modal-content {
-      background: #FFFFFF;
+      background: var(--color-bg-secondary);
       border-radius: 12px;
       width: 90%;
       max-width: 760px;
@@ -325,7 +325,7 @@ import { User } from '../../models/user.model';
       margin: 0;
       font-size: 1.1rem;
       font-weight: 700;
-      color: #1F2933;
+      color: var(--color-text-primary);
     }
 
     .modal-close {
@@ -391,7 +391,7 @@ import { User } from '../../models/user.model';
       transition: all 0.2s ease;
       box-sizing: border-box;
       font-family: inherit;
-      color: #1F2933;
+      color: var(--color-text-primary);
     }
 
     .form-control:focus {
@@ -413,11 +413,11 @@ import { User } from '../../models/user.model';
     }
 
     .summary-card {
-      background: #FFFFFF;
+      background: var(--color-bg-secondary);
       padding: 1.75rem;
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border: 1px solid #E5E7EB;
+      border: 1px solid var(--color-border-light);
       transition: all 0.3s ease;
     }
 
@@ -451,7 +451,7 @@ import { User } from '../../models/user.model';
     .summary-value-small {
       font-size: 1.5rem;
       font-weight: 700;
-      color: #1F2933;
+      color: var(--color-text-primary);
       margin-bottom: 0.5rem;
     }
 
@@ -469,11 +469,11 @@ import { User } from '../../models/user.model';
     }
 
     .kanban-column {
-      background: #FFFFFF;
+      background: var(--color-bg-secondary);
       border-radius: 12px;
       padding: 1.5rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border: 1px solid #E5E7EB;
+      border: 1px solid var(--color-border-light);
     }
 
     .column-header {
@@ -487,7 +487,7 @@ import { User } from '../../models/user.model';
 
     .column-header h3 {
       margin: 0;
-      color: #1F2933;
+      color: var(--color-text-primary);
       font-size: 1.1rem;
       font-weight: 700;
     }
@@ -509,7 +509,7 @@ import { User } from '../../models/user.model';
     }
 
     .deal-card {
-      background: #F5F7FA;
+      background: var(--color-bg-primary);
       padding: 1.25rem;
       border-radius: 10px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
@@ -525,7 +525,7 @@ import { User } from '../../models/user.model';
     .deal-value {
       font-size: 1.4rem;
       font-weight: 700;
-      color: #1F2933;
+      color: var(--color-text-primary);
       margin-bottom: 1rem;
     }
 
@@ -546,7 +546,7 @@ import { User } from '../../models/user.model';
     }
 
     .info-row span {
-      color: #1F2933;
+      color: var(--color-text-primary);
       font-weight: 500;
       text-align: right;
     }

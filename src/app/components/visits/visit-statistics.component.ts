@@ -94,21 +94,21 @@ interface Statistics {
   `,
   styles: [`
     .stats-container {
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 12px;
       padding: 2rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--color-border-light);
       margin-bottom: 2rem;
     }
 
     .stats-title {
       margin: 0 0 1.5rem 0;
-      color: #1e293b;
+      color: var(--color-text-primary);
       font-size: 1.25rem;
       font-weight: 700;
       padding-bottom: 1rem;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid var(--color-border-light);
     }
 
     .stats-grid {
@@ -185,14 +185,14 @@ interface Statistics {
       gap: 1rem;
       margin-bottom: 2rem;
       padding: 1.5rem;
-      background: #f8f9fa;
+      background: var(--color-bg-tertiary);
       border-radius: 12px;
     }
 
     .period-card {
       text-align: center;
       padding: 1rem;
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
@@ -200,13 +200,13 @@ interface Statistics {
     .period-value {
       font-size: 2rem;
       font-weight: 700;
-      color: #667eea;
+      color: var(--color-primary);
       margin-bottom: 0.5rem;
     }
 
     .period-label {
       font-size: 0.85rem;
-      color: #64748b;
+      color: var(--color-text-secondary);
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -214,9 +214,9 @@ interface Statistics {
 
     .completion-rate {
       padding: 1.5rem;
-      background: linear-gradient(135deg, #f8f9ff 0%, #f1f5ff 100%);
+      background: var(--color-bg-tertiary);
       border-radius: 12px;
-      border: 2px solid #e0e7ff;
+      border: 2px solid var(--color-border-light);
     }
 
     .rate-header {
@@ -225,17 +225,17 @@ interface Statistics {
       align-items: center;
       margin-bottom: 1rem;
       font-weight: 600;
-      color: #1e293b;
+      color: var(--color-text-primary);
     }
 
     .rate-value {
       font-size: 1.5rem;
-      color: #667eea;
+      color: var(--color-primary);
     }
 
     .rate-bar {
       height: 12px;
-      background: #e0e7ff;
+      background: var(--color-bg-secondary);
       border-radius: 6px;
       overflow: hidden;
       margin-bottom: 0.5rem;
@@ -250,7 +250,7 @@ interface Statistics {
 
     .rate-details {
       text-align: center;
-      color: #64748b;
+      color: var(--color-text-secondary);
     }
 
     @media (max-width: 768px) {

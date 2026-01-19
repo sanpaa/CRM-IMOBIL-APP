@@ -82,12 +82,6 @@ import { AuthService } from '../../services/auth.service';
           Já tem conta? <a routerLink="/login">Faça login</a>
         </div>
 
-        <div class="pricing-link">
-          <a routerLink="/pricing">
-            <i class="bi bi-tag"></i>
-            Ver planos e preços
-          </a>
-        </div>
       </div>
     </div>
   `,
@@ -102,7 +96,7 @@ import { AuthService } from '../../services/auth.service';
     }
 
     .register-card {
-      background: white;
+      background: var(--color-bg-secondary);
       padding: 2rem;
       border-radius: 10px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);

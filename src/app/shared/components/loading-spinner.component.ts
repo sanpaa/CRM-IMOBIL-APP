@@ -41,7 +41,7 @@ import { CommonModule } from '@angular/common';
       height: 3rem;
       border: 4px solid rgba(31, 41, 55, 0.1);
       border-radius: 50%;
-      border-top-color: #1F2937;
+      border-top-color: var(--color-text-primary);
       animation: spinner 0.8s linear infinite;
     }
 

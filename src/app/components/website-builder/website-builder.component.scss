@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #f5f7fa;
+  background: var(--color-bg-primary);
 }
 
 .builder-header {
@@ -10,7 +10,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background: white;
+  background: var(--color-bg-secondary);
   border-bottom: 1px solid #e0e0e0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
@@ -74,7 +74,7 @@
 
 /* Component Library Sidebar */
 .component-library {
-  background: white;
+  background: var(--color-bg-secondary);
   border-right: 1px solid #e0e0e0;
   padding: 1.5rem;
   overflow-y: auto;
@@ -122,7 +122,7 @@
 
 /* Canvas Area */
 .canvas-area {
-  background: #f5f7fa;
+  background: var(--color-bg-primary);
   padding: 2rem;
   overflow-y: auto;
 }
@@ -155,7 +155,7 @@
 
 /* Sections Container */
 .sections-container {
-  background: white;
+  background: var(--color-bg-secondary);
   border-radius: 8px;
   padding: 1rem;
   min-height: 400px;
@@ -238,7 +238,7 @@
 
 .btn-icon {
   padding: 0.5rem;
-  background: white;
+  background: var(--color-bg-secondary);
   border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
@@ -253,7 +253,7 @@
 
 .drag-preview {
   padding: 1rem;
-  background: white;
+  background: var(--color-bg-secondary);
   border: 2px solid #004AAD;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -266,7 +266,7 @@
 
 /* Properties Panel */
 .properties-panel {
-  background: white;
+  background: var(--color-bg-secondary);
   border-left: 1px solid #e0e0e0;
   padding: 1.5rem;
   overflow-y: auto;
@@ -421,7 +421,7 @@ button:disabled {
 }
 
 .modal-content {
-  background: white;
+  background: var(--color-bg-secondary);
   padding: 2rem;
   border-radius: 8px;
   max-width: 500px;
@@ -513,7 +513,7 @@ button:disabled {
 
 /* Live Preview Panel */
 .live-preview-panel {
-  background: white;
+  background: var(--color-bg-secondary);
   border-top: 2px solid #e0e0e0;
   display: flex;
   flex-direction: column;
@@ -548,7 +548,7 @@ button:disabled {
 
 .device-btn {
   padding: 0.5rem 0.75rem;
-  background: white;
+  background: var(--color-bg-secondary);
   border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
@@ -569,7 +569,7 @@ button:disabled {
 
 .fullscreen-btn {
   padding: 0.5rem 0.75rem;
-  background: white;
+  background: var(--color-bg-secondary);
   border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
@@ -593,7 +593,7 @@ button:disabled {
 }
 
 .preview-wrapper {
-  background: white;
+  background: var(--color-bg-secondary);
   transition: all 0.3s;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   overflow: auto;
@@ -627,7 +627,7 @@ button:disabled {
 
 /* Preview Component Styles - Matching public-website styles */
 .preview-website .component-header {
-  background: white;
+  background: var(--color-bg-secondary);
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
@@ -697,7 +697,7 @@ button:disabled {
 .preview-website .hero-button {
   display: inline-block;
   padding: 0.75rem 1.5rem;
-  background: white;
+  background: var(--color-bg-secondary);
   color: #004AAD;
   text-decoration: none;
   border-radius: 6px;
@@ -712,7 +712,7 @@ button:disabled {
 .preview-website .search-form {
   display: flex;
   gap: 0.5rem;
-  background: white;
+  background: var(--color-bg-secondary);
   padding: 0.75rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -747,7 +747,7 @@ button:disabled {
 }
 
 .preview-website .property-card {
-  background: white;
+  background: var(--color-bg-secondary);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -986,7 +986,7 @@ button:disabled {
 .fullscreen-preview-content {
   width: 95vw;
   height: 95vh;
-  background: white;
+  background: var(--color-bg-secondary);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -1047,7 +1047,7 @@ button:disabled {
 }
 
 .preview-wrapper-fullscreen {
-  background: white;
+  background: var(--color-bg-secondary);
   transition: all 0.3s;
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
   overflow: auto;

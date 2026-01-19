@@ -50,7 +50,7 @@ import { VisitFormComponent } from './visit-form.component';
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let visit of visits">
+            <tr *ngFor="let visit of filteredVisits">
               <td>{{ visit.visit_date | date:'dd/MM/yyyy' }}</td>
               <td>{{ visit.visit_time }}</td>
               <td><span class="badge" [class]="'badge-' + visit.status">{{ visit.status || 'agendada' }}</span></td>
@@ -61,7 +61,7 @@ import { VisitFormComponent } from './visit-form.component';
                 <button (click)="generatePdf(visit.id)" class="btn-sm btn-success">Gerar PDF</button>
               </td>
             </tr>
-            <tr *ngIf="visits.length === 0">
+            <tr *ngIf="filteredVisits.length === 0">
               <td colspan="5" class="text-center">Nenhuma visita agendada</td>
             </tr>
           </tbody>
@@ -81,22 +81,22 @@ import { VisitFormComponent } from './visit-form.component';
   styles: [`
     .page-container {
       min-height: 100vh;
-      background: #f8f9fa;
+      background: var(--color-bg-primary);
     }
 
     .page-header {
-      background: white;
+      background: var(--color-bg-secondary);
       padding: 2rem 2.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--color-border-light);
     }
 
     .page-header h1 {
       margin: 0;
-      color: #1e293b;
+      color: var(--color-text-primary);
       font-size: 2rem;
       font-weight: 700;
     }
@@ -124,12 +124,12 @@ import { VisitFormComponent } from './visit-form.component';
     }
 
     .table-card {
-      background: white;
+      background: var(--color-bg-secondary);
       margin-bottom: 2rem;
       padding: 2.5rem;
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--color-border-light);
     }
 
     .data-table {
@@ -138,21 +138,21 @@ import { VisitFormComponent } from './visit-form.component';
     }
 
     .data-table th {
-      background: #f8f9fa;
+      background: var(--color-bg-tertiary);
       padding: 1rem 1.25rem;
       text-align: left;
       font-weight: 600;
-      color: #1e293b;
+      color: var(--color-text-secondary);
       font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid var(--color-border-light);
     }
 
     .data-table td {
       padding: 1.25rem;
-      border-bottom: 1px solid #e5e7eb;
-      color: #475569;
+      border-bottom: 1px solid var(--color-border-light);
+      color: var(--color-text-primary);
     }
 
     .data-table tbody tr {
@@ -160,7 +160,7 @@ import { VisitFormComponent } from './visit-form.component';
     }
 
     .data-table tbody tr:hover {
-      background: #f8f9fa;
+      background: var(--color-bg-tertiary);
     }
 
     .badge {
@@ -182,7 +182,7 @@ import { VisitFormComponent } from './visit-form.component';
     .btn-sm {
       padding: 0.5rem 1rem;
       margin-right: 0.5rem;
-      background: #64748b;
+      background: var(--color-border-dark);
       color: white;
       border: none;
       border-radius: 6px;
@@ -193,7 +193,7 @@ import { VisitFormComponent } from './visit-form.component';
     }
 
     .btn-sm:hover {
-      background: #475569;
+      background: var(--color-text-secondary);
       transform: translateY(-1px);
     }
 
@@ -216,7 +216,7 @@ import { VisitFormComponent } from './visit-form.component';
     .text-center {
       text-align: center;
       padding: 2rem;
-      color: #94a3b8;
+      color: var(--color-text-tertiary);
       font-style: italic;
     }
 
@@ -238,6 +238,7 @@ import { VisitFormComponent } from './visit-form.component';
 })
 export class VisitListComponent implements OnInit {
   visits: Visit[] = [];
+  filteredVisits: Visit[] = [];
   showForm = false;
   editingVisit: Visit | null = null;
   currentView: 'day' | 'week' | 'month' = 'month';
@@ -255,6 +256,7 @@ export class VisitListComponent implements OnInit {
   async loadVisits() {
     try {
       this.visits = await this.visitService.getAll();
+      this.applyFilter();
     } catch (error) {
       console.error('Error loading visits:', error);
     }
@@ -292,10 +294,12 @@ export class VisitListComponent implements OnInit {
 
   onViewChange(view: 'day' | 'week' | 'month') {
     this.currentView = view;
+    this.applyFilter();
   }
 
   onDateChange(date: Date) {
     this.currentDate = date;
+    this.applyFilter();
   }
 
   async generatePdf(visitId: string) {
@@ -316,5 +320,46 @@ export class VisitListComponent implements OnInit {
   private showError(message: string) {
     // For now using alert, but this can be replaced with a toast/notification service
     alert(message);
+  }
+
+  private applyFilter() {
+    const { start, end } = this.getCurrentRange();
+
+    this.filteredVisits = (this.visits || [])
+      .filter(visit => {
+        const visitDate = new Date(visit.visit_date);
+        if (Number.isNaN(visitDate.getTime())) return false;
+        return visitDate >= start && visitDate <= end;
+      })
+      .sort((a, b) => {
+        const aDate = new Date(a.visit_date);
+        const bDate = new Date(b.visit_date);
+        const dateDiff = aDate.getTime() - bDate.getTime();
+        if (dateDiff !== 0) return dateDiff;
+        return String(a.visit_time || '').localeCompare(String(b.visit_time || ''));
+      });
+  }
+
+  private getCurrentRange(): { start: Date; end: Date } {
+    const base = new Date(this.currentDate);
+
+    if (this.currentView === 'day') {
+      const start = new Date(base.getFullYear(), base.getMonth(), base.getDate(), 0, 0, 0, 0);
+      const end = new Date(base.getFullYear(), base.getMonth(), base.getDate(), 23, 59, 59, 999);
+      return { start, end };
+    }
+
+    if (this.currentView === 'week') {
+      // Consistente com o calendário: semana começa no Domingo
+      const day = base.getDay(); // 0 = domingo
+      const weekStart = new Date(base.getFullYear(), base.getMonth(), base.getDate() - day, 0, 0, 0, 0);
+      const weekEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6, 23, 59, 59, 999);
+      return { start: weekStart, end: weekEnd };
+    }
+
+    // month
+    const start = new Date(base.getFullYear(), base.getMonth(), 1, 0, 0, 0, 0);
+    const end = new Date(base.getFullYear(), base.getMonth() + 1, 0, 23, 59, 59, 999);
+    return { start, end };
   }
 }

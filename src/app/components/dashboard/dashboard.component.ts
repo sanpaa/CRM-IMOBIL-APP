@@ -9,20 +9,23 @@ import { DealService } from '../../services/deal.service';
 import { User } from '../../models/user.model';
 import { RouterModule } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
-import { UsageWidgetComponent } from '../usage-widget/usage-widget.component';
+import { GlobalSearchComponent } from '../../shared/components/global-search.component';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterModule, UsageWidgetComponent],
+  imports: [CommonModule, RouterLink, RouterModule, GlobalSearchComponent],
   template: `
     <div class="dashboard-wrapper">
       <header class="page-header">
         <div class="header-content">
-          <h1>Dashboard</h1>
-          <p class="header-subtitle">Visão geral do seu negócio</p>
+          <div class="header-text">
+            <h1>Olá, {{ currentUser?.name || 'Cliente' }}!</h1>
+            <p class="header-subtitle">Bem-vindo de volta.</p>
+          </div>
+          <app-global-search class="header-search"></app-global-search>
         </div>
       </header>
 
@@ -30,6 +33,7 @@ Chart.register(...registerables);
         <!-- Stats Cards -->
         <div class="stats-grid">
           <div class="stat-card stat-card-primary">
+            <span class="stat-trend neutral">0%</span>
             <div class="stat-icon">
               <i class="bi bi-people-fill"></i>
             </div>
@@ -40,6 +44,7 @@ Chart.register(...registerables);
           </div>
 
           <div class="stat-card stat-card-success">
+            <span class="stat-trend neutral">0%</span>
             <div class="stat-icon">
               <i class="bi bi-house-door-fill"></i>
             </div>
@@ -50,6 +55,7 @@ Chart.register(...registerables);
           </div>
 
           <div class="stat-card stat-card-warning">
+            <span class="stat-trend neutral">0%</span>
             <div class="stat-icon">
               <i class="bi bi-calendar-check-fill"></i>
             </div>
@@ -60,6 +66,7 @@ Chart.register(...registerables);
           </div>
 
           <div class="stat-card stat-card-info">
+            <span class="stat-trend neutral">0%</span>
             <div class="stat-icon">
               <i class="bi bi-briefcase-fill"></i>
             </div>
@@ -70,13 +77,18 @@ Chart.register(...registerables);
           </div>
         </div>
 
-        <!-- Usage Widget -->
-        <div class="usage-widget-section">
-          <app-usage-widget></app-usage-widget>
-        </div>
-
         <!-- Charts Section -->
         <div class="charts-grid">
+          <div class="chart-card chart-card-wide">
+            <div class="chart-header">
+              <h3>Atividades dos Últimos 6 Meses</h3>
+              <p>Visão histórica de clientes e imóveis</p>
+            </div>
+            <div class="chart-container chart-container-wide">
+              <canvas #monthlyChart></canvas>
+            </div>
+          </div>
+
           <div class="chart-card">
             <div class="chart-header">
               <h3>Clientes por Status</h3>
@@ -96,16 +108,6 @@ Chart.register(...registerables);
               <canvas #dealsChart></canvas>
             </div>
           </div>
-
-          <div class="chart-card chart-card-wide">
-            <div class="chart-header">
-              <h3>Atividades dos Últimos 6 Meses</h3>
-              <p>Visão histórica de clientes e imóveis</p>
-            </div>
-            <div class="chart-container">
-              <canvas #monthlyChart></canvas>
-            </div>
-          </div>
         </div>
 
         <!-- Quick Actions -->
@@ -113,19 +115,27 @@ Chart.register(...registerables);
           <h3>Ações Rápidas</h3>
           <div class="actions-grid">
             <a routerLink="/clients" class="action-card">
-              <i class="bi bi-person-plus-fill"></i>
+              <span class="action-icon">
+                <i class="bi bi-person-fill"></i>
+              </span>
               <span class="action-label">Novo Cliente</span>
             </a>
             <a routerLink="/properties" class="action-card">
-              <i class="bi bi-house-add-fill"></i>
+              <span class="action-icon">
+                <i class="bi bi-house-door-fill"></i>
+              </span>
               <span class="action-label">Novo Imóvel</span>
             </a>
             <a routerLink="/visits" class="action-card">
-              <i class="bi bi-calendar-plus-fill"></i>
+              <span class="action-icon">
+                <i class="bi bi-calendar-check-fill"></i>
+              </span>
               <span class="action-label">Agendar Visita</span>
             </a>
             <a routerLink="/deals" class="action-card">
-              <i class="bi bi-cash-stack"></i>
+              <span class="action-icon">
+                <i class="bi bi-briefcase-fill"></i>
+              </span>
               <span class="action-label">Novo Negócio</span>
             </a>
           </div>
@@ -136,84 +146,109 @@ Chart.register(...registerables);
   styles: [`
     .dashboard-wrapper {
       min-height: 100vh;
-      background: #F5F7FA;
+      background: var(--color-bg-primary);
     }
 
     .page-header {
-      background: #FFFFFF;
-      padding: 2rem 2.5rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border-bottom: 1px solid #E5E7EB;
+      background: var(--color-bg-primary);
+      padding: 2rem 2.75rem 1.5rem;
+      border-bottom: 1px solid transparent;
     }
 
-    .header-content h1 {
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .header-text h1 {
       margin: 0;
-      color: #1F2933;
+      color: var(--color-text-primary);
       font-size: 2rem;
       font-weight: 700;
     }
 
     .header-subtitle {
       margin: 0.25rem 0 0 0;
-      color: #6B7280;
+      color: var(--color-text-secondary);
       font-size: 0.95rem;
     }
 
+    .header-search {
+      min-width: 320px;
+    }
+
     .dashboard-content {
-      padding: 2rem 2.5rem;
+      padding: 1.5rem 2.75rem 2.25rem;
     }
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .usage-widget-section {
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
     }
 
     .stat-card {
-      background: #FFFFFF;
-      padding: 1.75rem;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      position: relative;
+      background: var(--color-bg-secondary);
+      padding: 1.2rem 1.4rem;
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
       display: flex;
       align-items: center;
-      gap: 1.25rem;
+      gap: 1rem;
       transition: all 0.3s ease;
-      border: 1px solid #E5E7EB;
+      border: 1px solid var(--color-border-light);
     }
 
     .stat-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      box-shadow: var(--shadow-md);
     }
 
-    .stat-card-primary { border-left: 4px solid #374151; }
-    .stat-card-success { border-left: 4px solid #059669; }
-    .stat-card-warning { border-left: 4px solid #D97706; }
-    .stat-card-info { border-left: 4px solid #4B5563; }
+    .stat-card-primary { background: linear-gradient(135deg, #6FA8FF, #4F6EDB); color: #fff; border-color: transparent; }
+    .stat-card-success { background: linear-gradient(135deg, #74D99A, #2EBB6D); color: #fff; border-color: transparent; }
+    .stat-card-warning { background: linear-gradient(135deg, #FFD07A, #F5A623); color: #fff; border-color: transparent; }
+    .stat-card-info { background: linear-gradient(135deg, #B394FF, #7B5BDA); color: #fff; border-color: transparent; }
+
+    .stat-trend {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #1F2937;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
 
     .stat-icon {
-      font-size: 2.5rem;
-      color: currentColor;
-      opacity: 0.9;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.2);
+      font-size: 1.3rem;
     }
 
-    .stat-card-primary .stat-icon { color: #374151; }
-    .stat-card-success .stat-icon { color: #059669; }
-    .stat-card-warning .stat-icon { color: #D97706; }
-    .stat-card-info .stat-icon { color: #4B5563; }
+    .stat-card-primary .stat-icon,
+    .stat-card-success .stat-icon,
+    .stat-card-warning .stat-icon,
+    .stat-card-info .stat-icon { color: #fff; }
 
     .stat-content {
       flex: 1;
     }
 
     .stat-label {
-      font-size: 0.85rem;
-      color: #6B7280;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.8);
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -221,30 +256,28 @@ Chart.register(...registerables);
     }
 
     .stat-value {
-      font-size: 2.5rem;
+      font-size: 2.1rem;
       font-weight: 700;
-      color: #1F2933;
+      color: #fff;
       line-height: 1;
     }
 
     .charts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.75rem;
+      margin-bottom: 2.25rem;
     }
 
     .chart-card {
-      background: #FFFFFF;
+      background: var(--color-bg-secondary);
       padding: 1.75rem;
       border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border: 1px solid #E5E7EB;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border-light);
     }
 
-    .chart-card-wide {
-      grid-column: 1 / -1;
-    }
+    .chart-card-wide { grid-column: 1 / -1; }
 
     .chart-header {
       margin-bottom: 1.5rem;
@@ -252,14 +285,14 @@ Chart.register(...registerables);
 
     .chart-header h3 {
       margin: 0 0 0.25rem 0;
-      color: #1F2933;
+      color: var(--color-text-primary);
       font-size: 1.1rem;
       font-weight: 700;
     }
 
     .chart-header p {
       margin: 0;
-      color: #6B7280;
+      color: var(--color-text-secondary);
       font-size: 0.85rem;
     }
 
@@ -268,64 +301,85 @@ Chart.register(...registerables);
       height: 300px;
     }
 
-    .chart-card-wide .chart-container {
-      height: 350px;
+    .chart-card-wide {
+      grid-column: 1 / -1;
+    }
+
+    .chart-container-wide {
+      height: 260px;
     }
 
     .quick-actions {
-      background: #FFFFFF;
+      background: var(--color-bg-secondary);
       padding: 1.75rem;
       border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border: 1px solid #E5E7EB;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border-light);
     }
 
     .quick-actions h3 {
       margin: 0 0 1.5rem 0;
-      color: #1F2933;
+      color: var(--color-text-primary);
       font-size: 1.1rem;
       font-weight: 700;
     }
 
     .actions-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1rem;
     }
 
     .action-card {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
       gap: 0.75rem;
-      padding: 1.5rem;
-      background: #374151;
-      color: white;
+      padding: 0.8rem 1rem;
+      background: var(--color-bg-secondary);
+      color: var(--color-text-primary);
       text-decoration: none;
-      border-radius: 10px;
+      border-radius: 18px;
       transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(55, 65, 81, 0.2);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border-light);
     }
 
     .action-card:hover {
       transform: translateY(-4px);
-      background: #1F2937;
-      box-shadow: 0 4px 12px rgba(55, 65, 81, 0.3);
+      border-color: #C7D2FE;
+      box-shadow: var(--shadow-md);
     }
 
-    .action-card i {
-      font-size: 2.5rem;
+    .action-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(59, 130, 246, 0.12);
+      color: #3B82F6;
+      font-size: 1rem;
     }
 
     .action-label {
       font-weight: 600;
       font-size: 0.95rem;
-      text-align: center;
     }
 
     @media (max-width: 768px) {
       .dashboard-content {
         padding: 1.5rem;
+      }
+
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-search {
+        width: 100%;
       }
 
       .stats-grid {
@@ -337,8 +391,38 @@ Chart.register(...registerables);
       }
 
       .actions-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
       }
+    }
+
+    :host-context(body[data-theme='dark']) .stat-card {
+      border-color: transparent;
+    }
+
+    :host-context(body[data-theme='dark']) .stat-card-primary {
+      background: linear-gradient(135deg, #2A4B8D, #1E3A8A);
+    }
+
+    :host-context(body[data-theme='dark']) .stat-card-success {
+      background: linear-gradient(135deg, #166534, #14532D);
+    }
+
+    :host-context(body[data-theme='dark']) .stat-card-warning {
+      background: linear-gradient(135deg, #7C4A03, #92400E);
+    }
+
+    :host-context(body[data-theme='dark']) .stat-card-info {
+      background: linear-gradient(135deg, #4C1D95, #312E81);
+    }
+
+    :host-context(body[data-theme='dark']) .stat-trend {
+      color: var(--color-text-primary);
+      background: rgba(15, 23, 42, 0.6);
+      border-color: rgba(15, 23, 42, 0.6);
+    }
+
+    :host-context(body[data-theme='dark']) .action-icon {
+      background: rgba(59, 130, 246, 0.2);
     }
   `]
 })
@@ -361,6 +445,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private monthlyData: { clients: number[], properties: number[] } = { clients: [], properties: [] };
 
   private charts: any[] = [];
+  private themeObserver?: MutationObserver;
 
   constructor(
     private authService: AuthService,
@@ -376,6 +461,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.currentUser = user;
     });
 
+    this.observeThemeChanges();
     await this.loadStats();
   }
 
@@ -518,6 +604,27 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.charts = [];
   }
 
+  private observeThemeChanges() {
+    const target = document.body;
+    this.themeObserver = new MutationObserver(() => {
+      if (this.clientsChartRef && this.dealsChartRef && this.monthlyChartRef) {
+        this.destroyCharts();
+        this.createCharts();
+      }
+    });
+    this.themeObserver.observe(target, { attributes: true, attributeFilter: ['data-theme'] });
+  }
+
+  private getChartTheme() {
+    const styles = getComputedStyle(document.body);
+    return {
+      text: styles.getPropertyValue('--color-text-secondary').trim() || '#64748B',
+      grid: styles.getPropertyValue('--color-border-light').trim() || 'rgba(15, 23, 42, 0.08)',
+      card: styles.getPropertyValue('--color-bg-secondary').trim() || '#FFFFFF',
+      accent: styles.getPropertyValue('--color-primary').trim() || '#3B82F6'
+    };
+  }
+
   createCharts() {
     this.createClientsChart();
     this.createDealsChart();
@@ -537,6 +644,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       existingChart.destroy();
     }
 
+    const theme = this.getChartTheme();
     const chart = new Chart(ctx, {
       type: 'doughnut',
       data: {
@@ -544,13 +652,13 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         datasets: [{
           data: this.clientsData.length > 0 ? this.clientsData : [0, 0, 0, 0],
           backgroundColor: [
-            '#6B7280',
-            '#9CA3AF',
-            '#4B5563',
-            '#059669'
+            '#93C5FD',
+            '#60A5FA',
+            '#3B82F6',
+            '#2563EB'
           ],
           borderWidth: 2,
-          borderColor: '#fff'
+          borderColor: theme.card
         }]
       },
       options: {
@@ -563,7 +671,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
               padding: 15,
               font: {
                 size: 12
-              }
+              },
+              color: theme.text
             }
           },
           tooltip: {
@@ -596,6 +705,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       existingChart.destroy();
     }
 
+    const theme = this.getChartTheme();
     const chart = new Chart(ctx, {
       type: 'bar',
       data: {
@@ -603,18 +713,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         datasets: [{
           label: 'Negócios',
           data: this.dealsData.length > 0 ? this.dealsData : [0, 0, 0, 0],
-          backgroundColor: [
-            'rgba(107, 114, 128, 0.8)',
-            'rgba(156, 163, 175, 0.8)',
-            'rgba(75, 85, 99, 0.8)',
-            'rgba(5, 150, 105, 0.8)'
-          ],
-          borderColor: [
-            'rgb(107, 114, 128)',
-            'rgb(156, 163, 175)',
-            'rgb(75, 85, 99)',
-            'rgb(5, 150, 105)'
-          ],
+          backgroundColor: 'rgba(59, 130, 246, 0.85)',
+          borderColor: theme.accent,
           borderWidth: 2,
           borderRadius: 8
         }]
@@ -641,14 +741,24 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           y: {
             beginAtZero: true,
             ticks: {
-              stepSize: 5
+              stepSize: 5,
+              color: theme.text
             },
             grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
+              color: theme.grid
+            },
+            border: {
+              display: false
             }
           },
           x: {
             grid: {
+              display: false
+            },
+            ticks: {
+              color: theme.text
+            },
+            border: {
               display: false
             }
           }
@@ -672,6 +782,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       existingChart.destroy();
     }
 
+    const theme = this.getChartTheme();
     const chart = new Chart(ctx, {
       type: 'line',
       data: {
@@ -680,28 +791,28 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           {
             label: 'Novos Clientes',
             data: this.monthlyData.clients.length > 0 ? this.monthlyData.clients : [0, 0, 0, 0, 0, 0],
-            borderColor: 'rgb(75, 85, 99)',
-            backgroundColor: 'rgba(75, 85, 99, 0.1)',
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: 'rgba(59, 130, 246, 0.18)',
             borderWidth: 3,
             fill: true,
             tension: 0.4,
             pointRadius: 5,
             pointHoverRadius: 7,
-            pointBackgroundColor: 'rgb(75, 85, 99)',
+            pointBackgroundColor: 'rgb(59, 130, 246)',
             pointBorderColor: '#fff',
             pointBorderWidth: 2
           },
           {
             label: 'Novos Imóveis',
             data: this.monthlyData.properties.length > 0 ? this.monthlyData.properties : [0, 0, 0, 0, 0, 0],
-            borderColor: 'rgb(5, 150, 105)',
-            backgroundColor: 'rgba(5, 150, 105, 0.1)',
+            borderColor: 'rgb(129, 140, 248)',
+            backgroundColor: 'rgba(129, 140, 248, 0.2)',
             borderWidth: 3,
             fill: true,
             tension: 0.4,
             pointRadius: 5,
             pointHoverRadius: 7,
-            pointBackgroundColor: 'rgb(5, 150, 105)',
+            pointBackgroundColor: 'rgb(129, 140, 248)',
             pointBorderColor: '#fff',
             pointBorderWidth: 2
           }
@@ -722,7 +833,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
               font: {
                 size: 12
               },
-              usePointStyle: true
+              usePointStyle: true,
+              color: theme.text
             }
           },
           tooltip: {
@@ -740,14 +852,24 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           y: {
             beginAtZero: true,
             ticks: {
-              stepSize: 10
+              stepSize: 10,
+              color: theme.text
             },
             grid: {
-              color: 'rgba(0, 0, 0, 0.05)'
+              color: theme.grid
+            },
+            border: {
+              display: false
             }
           },
           x: {
             grid: {
+              display: false
+            },
+            ticks: {
+              color: theme.text
+            },
+            border: {
               display: false
             }
           }
@@ -761,6 +883,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy() {
     // Clean up charts
     this.destroyCharts();
+    this.themeObserver?.disconnect();
   }
 
   logout() {

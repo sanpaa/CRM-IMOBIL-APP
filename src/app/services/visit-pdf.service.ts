@@ -101,177 +101,429 @@ export class VisitPdfService {
 
   private getStyles(): string {
     return `
-      /* Reset and Base Styles */
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
 
+      :root {
+        --slate-900: #0F172A;
+        --slate-800: #1E293B;
+        --slate-600: #475569;
+        --slate-500: #64748B;
+        --slate-300: #CBD5E1;
+        --slate-200: #E2E8F0;
+        --slate-100: #F1F5F9;
+        --slate-50: #F8FAFC;
+        --blue-700: #1D4ED8;
+        --blue-600: #2563EB;
+        --green-100: #DCFCE7;
+        --green-700: #166534;
+        --color-bg-primary: #E9EEF5;
+        --color-bg-secondary: #FFFFFF;
+      }
+
       body {
-        font-family: Arial, sans-serif;  /* Standard font for PDF compatibility */
+        font-family: 'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif;
         font-size: 11pt;
-        line-height: 1.4;  /* Adequate spacing to prevent text overlap */
-        color: #000;
-        background: white;
+        line-height: 1.4;
+        color: var(--slate-800);
+        background: #E9EEF5;
       }
 
       .page {
-        width: 210mm;  /* A4 width */
-        min-height: 297mm;  /* A4 height */
-        padding: 15mm;
+        width: 210mm;
+        min-height: 297mm;
+        padding: 20mm;
         margin: 0 auto;
-        background: white;
+        background: #E9EEF5;
         position: relative;
       }
 
       .page-break {
-        page-break-before: always;  /* Force new page for each property */
+        page-break-before: always;
       }
 
-      /* Header - Uses table layout for proper alignment */
+      .card {
+        background: var(--color-bg-secondary);
+        border-radius: 14px;
+        border: 1px solid var(--slate-200);
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+        padding: 14px 18px 16px;
+      }
+
+      .card-header {
+        border-bottom: 1px solid var(--slate-200);
+        padding-bottom: 10px;
+        margin-bottom: 12px;
+      }
+
+      .card-body {
+        padding-bottom: 4px;
+      }
+
       .header-table {
         width: 100%;
-        border: 1px solid #000;
-        border-collapse: collapse;  /* Prevents double borders */
-        margin-bottom: 10mm;
+        border-collapse: collapse;
       }
 
       .header-table td {
-        padding: 8px;
-        vertical-align: top;
+        padding: 0;
         border: none;
+        vertical-align: middle;
       }
 
-      .logo-cell {
-        width: 60px;
+      .header-left {
+        width: 65%;
+      }
+
+      .header-right {
+        width: 35%;
+        text-align: right;
+      }
+
+      .broker-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .broker-avatar-cell {
+        width: 52px;
+        padding-right: 10px;
+        vertical-align: middle;
+      }
+
+      .broker-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: var(--slate-200);
+        color: var(--slate-800);
         text-align: center;
+        line-height: 42px;
+        font-weight: 700;
+        font-size: 11pt;
+        overflow: hidden;
       }
 
-      .logo-box {
-        width: 50px;
-        height: 50px;
-        border: 1px solid #ccc;
-        display: inline-block;
-        overflow: hidden;  /* Contain logo within bounds */
-      }
-
-      .logo-box img {
+      .broker-avatar img {
         width: 100%;
         height: 100%;
-        object-fit: contain;  /* Maintain logo aspect ratio */
+        object-fit: cover;
+        display: block;
       }
 
-      .company-info {
-        vertical-align: top;
+      .broker-name {
+        font-size: 11.5pt;
+        font-weight: 700;
+        color: var(--slate-800);
       }
 
-      .company-name {
-        font-size: 13pt;
-        font-weight: bold;
-        margin-bottom: 4px;
+      .broker-role {
+        font-size: 8.5pt;
+        color: var(--slate-500);
       }
 
-      .company-detail {
-        font-size: 10pt;
+      .broker-phone {
+        font-size: 8.5pt;
+        color: var(--slate-600);
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 7.5pt;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        background: var(--blue-600);
+        color: #FFFFFF;
+        margin-bottom: 6px;
+      }
+
+      .header-title {
+        font-size: 15pt;
+        font-weight: 800;
+        font-style: italic;
+        letter-spacing: 1px;
+        color: var(--slate-800);
+        line-height: 1.1;
+      }
+
+      .section {
+        margin-bottom: 10px;
+      }
+
+      .section-heading-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 6px;
+      }
+
+      .section-heading-icon {
+        width: 14px;
+        height: 14px;
+        color: var(--blue-700);
+        vertical-align: middle;
+      }
+
+      .section-heading-icon svg {
+        width: 14px;
+        height: 14px;
+        display: block;
+      }
+
+      .section-heading-text {
+        font-size: 8.5pt;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--slate-800);
+        padding-left: 6px;
+        vertical-align: middle;
+      }
+
+      .section-card {
+        background: var(--color-bg-primary);
+        border: 1px solid var(--slate-200);
+        border-radius: 10px;
+        padding: 10px 12px;
+      }
+
+      .field-label {
+        font-weight: 700;
+        color: var(--slate-500);
+        font-size: 7.5pt;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        display: block;
         margin-bottom: 2px;
       }
 
-      .broker-info {
+      .field-value {
+        color: var(--slate-800);
+        font-weight: 700;
+        font-size: 10pt;
+        display: block;
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--slate-200);
+        margin: 8px 0;
+      }
+
+      .subsection {
+        margin-top: 6px;
+      }
+
+      .info-grid {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .info-grid td {
+        width: 33.33%;
+        vertical-align: top;
+        padding-right: 8px;
+      }
+
+      .info-grid td:last-child {
+        padding-right: 0;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 8.5pt;
+        font-weight: 700;
+        background: var(--green-100);
+        color: var(--green-700);
+      }
+
+      .status-icon {
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+        vertical-align: -1px;
+        margin-right: 4px;
+      }
+
+      .status-icon svg {
+        width: 10px;
+        height: 10px;
+        display: block;
+      }
+
+      .visit-notes {
+        font-style: italic;
+        color: var(--slate-600);
+        font-size: 9pt;
+        margin-top: 2px;
+      }
+
+      .participants-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .participants-table td {
+        width: 50%;
+        vertical-align: top;
+        padding: 0 6px;
+      }
+
+      .participants-table td:first-child {
+        padding-left: 0;
+      }
+
+      .participants-table td:last-child {
+        padding-right: 0;
+      }
+
+      .participant-card {
+        background: var(--color-bg-secondary);
+        border: 1px solid var(--slate-200);
+        border-radius: 10px;
+        padding: 8px 10px;
+        min-height: 64px;
+      }
+
+      .participant-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .participant-avatar-cell {
+        width: 40px;
+        padding-right: 8px;
+        vertical-align: middle;
+      }
+
+      .participant-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--slate-200);
+        color: var(--slate-800);
+        text-align: center;
+        line-height: 32px;
+        font-weight: 700;
+        font-size: 9.5pt;
+        overflow: hidden;
+      }
+
+      .participant-role {
+        font-size: 7.5pt;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        color: var(--slate-500);
+        margin-bottom: 2px;
+      }
+
+      .participant-name {
+        font-weight: 700;
+        color: var(--slate-800);
+        font-size: 10pt;
+      }
+
+      .property-top {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .property-left {
+        width: 60%;
+        vertical-align: top;
+      }
+
+      .property-right {
+        width: 40%;
         text-align: right;
         vertical-align: top;
       }
 
-      .broker-title {
-        font-size: 11pt;
-        font-weight: bold;
-        margin-bottom: 4px;
+      .property-reference {
+        color: var(--blue-700);
+        font-weight: 700;
       }
 
-      .broker-detail {
-        font-size: 10pt;
-        margin-bottom: 2px;
+      .property-value {
+        color: var(--slate-800);
+        font-weight: 800;
       }
 
-      /* Title */
-      .title {
-        text-align: center;
-        font-size: 16pt;
-        font-weight: bold;
-        margin-bottom: 10mm;
-      }
-
-      /* Sections */
-      .section {
-        margin-bottom: 8mm;
-      }
-
-      .section-title-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 0;
-      }
-
-      .section-title-table td {
-        background-color: #f0f0f0;
-        border: 1px solid #000;
-        padding: 6px 8px;
-        font-weight: bold;
-        font-size: 11pt;
-      }
-
-      .section-content-table {
-        width: 100%;
-        border-collapse: collapse;
-        border: 1px solid #000;
-        border-top: none;
-      }
-
-      .section-content-table td {
-        padding: 6px 8px;
-        border-left: 1px solid #000;
-        border-right: 1px solid #000;
-        vertical-align: top;
-      }
-
-      .section-content-table tr:last-child td {
-        border-bottom: 1px solid #000;
-      }
-
-      .label {
-        font-weight: bold;
+      .address-line {
         display: inline-block;
-        margin-right: 6px;
+        color: var(--slate-600);
+        font-size: 9pt;
       }
 
-      .value {
-        display: inline;
+      .icon {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        margin-right: 4px;
+        vertical-align: -1px;
+        color: var(--slate-500);
       }
 
-      /* Data grid for specs */
-      .data-grid {
+      .icon svg {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+      }
+
+      .metrics-grid {
         width: 100%;
         border-collapse: collapse;
       }
 
-      .data-grid td {
-        padding: 4px 0;
-        border: none;
+      .metrics-grid td {
+        width: 16.66%;
+        text-align: center;
+        vertical-align: top;
+        padding-top: 6px;
       }
 
-      .data-row {
-        margin-bottom: 4px;
+      .metric-icon {
+        width: 16px;
+        height: 16px;
+        margin: 0 auto 4px;
+        color: var(--slate-500);
       }
 
-      /* Rating boxes */
+      .metric-icon svg {
+        width: 16px;
+        height: 16px;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .metric-value {
+        font-weight: 700;
+        color: var(--blue-700);
+        font-size: 9.5pt;
+      }
+
+      .metric-label {
+        font-size: 7.5pt;
+        color: var(--slate-500);
+        text-transform: uppercase;
+      }
+
       .rating-container {
         margin: 8px 0;
       }
 
       .rating-label {
-        font-weight: bold;
+        font-weight: 600;
         margin-bottom: 4px;
         display: block;
+        color: var(--slate-500);
+        font-size: 8.5pt;
       }
 
       .rating-boxes {
@@ -280,98 +532,129 @@ export class VisitPdfService {
 
       .rating-box {
         display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 1px solid #000;
+        width: 18px;
+        height: 18px;
+        border: 1px solid var(--slate-300);
         margin-right: 4px;
         text-align: center;
-        line-height: 20px;
-        font-size: 9pt;
+        line-height: 18px;
+        font-size: 8pt;
         vertical-align: middle;
+        color: var(--slate-500);
       }
 
       .rating-box.filled {
-        background-color: #000;
-        color: #fff;
+        background-color: var(--blue-700);
+        color: #FFFFFF;
+        border-color: var(--blue-700);
       }
 
-      /* Checkbox - CSS-based, no Unicode characters */
       .checkbox-container {
         margin: 8px 0;
       }
 
       .checkbox-label {
-        font-weight: bold;
+        font-weight: 600;
         margin-bottom: 4px;
         display: block;
+        color: var(--slate-500);
+        font-size: 8.5pt;
       }
 
       .checkbox-option {
         display: inline-block;
-        margin-right: 15px;
+        margin-right: 12px;
         margin-bottom: 6px;
       }
 
       .checkbox-box {
         display: inline-block;
-        width: 14px;
-        height: 14px;
-        border: 1px solid #000;  /* Simple border creates checkbox */
+        width: 12px;
+        height: 12px;
+        border: 1px solid var(--slate-300);
         margin-right: 4px;
         vertical-align: middle;
         position: relative;
       }
 
       .checkbox-box.checked::before {
-        content: 'X';  /* Simple X mark, not Unicode */
+        content: 'X';
         position: absolute;
         top: -2px;
-        left: 2px;
-        font-size: 12pt;
+        left: 1px;
+        font-size: 10pt;
         font-weight: bold;
+        color: var(--slate-800);
       }
 
       .checkbox-text {
         display: inline;
         vertical-align: middle;
-        font-size: 10pt;
+        font-size: 8.5pt;
+        color: var(--slate-600);
       }
 
-      /* Declaration */
-      .declaration {
-        text-align: justify;
-        margin: 10mm 0;
-        font-size: 10pt;
-        line-height: 1.5;
+      .declaration-card {
+        text-align: center;
+        background: var(--color-bg-primary);
+        border: 1px solid var(--slate-200);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 8.5pt;
+        color: var(--slate-600);
+        font-style: italic;
+        margin: 10px 0 10px;
       }
 
-      /* Signatures */
+      .signature-divider {
+        border-top: 1px solid var(--slate-200);
+        margin: 14px 0 12px;
+      }
+
       .signatures-table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 15mm;
       }
 
       .signatures-table td {
+        width: 50%;
         text-align: center;
+        vertical-align: top;
         padding: 0 10px;
-        vertical-align: bottom;
-        border: none;
+      }
+
+      .signature-block {
+        min-height: 56px;
       }
 
       .signature-line {
-        border-top: 1px solid #000;
-        padding-top: 6px;
-        font-size: 9pt;
-        margin-top: 30px;
+        border-top: 1px solid var(--slate-300);
+        padding-top: 8px;
+        font-size: 8.5pt;
+        color: var(--slate-600);
       }
 
-      /* Footer */
+      .signature-name {
+        font-size: 8.5pt;
+        color: var(--slate-800);
+        margin-top: 4px;
+        min-height: 12px;
+      }
+
       .footer {
-        text-align: center;
-        font-size: 8pt;
-        margin-top: 15mm;
-        color: #666;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 7.5pt;
+        margin-top: 8px;
+        color: var(--slate-500);
+      }
+
+      .footer-left {
+        text-align: left;
+      }
+
+      .footer-right {
+        text-align: right;
       }
 
       @media print {
@@ -382,7 +665,7 @@ export class VisitPdfService {
         
         .page {
           margin: 0;
-          padding: 15mm;
+          padding: 20mm;
           page-break-after: always;
         }
 
@@ -402,23 +685,21 @@ export class VisitPdfService {
     
     return `
 <div class="page${pageBreakClass}">
-  ${this.generateHeader(visit)}
-  
-  <div class="title">ROTEIRO DE VISITA</div>
-  
-  ${this.generateVisitDataSection(visit)}
-  
-  ${this.generateParticipantsSection(visit)}
-  
-  ${this.generatePropertyDataSection(property, propertyNumber)}
-  
-  ${this.generateEvaluationSection(visit, property)}
-  
-  ${this.generateDeclaration()}
-  
-  ${this.generateSignatures()}
-  
-  ${this.generateFooter()}
+  <div class="card">
+    <div class="card-header">
+      ${this.generateHeader(visit)}
+    </div>
+    <div class="card-body">
+      ${this.generateVisitDataSection(visit)}
+      ${this.generateParticipantsSection(visit)}
+      ${this.generatePropertyDataSection(property, propertyNumber)}
+      ${this.generateEvaluationSection(visit, property)}
+      ${this.generateDeclaration()}
+    </div>
+    <div class="signature-divider"></div>
+    ${this.generateSignatures(visit)}
+    ${this.generateFooter()}
+  </div>
 </div>
     `;
   }
@@ -426,17 +707,20 @@ export class VisitPdfService {
   private generateEmptyPage(visit: VisitWithDetails): string {
     return `
 <div class="page">
-  ${this.generateHeader(visit)}
-  
-  <div class="title">ROTEIRO DE VISITA</div>
-  
-  ${this.generateVisitDataSection(visit)}
-  
-  <div style="text-align: center; margin-top: 30mm; font-style: italic; color: #666;">
-    Nenhum imóvel vinculado a esta visita.
+  <div class="card">
+    <div class="card-header">
+      ${this.generateHeader(visit)}
+    </div>
+    <div class="card-body">
+      ${this.generateVisitDataSection(visit)}
+      <div class="declaration-card">
+        Nenhum imóvel vinculado a esta visita.
+      </div>
+    </div>
+    <div class="signature-divider"></div>
+    ${this.generateSignatures(visit)}
+    ${this.generateFooter()}
   </div>
-  
-  ${this.generateFooter()}
 </div>
     `;
   }
@@ -447,41 +731,39 @@ export class VisitPdfService {
    * If logo fails to load or URL is invalid, a placeholder is shown.
    */
   private generateHeader(visit: VisitWithDetails): string {
-    // Validate and sanitize logo URL
-    let logoHtml = '<div style="padding: 15px; font-size: 8pt; color: #999;">LOGO</div>';
-    
+    const brokerNameRaw = visit.broker_name || 'Corretor não informado';
+    const brokerName = this.escapeHtml(brokerNameRaw);
+    const brokerPhone = visit.broker_phone ? this.escapeHtml(visit.broker_phone) : '';
+    const brokerInitials = this.getInitials(brokerNameRaw, 'CR');
+
+    let avatarHtml = brokerInitials;
     if (visit.company_logo_url && typeof visit.company_logo_url === 'string') {
       const url = visit.company_logo_url.trim();
-      
-      // Validate URL format
-      const isValidUrl = this.isValidLogoUrl(url);
-      if (isValidUrl) {
-        // Use a div wrapper to hide on error instead of inline handler
-        logoHtml = `<img src="${this.escapeHtml(url)}" alt="Logo" style="display: block;" />`;
+      if (this.isValidLogoUrl(url)) {
+        avatarHtml = `<img src="${this.escapeHtml(url)}" alt="Logo" />`;
       }
     }
 
     return `
 <table class="header-table">
   <tr>
-    <td class="logo-cell">
-      <div class="logo-box">
-        ${logoHtml}
-      </div>
+    <td class="header-left">
+      <table class="broker-table">
+        <tr>
+          <td class="broker-avatar-cell">
+            <div class="broker-avatar">${avatarHtml}</div>
+          </td>
+          <td>
+            <div class="broker-name">${brokerName}</div>
+            <div class="broker-role">Corretor de Imóveis</div>
+            ${brokerPhone ? `<div class="broker-phone">${brokerPhone}</div>` : ''}
+          </td>
+        </tr>
+      </table>
     </td>
-    <td class="company-info">
-      <div class="company-name">${this.escapeHtml(visit.company_name || 'Imobiliária')}</div>
-      ${visit.company_address ? `<div class="company-detail">${this.escapeHtml(visit.company_address)}</div>` : ''}
-      ${visit.company_phone ? `<div class="company-detail">Tel: ${this.escapeHtml(visit.company_phone)}</div>` : ''}
-      ${visit.company_creci ? `<div class="company-detail">CRECI: ${this.escapeHtml(visit.company_creci)}</div>` : ''}
-    </td>
-    <td class="broker-info">
-      ${visit.broker_name ? `
-        <div class="broker-title">Corretor Responsável</div>
-        <div class="broker-detail">${this.escapeHtml(visit.broker_name)}</div>
-        ${visit.broker_creci ? `<div class="broker-detail">CRECI: ${this.escapeHtml(visit.broker_creci)}</div>` : ''}
-        ${visit.broker_phone ? `<div class="broker-detail">Tel: ${this.escapeHtml(visit.broker_phone)}</div>` : ''}
-      ` : ''}
+    <td class="header-right">
+      <div class="badge">DOCUMENTO OFICIAL</div>
+      <div class="header-title">ROTEIRO DE VISITA</div>
     </td>
   </tr>
 </table>
@@ -492,40 +774,45 @@ export class VisitPdfService {
     const visitDate = visit.visit_date ? new Date(visit.visit_date).toLocaleDateString('pt-BR') : '-';
     const visitTime = visit.visit_time || '-';
     const status = this.formatStatus(visit.status);
+    const statusBadge = this.getStatusBadgeHtml(status);
     const notes = visit.notes ? this.escapeHtml(visit.notes) : '';
-    const notesRow = notes
+    const notesBlock = notes
       ? `
-    <tr>
-      <td colspan="3">
-        <span class="label">Observações:</span>
-        <span class="value">${notes}</span>
-      </td>
-    </tr>
+    <div class="divider"></div>
+    <div>
+      <span class="field-label">Observações importantes</span>
+      <div class="visit-notes">"${notes}"</div>
+    </div>
       `
       : '';
 
     return `
 <div class="section">
-  <table class="section-title-table">
-    <tr><td>Dados da Visita</td></tr>
-  </table>
-  <table class="section-content-table">
+  <table class="section-heading-table">
     <tr>
-      <td style="width: 33%;">
-        <span class="label">Data:</span>
-        <span class="value">${visitDate}</span>
-      </td>
-      <td style="width: 33%;">
-        <span class="label">Horário:</span>
-        <span class="value">${visitTime}</span>
-      </td>
-      <td style="width: 34%;">
-        <span class="label">Status:</span>
-        <span class="value">${status}</span>
-      </td>
+      <td class="section-heading-icon">${this.getSectionIconSvg('visit')}</td>
+      <td class="section-heading-text">Dados da Visita</td>
     </tr>
-    ${notesRow}
   </table>
+  <div class="section-card">
+    <table class="info-grid">
+      <tr>
+        <td>
+          <span class="field-label">Data da visita</span>
+          <span class="field-value">${visitDate}</span>
+        </td>
+        <td>
+          <span class="field-label">Horário agendado</span>
+          <span class="field-value">${visitTime}</span>
+        </td>
+        <td>
+          <span class="field-label">Status do agendamento</span>
+          ${statusBadge}
+        </td>
+      </tr>
+    </table>
+    ${notesBlock}
+  </div>
 </div>
     `;
   }
@@ -536,25 +823,54 @@ export class VisitPdfService {
    * as per requirements - owner signature was also removed from the document.
    */
   private generateParticipantsSection(visit: VisitWithDetails): string {
+    const clientNameRaw = visit.client_name || 'Cliente não informado';
+    const brokerNameRaw = visit.broker_name || 'Corretor não informado';
+    const clientName = this.escapeHtml(clientNameRaw);
+    const brokerName = this.escapeHtml(brokerNameRaw);
     return `
 <div class="section">
-  <table class="section-title-table">
-    <tr><td>Participantes</td></tr>
-  </table>
-  <table class="section-content-table">
+  <table class="section-heading-table">
     <tr>
-      <td>
-        <div class="data-row">
-          <span class="label">Cliente:</span>
-          <span class="value">${this.escapeHtml(visit.client_name || '-')}</span>
-        </div>
-        <div class="data-row">
-          <span class="label">Corretor:</span>
-          <span class="value">${this.escapeHtml(visit.broker_name || '-')}</span>
-        </div>
-      </td>
+      <td class="section-heading-icon">${this.getSectionIconSvg('participants')}</td>
+      <td class="section-heading-text">Participantes</td>
     </tr>
   </table>
+  <div class="section-card">
+    <table class="participants-table">
+      <tr>
+        <td>
+          <div class="participant-card">
+            <table class="participant-table">
+              <tr>
+                <td class="participant-avatar-cell">
+                  <div class="participant-avatar">${this.getInitials(clientNameRaw, 'CL')}</div>
+                </td>
+                <td>
+                  <div class="participant-role">Cliente</div>
+                  <div class="participant-name">${clientName}</div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+        <td>
+          <div class="participant-card">
+            <table class="participant-table">
+              <tr>
+                <td class="participant-avatar-cell">
+                  <div class="participant-avatar">${this.getInitials(brokerNameRaw, 'CR')}</div>
+                </td>
+                <td>
+                  <div class="participant-role">Corretor Responsável</div>
+                  <div class="participant-name">${brokerName}</div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
     `;
   }
@@ -566,66 +882,73 @@ export class VisitPdfService {
 
     return `
 <div class="section">
-  <table class="section-title-table">
-    <tr><td>Dados do Imóvel ${propertyNumber}</td></tr>
-  </table>
-  <table class="section-content-table">
+  <table class="section-heading-table">
     <tr>
-      <td>
-        <div class="data-row">
-          <span class="label">Referência:</span>
-          <span class="value">${this.escapeHtml(property.property_reference || '-')}</span>
-        </div>
-        <div class="data-row">
-          <span class="label">Endereço:</span>
-          <span class="value">${this.escapeHtml(property.full_address || '-')}</span>
-        </div>
-        ${property.development ? `
-        <div class="data-row">
-          <span class="label">Empreendimento:</span>
-          <span class="value">${this.escapeHtml(property.development)}</span>
-        </div>
-        ` : ''}
-        
-        <table class="data-grid" style="margin-top: 8px;">
-          <tr>
-            <td style="width: 33%;">
-              <span class="label">Dormitórios:</span>
-              <span class="value">${property.bedrooms?.toString() || '-'}</span>
-            </td>
-            <td style="width: 33%;">
-              <span class="label">Suítes:</span>
-              <span class="value">${property.suites?.toString() || '-'}</span>
-            </td>
-            <td style="width: 34%;">
-              <span class="label">Banheiros:</span>
-              <span class="value">${property.bathrooms?.toString() || '-'}</span>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <span class="label">Vagas:</span>
-              <span class="value">${property.parking_spaces?.toString() || '-'}</span>
-            </td>
-            <td>
-              <span class="label">Área Total:</span>
-              <span class="value">${property.total_area ? property.total_area + ' m²' : '-'}</span>
-            </td>
-            <td>
-              <span class="label">Área Construída:</span>
-              <span class="value">${property.built_area ? property.built_area + ' m²' : '-'}</span>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="3">
-              <span class="label">Valor Sugerido:</span>
-              <span class="value">${value}</span>
-            </td>
-          </tr>
-        </table>
-      </td>
+      <td class="section-heading-icon">${this.getSectionIconSvg('property')}</td>
+      <td class="section-heading-text">Dados do Imóvel ${propertyNumber}</td>
     </tr>
   </table>
+  <div class="section-card">
+    <table class="property-top">
+      <tr>
+        <td class="property-left">
+          <span class="field-label">Referência</span>
+          <span class="field-value property-reference">${this.escapeHtml(property.property_reference || '-')}</span>
+        </td>
+        <td class="property-right">
+          <span class="field-label">Valor sugerido</span>
+          <span class="field-value property-value">${value}</span>
+        </td>
+      </tr>
+    </table>
+    <div class="divider"></div>
+    <div>
+      <span class="field-label">Localização</span>
+      <div class="address-line">${this.getLocationIconSvg()}${this.escapeHtml(property.full_address || '-')}</div>
+    </div>
+    ${property.development ? `
+    <div class="subsection">
+      <span class="field-label">Empreendimento</span>
+      <span class="field-value">${this.escapeHtml(property.development)}</span>
+    </div>
+    ` : ''}
+
+    <div class="divider"></div>
+    <table class="metrics-grid">
+      <tr>
+        <td>
+          <div class="metric-icon">${this.getAttributeIconSvg('bed')}</div>
+          <div class="metric-value">${property.bedrooms?.toString() || '-'}</div>
+          <div class="metric-label">Dormitórios</div>
+        </td>
+        <td>
+          <div class="metric-icon">${this.getAttributeIconSvg('suite')}</div>
+          <div class="metric-value">${property.suites?.toString() || '-'}</div>
+          <div class="metric-label">Suítes</div>
+        </td>
+        <td>
+          <div class="metric-icon">${this.getAttributeIconSvg('bath')}</div>
+          <div class="metric-value">${property.bathrooms?.toString() || '-'}</div>
+          <div class="metric-label">Banheiros</div>
+        </td>
+        <td>
+          <div class="metric-icon">${this.getAttributeIconSvg('car')}</div>
+          <div class="metric-value">${property.parking_spaces?.toString() || '-'}</div>
+          <div class="metric-label">Vagas</div>
+        </td>
+        <td>
+          <div class="metric-icon">${this.getAttributeIconSvg('area')}</div>
+          <div class="metric-value">${property.total_area ? property.total_area + ' m²' : '-'}</div>
+          <div class="metric-label">Área total</div>
+        </td>
+        <td>
+          <div class="metric-icon">${this.getAttributeIconSvg('built')}</div>
+          <div class="metric-value">${property.built_area ? property.built_area + ' m²' : '-'}</div>
+          <div class="metric-label">Construída</div>
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
     `;
   }
@@ -642,19 +965,18 @@ export class VisitPdfService {
 
     return `
 <div class="section">
-  <table class="section-title-table">
-    <tr><td>Avaliação do Imóvel</td></tr>
-  </table>
-  <table class="section-content-table">
+  <table class="section-heading-table">
     <tr>
-      <td>
-        ${this.generateRatingHtml('Estado de conservação:', evaluation.conservation_state)}
-        ${this.generateRatingHtml('Localização:', evaluation.location_rating)}
-        ${this.generateRatingHtml('Valor do imóvel:', evaluation.property_value_rating)}
-        ${this.generateCheckboxesHtml('Interesse do cliente:', evaluation.interest_level)}
-      </td>
+      <td class="section-heading-icon">${this.getSectionIconSvg('evaluation')}</td>
+      <td class="section-heading-text">Avaliação do Imóvel</td>
     </tr>
   </table>
+  <div class="section-card">
+    ${this.generateRatingHtml('Estado de conservação', evaluation.conservation_state)}
+    ${this.generateRatingHtml('Localização', evaluation.location_rating)}
+    ${this.generateRatingHtml('Valor do imóvel', evaluation.property_value_rating)}
+    ${this.generateCheckboxesHtml('Interesse do cliente', evaluation.interest_level)}
+  </div>
 </div>
     `;
   }
@@ -698,9 +1020,75 @@ export class VisitPdfService {
     `;
   }
 
+  private getStatusBadgeHtml(label: string): string {
+    const safeLabel = this.escapeHtml(label || '-');
+    return `<span class="status-badge"><span class="status-icon">${this.getStatusCheckIconSvg()}</span>${safeLabel}</span>`;
+  }
+
+  private getInitials(name: string, fallback: string): string {
+    if (!name) {
+      return fallback;
+    }
+
+    const trimmed = name.trim();
+    if (!trimmed) {
+      return fallback;
+    }
+
+    const parts = trimmed.split(/\s+/).filter(Boolean);
+    const initials = parts.slice(0, 2).map(part => part[0]).join('');
+    return (initials || fallback).toUpperCase();
+  }
+
+  private getLocationIconSvg(): string {
+    return `
+<span class="icon">
+  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M12 21s-6-5.2-6-10a6 6 0 1 1 12 0c0 4.8-6 10-6 10z"></path>
+    <circle cx="12" cy="11" r="2"></circle>
+  </svg>
+</span>`;
+  }
+
+  private getStatusCheckIconSvg(): string {
+    return `<svg viewBox="0 0 20 20" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10l3 3 7-7"></path></svg>`;
+  }
+
+  private getSectionIconSvg(type: 'visit' | 'participants' | 'property' | 'evaluation'): string {
+    if (type === 'visit') {
+      return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M8 2v4M16 2v4M3 10h18"></path></svg>`;
+    }
+    if (type === 'participants') {
+      return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"></circle><path d="M4 20a5 5 0 0 1 10 0"></path><circle cx="17" cy="9" r="2"></circle><path d="M14 20a4 4 0 0 1 7 0"></path></svg>`;
+    }
+    if (type === 'evaluation') {
+      return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.7 5.5L21 8l-4.5 4.2L17.6 20 12 16.8 6.4 20l1.1-7.8L3 8l6.3-.5z"></path></svg>`;
+    }
+    return `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10l8-6 8 6v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M9 22v-6h6v6"></path></svg>`;
+  }
+
+  private getAttributeIconSvg(type: 'bed' | 'suite' | 'bath' | 'car' | 'area' | 'built'): string {
+    if (type === 'bed') {
+      return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18v8H3z"></path><path d="M7 10V7h10v3"></path></svg>`;
+    }
+    if (type === 'suite') {
+      return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path></svg>`;
+    }
+    if (type === 'bath') {
+      return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"></path><path d="M7 10V6a2 2 0 0 1 2-2h2"></path></svg>`;
+    }
+    if (type === 'car') {
+      return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-5h14l2 5"></path><rect x="4" y="12" width="16" height="6" rx="2"></rect><circle cx="8" cy="18" r="1.5"></circle><circle cx="16" cy="18" r="1.5"></circle></svg>`;
+    }
+    if (type === 'area') {
+      return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M4 12h16M12 4v16"></path></svg>`;
+    }
+    return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10l8-6 8 6v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"></path><path d="M9 22v-6h6v6"></path></svg>`;
+  }
+
   private generateDeclaration(): string {
     return `
-<div class="declaration">
+<div class="declaration-card">
   Na qualidade de possível comprador, declaro para os devidos fins que visitei o imóvel acima descrito por intermédio da imobiliária, estando ciente das condições apresentadas.
 </div>
     `;
@@ -710,15 +1098,23 @@ export class VisitPdfService {
    * Generates signature section with only Cliente and Corretor.
    * Proprietário signature removed as per requirements.
    */
-  private generateSignatures(): string {
+  private generateSignatures(visit: VisitWithDetails): string {
+    const clientName = this.escapeHtml(visit.client_name || '');
+    const brokerName = this.escapeHtml(visit.broker_name || '');
     return `
 <table class="signatures-table">
   <tr>
     <td style="width: 50%;">
-      <div class="signature-line">Assinatura do Cliente</div>
+      <div class="signature-block">
+        <div class="signature-line">Assinatura do Cliente</div>
+        <div class="signature-name">${clientName || '&nbsp;'}</div>
+      </div>
     </td>
     <td style="width: 50%;">
-      <div class="signature-line">Assinatura do Corretor</div>
+      <div class="signature-block">
+        <div class="signature-line">Assinatura do Corretor</div>
+        <div class="signature-name">${brokerName || '&nbsp;'}</div>
+      </div>
     </td>
   </tr>
 </table>
@@ -728,9 +1124,12 @@ export class VisitPdfService {
   private generateFooter(): string {
     const timestamp = new Date().toLocaleString('pt-BR');
     return `
-<div class="footer">
-  Gerado em ${timestamp}
-</div>
+<table class="footer">
+  <tr>
+    <td class="footer-left">Gerado pelo Sistema Integrado</td>
+    <td class="footer-right">Data de geração: ${timestamp}</td>
+  </tr>
+</table>
     `;
   }
 

@@ -44,7 +44,7 @@ import { Subscription } from 'rxjs';
       align-items: center;
       gap: 1rem;
       padding: 1rem 1.25rem;
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       animation: slideIn 0.3s ease;
@@ -103,7 +103,7 @@ import { Subscription } from 'rxjs';
     .toast-message {
       flex: 1;
       font-size: 0.95rem;
-      color: #1F2937;
+      color: var(--color-text-primary);
       line-height: 1.4;
     }
 
@@ -120,7 +120,7 @@ import { Subscription } from 'rxjs';
 
     .toast-close:hover {
       background: #F3F4F6;
-      color: #1F2937;
+      color: var(--color-text-primary);
     }
 
     .toast-close i {

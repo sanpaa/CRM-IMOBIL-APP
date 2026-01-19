@@ -23,7 +23,7 @@ section {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: white;
+  background: var(--color-bg-secondary);
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
@@ -104,7 +104,7 @@ section {
 .hero-button {
   display: inline-block;
   padding: 1rem 2rem;
-  background: white;
+  background: var(--color-bg-secondary);
   color: #004AAD;
   text-decoration: none;
   border-radius: 6px;
@@ -127,7 +127,7 @@ section {
 .search-form {
   display: flex;
   gap: 1rem;
-  background: white;
+  background: var(--color-bg-secondary);
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -173,7 +173,7 @@ section {
 }
 
 .property-card {
-  background: white;
+  background: var(--color-bg-secondary);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);

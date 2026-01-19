@@ -80,7 +80,7 @@ import { Company } from '../../models/company.model';
     }
 
     .welcome-card {
-      background: white;
+      background: var(--color-bg-secondary);
       padding: 3rem 2.5rem;
       border-radius: 16px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -103,7 +103,7 @@ import { Company } from '../../models/company.model';
     .welcome-title {
       font-size: 2rem;
       font-weight: 700;
-      color: #1F2937;
+      color: var(--color-text-primary);
       margin-bottom: 1.5rem;
       animation: fadeIn 0.6s ease-out 0.5s both;
     }
@@ -113,7 +113,7 @@ import { Company } from '../../models/company.model';
       padding: 1.25rem;
       background: #F9FAFB;
       border-radius: 8px;
-      border: 1px solid #E5E7EB;
+      border: 1px solid var(--color-border-light);
       animation: fadeIn 0.6s ease-out 0.7s both;
     }
 
@@ -127,7 +127,7 @@ import { Company } from '../../models/company.model';
     .company-name {
       font-size: 1.25rem;
       font-weight: 700;
-      color: #1F2937;
+      color: var(--color-text-primary);
     }
 
     .loading-bar {

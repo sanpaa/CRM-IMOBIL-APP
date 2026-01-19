@@ -57,7 +57,7 @@ import { CommonModule } from '@angular/common';
     }
 
     .modal {
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 8px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       max-width: 500px;
@@ -85,7 +85,7 @@ import { CommonModule } from '@angular/common';
       margin: 0;
       font-size: 1.25rem;
       font-weight: 600;
-      color: #1F2937;
+      color: var(--color-text-primary);
       display: flex;
       align-items: center;
       gap: 0.75rem;

@@ -164,11 +164,11 @@ import { Property } from '../../models/property.model';
   `,
   styles: [`
     .form-card {
-      background: white;
+      background: var(--color-bg-secondary);
       padding: 2.5rem;
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--color-border-light);
     }
 
     .form-card h2 {
@@ -306,7 +306,7 @@ import { Property } from '../../models/property.model';
       align-items: center;
       gap: 0.75rem;
       padding: 0.875rem;
-      background: #f8fafc;
+      background: var(--color-bg-tertiary);
       border: 2px solid #e5e7eb;
       border-radius: 8px;
       transition: all 0.2s ease;

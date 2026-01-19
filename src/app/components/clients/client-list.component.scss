@@ -5,22 +5,22 @@
 /* Base (mantive suas regras principais - aqui só acrescentei/ajustei onde necessário) */
 .page-container {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--color-bg-primary);
 }
 
 /* Header */
 .page-header {
-  background: white;
+  background: var(--color-bg-secondary);
   padding: 2rem 2.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border-light);
 
   h1 {
     margin: 0;
-    color: #1e293b;
+    color: var(--color-text-primary);
     font-size: 2rem;
     font-weight: 700;
   }
@@ -32,12 +32,12 @@
 
 /* Filters */
 .filters-card {
-  background: white;
+  background: var(--color-bg-secondary);
   margin: 2rem 2.5rem;
   padding: 1.5rem 2rem;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border-light);
 }
 
 .filter-row {
@@ -53,7 +53,7 @@
 
   label {
     margin-bottom: 0.5rem;
-    color: #475569;
+    color: var(--color-text-secondary);
     font-weight: 600;
     font-size: 0.9rem;
   }
@@ -61,16 +61,18 @@
 
 .filter-input {
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  background: var(--color-bg-secondary);
+  border: 2px solid var(--color-border-light);
   border-radius: 8px;
   font-size: 0.95rem;
+  color: var(--color-text-primary);
   transition: all 0.2s ease;
   font-family: inherit;
 
   &:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
   }
 }
 
@@ -96,7 +98,7 @@
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .modal-content {
-  background: white;
+  background: var(--color-bg-secondary);
   border-radius: 16px;
   width: 90%;
   max-width: 700px;
@@ -113,18 +115,18 @@
 
 .modal-header {
   padding: 2rem 2rem 1.5rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--color-border-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  h2 { margin: 0; color: #1e293b; font-size: 1.5rem; font-weight: 700; }
+  h2 { margin: 0; color: var(--color-text-primary); font-size: 1.5rem; font-weight: 700; }
 
   .close-btn {
     background: none;
     border: none;
     font-size: 2rem;
-    color: #94a3b8;
+    color: var(--color-text-tertiary);
     cursor: pointer;
     padding: 0;
     width: 32px;
@@ -135,7 +137,7 @@
     border-radius: 4px;
     transition: all 0.2s ease;
 
-    &:hover { background: #f1f5f9; color: #475569; }
+    &:hover { background: var(--color-bg-tertiary); color: var(--color-text-secondary); }
   }
 }
 
@@ -154,7 +156,7 @@ form { padding: 2rem; }
 
   label {
     margin-bottom: 0.5rem;
-    color: #475569;
+    color: var(--color-text-secondary);
     font-weight: 600;
     font-size: 0.9rem;
   }
@@ -163,29 +165,31 @@ form { padding: 2rem; }
 .form-control {
   width: 100%;
   padding: 0.875rem;
-  border: 2px solid #e5e7eb;
+  background: var(--color-bg-secondary);
+  border: 2px solid var(--color-border-light);
   border-radius: 8px;
   font-size: 0.95rem;
+  color: var(--color-text-primary);
   transition: all 0.2s ease;
   box-sizing: border-box;
   font-family: inherit;
 
   &:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
   }
 }
 
 textarea.form-control { resize: vertical; min-height: 100px; }
-select.form-control { cursor: pointer; background-color: white; }
+select.form-control { cursor: pointer; background-color: var(--color-bg-secondary); }
 
 .modal-footer {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
   padding-top: 1.5rem;
-  border-top: 2px solid #f1f5f9;
+  border-top: 2px solid var(--color-border-light);
   margin-top: 1.5rem;
 }
 
@@ -198,24 +202,24 @@ select.form-control { cursor: pointer; background-color: white; }
   margin-bottom: 2rem;
 }
 
-.note-item { padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 1rem; border-left: 3px solid #667eea; }
-.note-date { font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.5rem; }
-.note-text { color: #475569; line-height: 1.5; }
-.no-notes { text-align:center; padding:2rem; color:#94a3b8; font-style:italic; }
+.note-item { padding: 1rem; background: var(--color-bg-tertiary); border-radius: 8px; margin-bottom: 1rem; border-left: 3px solid var(--color-primary); }
+.note-date { font-size: 0.75rem; color: var(--color-text-tertiary); margin-bottom: 0.5rem; }
+.note-text { color: var(--color-text-secondary); line-height: 1.5; }
+.no-notes { text-align:center; padding:2rem; color: var(--color-text-tertiary); font-style:italic; }
 
-.add-note-section { border-top: 2px solid #e5e7eb; padding-top:1.5rem;
+.add-note-section { border-top: 2px solid var(--color-border-light); padding-top:1.5rem;
   textarea { margin-bottom:1rem; }
   button { display:block; width:100%; }
 }
-.note-warning { display:block; margin-top:0.5rem; color:#94a3b8; font-style:italic; }
+.note-warning { display:block; margin-top:0.5rem; color: var(--color-text-tertiary); font-style:italic; }
 
 /* Table / cards */
 .table-card {
-  background: white;
+  background: var(--color-bg-secondary);
   margin: 2rem 2.5rem;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border-light);
   overflow: hidden;
 }
 
@@ -224,35 +228,35 @@ select.form-control { cursor: pointer; background-color: white; }
   border-collapse: collapse;
 
   th {
-    background: #f8f9fa;
+    background: var(--color-bg-tertiary);
     padding: 1rem 1.25rem;
     text-align: left;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--color-text-secondary);
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid var(--color-border-light);
   }
 
   td {
     padding: 1.25rem;
-    border-bottom: 1px solid #e5e7eb;
-    color: #475569;
+    border-bottom: 1px solid var(--color-border-light);
+    color: var(--color-text-primary);
     vertical-align: middle;
     word-break: break-word;
   }
 
   tbody tr {
     transition: background 0.2s ease;
-    &:hover { background: #f8f9fa; }
+    &:hover { background: var(--color-bg-tertiary); }
     &:last-child td { border-bottom: none; }
   }
 }
 
 /* client name layout */
 .client-name-cell { display:flex; align-items:center; gap:0.75rem; }
-.client-name { font-weight:600; color:#1e293b; }
+.client-name { font-weight:600; color: var(--color-text-primary); }
 .status-badge {
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
@@ -289,21 +293,21 @@ select.form-control { cursor: pointer; background-color: white; }
 
 .btn-secondary {
   padding: 0.875rem 1.75rem;
-  background: #f1f5f9;
-  color: #475569;
-  border: none;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-light);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
   transition: all 0.2s ease;
-  &:hover { background: #e2e8f0; }
+  &:hover { background: var(--color-bg-secondary); }
 }
 
 .btn-sm {
   padding: 0.5rem 1rem;
   margin-right: 0.5rem;
-  background: #64748b;
+  background: var(--color-border-dark);
   color: white;
   border: none;
   border-radius: 6px;
@@ -311,13 +315,13 @@ select.form-control { cursor: pointer; background-color: white; }
   font-size: 0.85rem;
   font-weight: 500;
   transition: all 0.2s ease;
-  &:hover { background: #475569; transform: translateY(-1px); }
+  &:hover { background: var(--color-text-secondary); transform: translateY(-1px); }
 }
 
 .btn-info { background: #3b82f6; &:hover { background: #2563eb; } }
 .btn-danger { background: #ef4444; &:hover { background: #dc2626; } }
 
-.text-center { text-align:center; padding:2rem; color:#94a3b8; font-style:italic; }
+.text-center { text-align:center; padding:2rem; color: var(--color-text-tertiary); font-style:italic; }
 
 /* ---------------- Responsive: transform table into cards on small screens ---------------- */
 @media (max-width: 768px) {
@@ -341,12 +345,12 @@ select.form-control { cursor: pointer; background-color: white; }
   .data-table thead { display: none; }            /* hide header */
   .data-table, .data-table tbody, .data-table tr, .data-table td { display: block; width: 100%; }
   .data-table tr {
-    background: white;
+    background: var(--color-bg-secondary);
     margin-bottom: 0.75rem;
     border-radius: 10px;
     padding: 0.75rem 0.85rem;
     box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-    border: 1px solid #eef2f7;
+    border: 1px solid var(--color-border-light);
   }
   .data-table td {
     padding: 0.45rem 0;
@@ -359,7 +363,7 @@ select.form-control { cursor: pointer; background-color: white; }
   .data-table td::before {
     content: attr(data-label); /* we will set data-label via CSS nth-child below */
     font-weight: 600;
-    color: #475569;
+    color: var(--color-text-secondary);
     margin-right: 0.75rem;
     flex: 0 0 auto;
     font-size: 0.85rem;

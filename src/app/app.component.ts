@@ -18,6 +18,11 @@ import { Subscription } from 'rxjs';
 export class AppComponent implements OnInit, OnDestroy {
   title = 'HSP CRM';
   private authSubscription?: Subscription;
+  private themeListener = (event: StorageEvent) => {
+    if (event.key === 'theme' && (event.newValue === 'dark' || event.newValue === 'light')) {
+      document.body.setAttribute('data-theme', event.newValue);
+    }
+  };
 
   constructor(
     private authService: AuthService,
@@ -25,6 +30,9 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.applyInitialTheme();
+    window.addEventListener('storage', this.themeListener);
+
     // Subscribe to authentication changes
     this.authSubscription = this.authService.currentUser$.subscribe(user => {
       if (user) {
@@ -42,5 +50,16 @@ export class AppComponent implements OnInit, OnDestroy {
       this.authSubscription.unsubscribe();
     }
     this.inactivityService.stopTracking();
+    window.removeEventListener('storage', this.themeListener);
+  }
+
+  private applyInitialTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+      document.body.setAttribute('data-theme', savedTheme);
+      return;
+    }
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.body.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
   }
 }

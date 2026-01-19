@@ -81,7 +81,7 @@ import { switchMap } from 'rxjs/operators';
   `,
   styles: [`
     .usage-widget {
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 12px;
       padding: 1.5rem;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);

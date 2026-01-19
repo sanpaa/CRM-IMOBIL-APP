@@ -180,7 +180,7 @@ import { Subscription } from 'rxjs';
     }
 
     .connection-card {
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 12px;
       padding: 2rem;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -237,7 +237,7 @@ import { Subscription } from 'rxjs';
     }
 
     .qr-image-container {
-      background: white;
+      background: var(--color-bg-secondary);
       padding: 1.5rem;
       border-radius: 12px;
       border: 2px solid #e5e5e5;
@@ -363,7 +363,7 @@ import { Subscription } from 'rxjs';
     }
 
     .info-card {
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 12px;
       padding: 2rem;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -416,7 +416,7 @@ import { Subscription } from 'rxjs';
       justify-content: center;
       min-height: 400px;
       padding: 2rem;
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
@@ -431,7 +431,7 @@ import { Subscription } from 'rxjs';
       max-width: 500px;
       margin: 2rem auto;
       padding: 2rem;
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       text-align: center;

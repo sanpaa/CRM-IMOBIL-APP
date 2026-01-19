@@ -126,12 +126,11 @@ interface CalendarDay {
   `,
   styles: [`
     .calendar-container {
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 12px;
       padding: 1.5rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      border: 1px solid #e5e7eb;
-      max-width: 1200px;
+      border: 1px solid var(--color-border-light);
     }
 
     .filter-buttons {
@@ -139,22 +138,23 @@ interface CalendarDay {
       gap: 0.5rem;
       margin-bottom: 1.5rem;
       padding-bottom: 1rem;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid var(--color-border-light);
     }
 
     .filter-btn {
       padding: 0.5rem 1.5rem;
-      border: 2px solid #e5e7eb;
-      background: white;
+      border: 2px solid var(--color-border-light);
+      background: var(--color-bg-secondary);
       border-radius: 8px;
       cursor: pointer;
       font-weight: 500;
+      color: var(--color-text-primary);
       transition: all 0.2s ease;
     }
 
     .filter-btn:hover {
-      border-color: #667eea;
-      background: #f8f9ff;
+      border-color: var(--color-primary);
+      background: var(--color-bg-tertiary);
     }
 
     .filter-btn.active {
@@ -172,7 +172,7 @@ interface CalendarDay {
 
     .calendar-header h2 {
       margin: 0;
-      color: #1e293b;
+      color: var(--color-text-primary);
       font-size: 1.5rem;
       font-weight: 700;
     }
@@ -181,17 +181,17 @@ interface CalendarDay {
       width: 40px;
       height: 40px;
       border: none;
-      background: #f1f5f9;
+      background: var(--color-bg-tertiary);
       border-radius: 8px;
       cursor: pointer;
       font-size: 1.5rem;
-      color: #475569;
+      color: var(--color-text-secondary);
       transition: all 0.2s ease;
     }
 
     .nav-btn:hover {
-      background: #e2e8f0;
-      color: #1e293b;
+      background: var(--color-bg-secondary);
+      color: var(--color-text-primary);
     }
 
     .calendar-grid {
@@ -209,7 +209,7 @@ interface CalendarDay {
     .weekday {
       text-align: center;
       font-weight: 600;
-      color: #64748b;
+      color: var(--color-text-secondary);
       font-size: 0.85rem;
       padding: 0.5rem;
       text-transform: uppercase;
@@ -225,7 +225,7 @@ interface CalendarDay {
     .calendar-day {
       min-height: 70px;
       padding: 0.5rem;
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--color-border-light);
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -234,8 +234,8 @@ interface CalendarDay {
     }
 
     .calendar-day:hover {
-      border-color: #667eea;
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+      border-color: var(--color-primary);
+      box-shadow: 0 2px 8px rgba(29, 78, 216, 0.2);
     }
 
     .calendar-day.other-month {
@@ -243,25 +243,25 @@ interface CalendarDay {
     }
 
     .calendar-day.today {
-      background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-      border-color: #667eea;
+      background: var(--color-bg-tertiary);
+      border-color: var(--color-primary);
     }
 
     .calendar-day.has-visits {
-      background: #f8f9ff;
+      background: var(--color-bg-tertiary);
     }
 
     .day-number {
       font-weight: 600;
-      color: #1e293b;
+      color: var(--color-text-primary);
       margin-bottom: 0.25rem;
       font-size: 0.875rem;
     }
 
     .holiday-badge {
       font-size: 0.7rem;
-      color: #dc2626;
-      background: #fef2f2;
+      color: var(--color-danger);
+      background: var(--color-danger-light);
       padding: 0.25rem 0.5rem;
       border-radius: 4px;
       margin-bottom: 0.5rem;
@@ -292,7 +292,7 @@ interface CalendarDay {
 
     .more-indicator {
       font-size: 0.7rem;
-      color: #64748b;
+      color: var(--color-text-secondary);
       font-weight: 600;
     }
 
@@ -304,22 +304,22 @@ interface CalendarDay {
     }
 
     .week-day-card {
-      border: 2px solid #e5e7eb;
+      border: 2px solid var(--color-border-light);
       border-radius: 8px;
       overflow: hidden;
     }
 
     .week-day-header {
-      background: #f8f9fa;
+      background: var(--color-bg-tertiary);
       padding: 1rem;
       text-align: center;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid var(--color-border-light);
     }
 
     .week-day-name {
       display: block;
       font-size: 0.85rem;
-      color: #64748b;
+      color: var(--color-text-secondary);
       font-weight: 600;
       text-transform: uppercase;
       margin-bottom: 0.25rem;
@@ -329,16 +329,16 @@ interface CalendarDay {
       display: block;
       font-size: 1.5rem;
       font-weight: 700;
-      color: #1e293b;
+      color: var(--color-text-primary);
     }
 
     .week-day-number.today {
-      color: #667eea;
+      color: var(--color-primary);
     }
 
     .holiday-label {
       font-size: 0.7rem;
-      color: #dc2626;
+      color: var(--color-danger);
       margin-top: 0.25rem;
     }
 
@@ -352,14 +352,14 @@ interface CalendarDay {
       justify-content: space-between;
       align-items: center;
       padding: 0.5rem;
-      background: #f8f9fa;
+      background: var(--color-bg-tertiary);
       border-radius: 6px;
       margin-bottom: 0.5rem;
     }
 
     .visit-time {
       font-weight: 600;
-      color: #475569;
+      color: var(--color-text-secondary);
       font-size: 0.85rem;
     }
 
@@ -374,7 +374,7 @@ interface CalendarDay {
 
     .no-visits {
       text-align: center;
-      color: #94a3b8;
+      color: var(--color-text-tertiary);
       font-size: 0.85rem;
       padding: 2rem 0.5rem;
       font-style: italic;
@@ -391,17 +391,17 @@ interface CalendarDay {
 
     .day-view-header h3 {
       margin: 0 0 0.5rem 0;
-      color: #1e293b;
+      color: var(--color-text-primary);
       font-size: 1.25rem;
       font-weight: 700;
     }
 
     .holiday-alert {
       padding: 0.75rem 1rem;
-      background: #fef2f2;
-      border: 1px solid #fecaca;
+      background: var(--color-danger-light);
+      border: 1px solid var(--color-danger-light);
       border-radius: 8px;
-      color: #dc2626;
+      color: var(--color-danger);
       font-weight: 600;
     }
 
@@ -415,20 +415,20 @@ interface CalendarDay {
       display: flex;
       gap: 1rem;
       padding: 1.5rem;
-      border: 2px solid #e5e7eb;
+      border: 2px solid var(--color-border-light);
       border-radius: 8px;
       transition: all 0.2s ease;
     }
 
     .day-visit-card:hover {
-      border-color: #667eea;
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+      border-color: var(--color-primary);
+      box-shadow: 0 2px 8px rgba(29, 78, 216, 0.2);
     }
 
     .visit-time-large {
       font-size: 1.5rem;
       font-weight: 700;
-      color: #667eea;
+      color: var(--color-primary);
       min-width: 80px;
     }
 
@@ -438,13 +438,13 @@ interface CalendarDay {
 
     .visit-notes {
       margin: 0.5rem 0 0 0;
-      color: #64748b;
+      color: var(--color-text-secondary);
       font-size: 0.9rem;
     }
 
     .no-visits-large {
       text-align: center;
-      color: #94a3b8;
+      color: var(--color-text-tertiary);
       font-size: 1rem;
       padding: 3rem;
       font-style: italic;

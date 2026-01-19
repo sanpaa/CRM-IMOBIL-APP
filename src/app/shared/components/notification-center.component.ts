@@ -125,7 +125,7 @@ import { AuthenticationError } from '../../models/errors/auth-error';
       right: 0;
       width: 400px;
       max-height: 500px;
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 8px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       z-index: 1051;
@@ -159,7 +159,7 @@ import { AuthenticationError } from '../../models/errors/auth-error';
       margin: 0;
       font-size: 1rem;
       font-weight: 600;
-      color: #1F2937;
+      color: var(--color-text-primary);
       display: flex;
       align-items: center;
       gap: 0.5rem;
@@ -181,7 +181,7 @@ import { AuthenticationError } from '../../models/errors/auth-error';
 
     .mark-all-read:hover {
       background: #E5E7EB;
-      color: #1F2937;
+      color: var(--color-text-primary);
     }
 
     .notification-list {
@@ -237,7 +237,7 @@ import { AuthenticationError } from '../../models/errors/auth-error';
 
     .notification-title {
       font-weight: 600;
-      color: #1F2937;
+      color: var(--color-text-primary);
       margin-bottom: 0.25rem;
       font-size: 0.95rem;
     }

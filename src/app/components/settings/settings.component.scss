@@ -4,7 +4,7 @@
 }
 
 .page-header {
-  background: white;
+  background: var(--color-bg-secondary);
   padding: 2rem 2.5rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   border-bottom: 1px solid #e5e7eb;
@@ -18,11 +18,11 @@
 }
 
 .settings-card {
-  background: white;
+  background: var(--color-bg-secondary);
   margin: 2rem 2.5rem;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border-light);
 }
 
 .settings-section {

@@ -96,8 +96,8 @@
       border: 2px solid white;
 
       &:hover {
-        background: white;
-        color: #1F2937;
+        background: var(--color-bg-secondary);
+        color: var(--color-text-primary);
         transform: translateY(-2px);
       }
     }
@@ -122,7 +122,7 @@
   }
 
   .pricing-card {
-    background: white;
+    background: var(--color-bg-secondary);
     border-radius: 12px;
     padding: 2rem;
     box-shadow: var(--shadow-md);
@@ -296,7 +296,7 @@
 /* Benefits Section */
 .benefits-section {
   padding: 4rem 2rem;
-  background: white;
+  background: var(--color-bg-secondary);
 
   .benefits-content {
     max-width: 1200px;
@@ -385,7 +385,7 @@
 
   .comparison-table {
     width: 100%;
-    background: white;
+    background: var(--color-bg-secondary);
     border-collapse: collapse;
 
     thead {
@@ -467,7 +467,7 @@
 /* User Policy Section */
 .user-policy-section {
   padding: 4rem 2rem;
-  background: white;
+  background: var(--color-bg-secondary);
 
   .policy-content {
     max-width: 1200px;
@@ -568,7 +568,7 @@
     margin-top: 2rem;
 
     .support-card {
-      background: white;
+      background: var(--color-bg-secondary);
       border-radius: 12px;
       padding: 2rem;
       box-shadow: var(--shadow-sm);
@@ -647,7 +647,7 @@
 /* Onboarding Section */
 .onboarding-section {
   padding: 4rem 2rem;
-  background: white;
+  background: var(--color-bg-secondary);
 
   .onboarding-content {
     max-width: 1000px;
@@ -784,8 +784,8 @@
     }
 
     .btn-cta-secondary {
-      background: white;
-      color: #1F2937;
+      background: var(--color-bg-secondary);
+      color: var(--color-text-primary);
 
       &:hover {
         background: #F9FAFB;
