@@ -117,8 +117,12 @@ export class PropertyListComponent implements OnInit {
       zip_code: '',
       contact: '',
       owner_id: '',
+      status: '',
+      floor: null,
+      furnished: false,
       featured: false,
-      sold: false
+      sold: false,
+      customOptions: []
     };
     this.documentFiles = [];
   }
@@ -129,7 +133,8 @@ export class PropertyListComponent implements OnInit {
       this.formData = {
         ...property,
         totalArea: property.totalArea ?? property.area ?? null,
-        builtArea: property.builtArea ?? null
+        builtArea: property.builtArea ?? null,
+        customOptions: (property as any).custom_options ?? []
       };
       this.documentFiles = [];
     } else {
@@ -151,6 +156,17 @@ export class PropertyListComponent implements OnInit {
       if (this.formData.totalArea != null && (this.formData.area == null || this.formData.area === 0)) {
         this.formData.area = this.formData.totalArea;
       }
+      if (Array.isArray(this.formData.customOptions)) {
+        const normalizedOptions = this.formData.customOptions
+          .map((option: { label?: string; value?: boolean }) => ({
+            label: (option.label || '').trim(),
+            value: !!option.value
+          }))
+          .filter((option: { label: string }) => option.label.length > 0);
+        this.formData.customOptions = normalizedOptions;
+        this.formData.custom_options = normalizedOptions;
+      }
+      delete this.formData.customOptions;
       
       if (this.editingProperty) {
         const updated = await this.propertyService.update(this.editingProperty.id, this.formData);
@@ -343,5 +359,16 @@ export class PropertyListComponent implements OnInit {
       case 'txt': return '📃';
       default: return '📎';
     }
+  }
+
+  addCustomOption() {
+    if (!this.formData.customOptions) {
+      this.formData.customOptions = [];
+    }
+    this.formData.customOptions.push({ label: '', value: false });
+  }
+
+  removeCustomOption(index: number) {
+    this.formData.customOptions.splice(index, 1);
   }
 }

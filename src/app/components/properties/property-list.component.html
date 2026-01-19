@@ -160,12 +160,38 @@
           <h3>Medidas</h3>
           <div class="form-row">
             <div class="form-group">
+              <label>Área (m²)</label>
+              <input type="number" [(ngModel)]="formData.area" name="area" class="form-control">
+            </div>
+            <div class="form-group">
               <label>Área Total (m²)</label>
               <input type="number" [(ngModel)]="formData.totalArea" name="totalArea" class="form-control">
             </div>
             <div class="form-group">
               <label>Área Construída (m²)</label>
               <input type="number" [(ngModel)]="formData.builtArea" name="builtArea" class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Detalhes do anúncio</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Status</label>
+              <input type="text" [(ngModel)]="formData.status" name="status" class="form-control" placeholder="pronto">
+            </div>
+            <div class="form-group">
+              <label>Andar</label>
+              <input type="number" [(ngModel)]="formData.floor" name="floor" class="form-control">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" [(ngModel)]="formData.furnished" name="furnished">
+                Mobiliado
+              </label>
             </div>
           </div>
         </div>
@@ -196,6 +222,31 @@
               <input type="text" [(ngModel)]="formData.state" name="state" maxlength="2" placeholder="UF" class="form-control">
             </div>
           </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Comodidades adicionais</h3>
+          <div class="form-group" *ngIf="formData.customOptions?.length">
+            <div class="custom-options">
+              <div class="custom-option" *ngFor="let option of formData.customOptions; let i = index">
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="option.label"
+                  name="customOptionLabel{{ i }}"
+                  placeholder="Digite a comodidade">
+                <label class="custom-option-toggle">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="option.value"
+                    name="customOptionValue{{ i }}">
+                  Disponível
+                </label>
+                <button type="button" class="btn-remove-inline" (click)="removeCustomOption(i)">Remover</button>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn-secondary btn-add" (click)="addCustomOption()">Adicionar comodidade</button>
         </div>
 
         <div class="form-section">

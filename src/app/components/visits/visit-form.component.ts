@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VisitService } from '../../services/visit.service';
 import { ClientService } from '../../services/client.service';
+import { OwnerService } from '../../services/owner.service';
 import { PropertyService } from '../../services/property.service';
 import { SupabaseService } from '../../services/supabase.service';
 import { Visit, VisitProperty, VisitEvaluation, InterestLevel } from '../../models/visit.model';
 import { Client } from '../../models/client.model';
+import { Owner } from '../../models/owner.model';
 import { Property } from '../../models/property.model';
 import { User } from '../../models/user.model';
 import { AuthService } from '../../services/auth.service';
@@ -78,7 +80,7 @@ import { AuthService } from '../../services/auth.service';
                   <label>Proprietário</label>
                   <select [(ngModel)]="formData.owner_id" name="owner_id" class="form-control">
                     <option value="">Selecione um proprietário</option>
-                    <option *ngFor="let owner of clients" [value]="owner.id">{{ owner.name }}</option>
+                    <option *ngFor="let owner of owners" [value]="owner.id">{{ owner.name }}</option>
                   </select>
                 </div>
               </div>
@@ -523,6 +525,7 @@ export class VisitFormComponent implements OnInit, OnChanges {
   properties: VisitProperty[] = [];
   evaluations: VisitEvaluation[] = [];
   clients: Client[] = [];
+  owners: Owner[] = [];
   brokers: User[] = [];
   availableProperties: Property[] = [];
   saving = false;
@@ -530,6 +533,7 @@ export class VisitFormComponent implements OnInit, OnChanges {
   constructor(
     private visitService: VisitService,
     private clientService: ClientService,
+    private ownerService: OwnerService,
     private propertyService: PropertyService,
     private authService: AuthService,
     private supabaseService: SupabaseService
@@ -537,6 +541,7 @@ export class VisitFormComponent implements OnInit, OnChanges {
 
   async ngOnInit() {
     await this.loadClients();
+    await this.loadOwners();
     await this.loadBrokers();
     await this.loadAvailableProperties();
     this.resetForm();
@@ -555,6 +560,14 @@ export class VisitFormComponent implements OnInit, OnChanges {
       this.clients = await this.clientService.getAll();
     } catch (error) {
       console.error('Error loading clients:', error);
+    }
+  }
+
+  async loadOwners() {
+    try {
+      this.owners = await this.ownerService.getAll();
+    } catch (error) {
+      console.error('Error loading owners:', error);
     }
   }
 

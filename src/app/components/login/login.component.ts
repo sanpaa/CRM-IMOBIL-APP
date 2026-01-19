@@ -21,7 +21,7 @@ import { AuthService } from '../../services/auth.service';
       <div class="login-panel">
         <div class="login-card">
           <div class="logo-section">
-            <i class="bi bi-building"></i>
+            <img src="/assets/logo.png" alt="HSP CRM" class="logo-image">
             <h1>HSP CRM</h1>
             <p>Sistema de Gestão Imobiliário</p>
           </div>
@@ -158,9 +158,11 @@ import { AuthService } from '../../services/auth.service';
       margin-bottom: 1.5rem;
     }
 
-    .logo-section i {
-      font-size: 2.5rem;
-      color: var(--color-primary);
+    .logo-section .logo-image {
+      width: 84px;
+      height: 84px;
+      object-fit: contain;
+      display: inline-block;
       margin-bottom: 0.5rem;
     }
 

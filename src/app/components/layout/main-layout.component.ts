@@ -25,7 +25,7 @@ import { Company } from '../../models/company.model';
         <div class="sidebar-header">
           <div class="logo">
             <div class="logo-mark">
-              <i class="bi bi-buildings"></i>
+              <img src="/assets/logo.png" alt="HSP CRM" class="logo-image">
             </div>
             <div class="logo-text">
               <h2>HSP CRM</h2>
@@ -207,19 +207,21 @@ import { Company } from '../../models/company.model';
     }
 
     .logo-mark {
-      width: 36px;
-      height: 36px;
+      width: 44px;
+      height: 44px;
       border-radius: 10px;
       background: var(--color-bg-tertiary);
       border: 1px solid var(--color-border-light);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--color-text-tertiary);
     }
 
-    .logo-mark i {
-      font-size: 1.1rem;
+    .logo-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
     }
 
     .logo-text h2 {

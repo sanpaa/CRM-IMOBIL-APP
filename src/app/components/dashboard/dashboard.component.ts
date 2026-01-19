@@ -22,7 +22,7 @@ Chart.register(...registerables);
       <header class="page-header">
         <div class="header-content">
           <div class="header-text">
-            <h1>Olá, {{ currentUser?.name || 'Cliente' }}!</h1>
+            <h1>Olá, {{ displayName }}!</h1>
             <p class="header-subtitle">Bem-vindo de volta.</p>
           </div>
           <app-global-search class="header-search"></app-global-search>
@@ -457,12 +457,43 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   async ngOnInit() {
+    this.currentUser = this.authService.getCurrentUser() || this.getStoredUser();
     this.authService.currentUser$.subscribe(user => {
-      this.currentUser = user;
+      if (user) {
+        this.currentUser = user;
+        return;
+      }
+      if (!this.currentUser) {
+        this.currentUser = this.getStoredUser();
+      }
     });
 
     this.observeThemeChanges();
     await this.loadStats();
+  }
+
+  get displayName(): string {
+    const directName = this.currentUser?.name || (this.currentUser as any)?.username;
+    if (directName) return directName;
+
+    const stored = this.getStoredUser();
+    return stored?.name || (stored as any)?.username || 'Cliente';
+  }
+
+  private getStoredUser(): User | null {
+    try {
+      const raw = localStorage.getItem('currentUser');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return null;
+      if (typeof parsed.name === 'string') return parsed as User;
+      if (typeof parsed.username === 'string') {
+        return { ...parsed, name: parsed.username } as User;
+      }
+      return null;
+    } catch {
+      return null;
+    }
   }
 
   ngAfterViewInit() {

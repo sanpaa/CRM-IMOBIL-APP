@@ -98,12 +98,38 @@ import { Property } from '../../models/property.model';
 
         <div class="form-row">
           <div class="form-group">
+            <label>Área (m²)</label>
+            <input type="number" [(ngModel)]="formData.area" name="area" class="form-control">
+          </div>
+          <div class="form-group">
             <label>Área Total (m²)</label>
             <input type="number" [(ngModel)]="formData.totalArea" name="totalArea" class="form-control">
           </div>
           <div class="form-group">
             <label>Área Construída (m²)</label>
             <input type="number" [(ngModel)]="formData.builtArea" name="builtArea" class="form-control">
+          </div>
+        </div>
+
+        <h3 class="section-title">Detalhes do anúncio</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Status</label>
+            <input type="text" [(ngModel)]="formData.status" name="status" class="form-control" placeholder="pronto">
+          </div>
+          <div class="form-group">
+            <label>Andar</label>
+            <input type="number" [(ngModel)]="formData.floor" name="floor" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="formData.furnished" name="furnished">
+              Mobiliado
+            </label>
           </div>
         </div>
 
@@ -149,6 +175,47 @@ import { Property } from '../../models/property.model';
             <input type="text" [(ngModel)]="formData.contact" name="contact" class="form-control" required>
           </div>
         </div>
+
+        <h3 class="section-title">Status</h3>
+
+        <div class="form-row">
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="formData.featured" name="featured">
+              Imóvel em destaque
+            </label>
+          </div>
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="formData.sold" name="sold">
+              Imóvel vendido
+            </label>
+          </div>
+        </div>
+
+        <h3 class="section-title">Comodidades adicionais</h3>
+
+        <div class="form-group" *ngIf="formData.customOptions?.length">
+          <div class="custom-options">
+            <div class="custom-option" *ngFor="let option of formData.customOptions; let i = index">
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="option.label"
+                name="customOptionLabel{{ i }}"
+                placeholder="Digite a comodidade">
+              <label class="custom-option-toggle">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="option.value"
+                  name="customOptionValue{{ i }}">
+                Disponível
+              </label>
+              <button type="button" class="remove-btn-inline" (click)="removeCustomOption(i)">Remover</button>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-secondary btn-add" (click)="addCustomOption()">Adicionar comodidade</button>
 
         <h3 class="section-title">Mídia</h3>
         
@@ -314,6 +381,56 @@ import { Property } from '../../models/property.model';
       font-size: 0.85rem;
     }
 
+    .custom-options {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .custom-option {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .custom-option-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+    }
+
+    .custom-option-toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+    }
+
+    .remove-btn-inline {
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      border: 2px solid #ef4444;
+      background: white;
+      color: #ef4444;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .remove-btn-inline:hover {
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .btn-add {
+      align-self: flex-start;
+      padding: 0.6rem 1.1rem;
+      font-size: 0.9rem;
+    }
+
     .media-preview {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -476,6 +593,10 @@ import { Property } from '../../models/property.model';
         grid-template-columns: 1fr;
       }
 
+      .custom-option {
+        grid-template-columns: 1fr;
+      }
+
       .form-card {
         padding: 1.5rem;
       }
@@ -506,7 +627,8 @@ export class PropertyFormComponent implements OnInit {
       this.formData = {
         ...this.editingProperty,
         totalArea: this.editingProperty.totalArea ?? this.editingProperty.area ?? null,
-        builtArea: this.editingProperty.builtArea ?? null
+        builtArea: this.editingProperty.builtArea ?? null,
+        customOptions: (this.editingProperty as any).custom_options ?? []
       };
       this.imageUrls = this.editingProperty.image_urls || [];
       this.documentUrls = this.editingProperty.document_urls || [];
@@ -551,7 +673,13 @@ export class PropertyFormComponent implements OnInit {
       neighborhood: '',
       city: '',
       state: '',
-      contact: ''
+      contact: '',
+      status: '',
+      floor: null,
+      furnished: false,
+      featured: false,
+      sold: false,
+      customOptions: []
     };
     this.imageUrls = [];
     this.documentUrls = [];
@@ -746,6 +874,17 @@ export class PropertyFormComponent implements OnInit {
     if (this.formData.totalArea != null && (this.formData.area == null || this.formData.area === 0)) {
       this.formData.area = this.formData.totalArea;
     }
+    if (Array.isArray(this.formData.customOptions)) {
+      const normalizedOptions = this.formData.customOptions
+        .map((option: { label?: string; value?: boolean }) => ({
+          label: (option.label || '').trim(),
+          value: !!option.value
+        }))
+        .filter((option: { label: string }) => option.label.length > 0);
+      this.formData.customOptions = normalizedOptions;
+      this.formData.custom_options = normalizedOptions;
+    }
+    delete this.formData.customOptions;
     
     this.formData.image_urls = this.imageUrls;
     this.formData.document_files = this.documentFiles.map(d => d.file);
@@ -755,5 +894,16 @@ export class PropertyFormComponent implements OnInit {
 
   onCancel() {
     this.cancel.emit();
+  }
+
+  addCustomOption() {
+    if (!this.formData.customOptions) {
+      this.formData.customOptions = [];
+    }
+    this.formData.customOptions.push({ label: '', value: false });
+  }
+
+  removeCustomOption(index: number) {
+    this.formData.customOptions.splice(index, 1);
   }
 }

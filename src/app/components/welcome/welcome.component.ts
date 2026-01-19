@@ -111,7 +111,7 @@ import { Company } from '../../models/company.model';
     .company-info {
       margin-bottom: 2rem;
       padding: 1.25rem;
-      background: #F9FAFB;
+      background: var(--color-bg-tertiary);
       border-radius: 8px;
       border: 1px solid var(--color-border-light);
       animation: fadeIn 0.6s ease-out 0.7s both;
@@ -119,7 +119,7 @@ import { Company } from '../../models/company.model';
 
     .company-label {
       font-size: 0.875rem;
-      color: #6B7280;
+      color: var(--color-text-secondary);
       margin-bottom: 0.5rem;
       font-weight: 500;
     }
@@ -181,7 +181,7 @@ export class WelcomeComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.currentUser = this.authService.getCurrentUser();
+    this.currentUser = this.authService.getCurrentUser() || this.getStoredUser();
     
     if (this.currentUser && this.currentUser.company_id) {
       this.company = await this.companyService.getById(this.currentUser.company_id);
@@ -194,9 +194,26 @@ export class WelcomeComponent implements OnInit {
   }
 
   getUserFirstName(): string {
-    if (!this.currentUser || !this.currentUser.name) {
+    const name = this.currentUser?.name || (this.currentUser as any)?.username;
+    if (!name) {
       return 'Usuário';
     }
-    return this.currentUser.name.split(' ')[0];
+    return name.split(' ')[0];
+  }
+
+  private getStoredUser(): User | null {
+    try {
+      const raw = localStorage.getItem('currentUser');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return null;
+      if (typeof parsed.name === 'string') return parsed as User;
+      if (typeof parsed.username === 'string') {
+        return { ...parsed, name: parsed.username } as User;
+      }
+      return null;
+    } catch {
+      return null;
+    }
   }
 }

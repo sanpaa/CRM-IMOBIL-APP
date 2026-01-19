@@ -31,8 +31,10 @@ export interface Property {
   contact: string;
   featured?: boolean;
   sold?: boolean;
+  custom_options?: { label: string; value: boolean }[];
   status?: string;
   furnished?: boolean;
+  floor?: number;
   created_at: string;
   updated_at: string;
 }
