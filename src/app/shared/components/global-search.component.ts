@@ -327,6 +327,7 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
   private lastFailedTerm = '';
   private lastFailedAt = 0;
   private readonly failureCooldownMs = 4000;
+  private commandOnly = false;
   private destroy$ = new Subject<void>();
 
   skeletonItems = Array.from({ length: 6 });
@@ -363,6 +364,10 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
         if (!value) {
           return of(null);
         }
+        if (this.commandOnly) {
+          this.loading = false;
+          return of(null);
+        }
         if (this.isInFailureCooldown(value)) {
           return of(EMPTY_RESULTS);
         }
@@ -382,6 +387,9 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
       }),
       takeUntil(this.destroy$)
     ).subscribe(result => {
+      if (this.commandOnly) {
+        return;
+      }
       if (!result) {
         this.resetResults();
         return;
@@ -514,13 +522,13 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
   private getRouteForItem(item: GlobalSearchItem): string[] {
     switch (item.category) {
       case 'clients':
-        return ['/clientes', item.id];
+        return ['/clients', item.id];
       case 'properties':
-        return ['/imoveis', item.id];
+        return ['/properties', item.id];
       case 'deals':
-        return ['/negocios', item.id];
+        return ['/deals', item.id];
       case 'visits':
-        return ['/agenda', item.id];
+        return ['/visits', item.id];
       default:
         return ['/dashboard'];
     }
@@ -542,11 +550,13 @@ export class GlobalSearchComponent implements OnInit, OnDestroy {
   private applyCommandHints() {
     const commandGroup = this.getCommandGroup();
     if (!commandGroup) {
+      this.commandOnly = false;
       if (!this.loading && !this.searchTerm) {
         this.resetResults();
       }
       return;
     }
+    this.commandOnly = true;
     this.groups = [commandGroup];
     this.flatResults = commandGroup.items;
   }

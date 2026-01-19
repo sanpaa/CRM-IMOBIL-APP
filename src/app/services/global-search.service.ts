@@ -58,13 +58,66 @@ export class GlobalSearchService {
     );
   }
 
-  private normalizeResults(result: Partial<GlobalSearchResults>): GlobalSearchResults {
+  private normalizeResults(result: Partial<GlobalSearchResults> & {
+    clientes?: unknown[];
+    imoveis?: unknown[];
+    negocios?: unknown[];
+    visitas?: unknown[];
+  }): GlobalSearchResults {
+    const clients = this.normalizeClientItems(this.coerceArray(result.clients ?? result.clientes ?? []));
+    const properties = this.normalizePropertyItems(this.coerceArray(result.properties ?? result.imoveis ?? []));
+    const deals = this.normalizeDealItems(this.coerceArray(result.deals ?? result.negocios ?? []));
+    const visits = this.normalizeVisitItems(this.coerceArray(result.visits ?? result.visitas ?? []));
+
     return {
-      clients: (result.clients || []).slice(0, 5),
-      properties: (result.properties || []).slice(0, 5),
-      deals: (result.deals || []).slice(0, 5),
-      visits: (result.visits || []).slice(0, 5)
+      clients: clients.slice(0, 5),
+      properties: properties.slice(0, 5),
+      deals: deals.slice(0, 5),
+      visits: visits.slice(0, 5)
     };
+  }
+
+  private normalizeClientItems(items: Array<Record<string, unknown>>): GlobalSearchItem[] {
+    return items.map(item => ({
+      id: String(item['id'] ?? ''),
+      title: String(item['nome'] ?? item['name'] ?? 'Cliente'),
+      subtitle: item['telefone'] ? String(item['telefone']) : item['phone'] ? String(item['phone']) : undefined,
+      category: 'clients'
+    }));
+  }
+
+  private normalizePropertyItems(items: Array<Record<string, unknown>>): GlobalSearchItem[] {
+    return items.map(item => ({
+      id: String(item['id'] ?? ''),
+      title: String(item['referencia'] ?? item['reference'] ?? item['codigo'] ?? item['code'] ?? 'Imovel'),
+      subtitle: item['endereco'] ? String(item['endereco']) : item['address'] ? String(item['address']) : undefined,
+      category: 'properties'
+    }));
+  }
+
+  private normalizeDealItems(items: Array<Record<string, unknown>>): GlobalSearchItem[] {
+    return items.map(item => ({
+      id: String(item['id'] ?? ''),
+      title: String(item['titulo'] ?? item['title'] ?? 'Negocio'),
+      subtitle: item['status'] ? String(item['status']) : undefined,
+      category: 'deals'
+    }));
+  }
+
+  private normalizeVisitItems(items: Array<Record<string, unknown>>): GlobalSearchItem[] {
+    return items.map(item => ({
+      id: String(item['id'] ?? ''),
+      title: String(item['titulo'] ?? item['title'] ?? item['cliente'] ?? item['client'] ?? 'Visita'),
+      subtitle: item['data'] ? String(item['data']) : item['date'] ? String(item['date']) : undefined,
+      category: 'visits'
+    }));
+  }
+
+  private coerceArray(value: unknown): Array<Record<string, unknown>> {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+    return value.filter((item): item is Record<string, unknown> => !!item && typeof item === 'object');
   }
 
   private normalizeTerm(value: string): string {
