@@ -101,7 +101,7 @@ import { AuthService } from '../../services/auth.service';
       color: #fff;
       background-image:
         linear-gradient(135deg, rgba(29, 78, 216, 0.85), rgba(29, 78, 216, 0.35)),
-        url('assets/login-hero.jpg');
+        url('/assets/login-hero.jpg');
       background-size: cover;
       background-position: center;
     }
