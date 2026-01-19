@@ -25,7 +25,10 @@ export class PropertyListComponent implements OnInit {
   formData: any = {};
   documentFiles: { name: string; file: File }[] = [];
   isLoading = false;
-  
+  private static readonly CEP_REGEX = /\D/g;
+
+  loadingCep = false;
+
   // Filters
   searchTerm = '';
   filterType = '';
@@ -95,10 +98,18 @@ export class PropertyListComponent implements OnInit {
       description: '',
       type: 'apartamento',
       price: 0,
-      bedrooms: 0,
-      bathrooms: 0,
-      area: 0,
-      parking: 0,
+      bedrooms: null,
+      suites: null,
+      bathrooms: null,
+      parking: null,
+      kitchens: null,
+      diningRoom: false,
+      livingRoom: false,
+      serviceArea: false,
+      closet: false,
+      totalArea: null,
+      builtArea: null,
+      area: null,
       street: '',
       neighborhood: '',
       city: '',
@@ -115,7 +126,11 @@ export class PropertyListComponent implements OnInit {
   openModal(property?: Property) {
     if (property) {
       this.editingProperty = property;
-      this.formData = { ...property };
+      this.formData = {
+        ...property,
+        totalArea: property.totalArea ?? property.area ?? null,
+        builtArea: property.builtArea ?? null
+      };
       this.documentFiles = [];
     } else {
       this.editingProperty = null;
@@ -133,6 +148,9 @@ export class PropertyListComponent implements OnInit {
   async saveProperty() {
     try {
       let propertyId: string;
+      if (this.formData.totalArea != null && (this.formData.area == null || this.formData.area === 0)) {
+        this.formData.area = this.formData.totalArea;
+      }
       
       if (this.editingProperty) {
         const updated = await this.propertyService.update(this.editingProperty.id, this.formData);
@@ -189,6 +207,64 @@ export class PropertyListComponent implements OnInit {
     const owner = this.owners.find(o => o.id === ownerId);
     return owner ? owner.name : '-';
   }
+
+  async fetchAddressFromCep() {
+    const cep = this.formData.zip_code?.replace(PropertyListComponent.CEP_REGEX, '');
+    if (!cep || cep.length !== 8) return;
+
+    this.loadingCep = true;
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        this.formData.street = data.logradouro || this.formData.street;
+        this.formData.neighborhood = data.bairro || this.formData.neighborhood;
+        this.formData.city = data.localidade || this.formData.city;
+        this.formData.state = data.uf || this.formData.state;
+
+        await this.geocodeAddress();
+      }
+    } finally {
+      this.loadingCep = false;
+    }
+  }
+
+  async geocodeAddress() {
+    if (!this.formData.city || !this.formData.state) return;
+
+    const cepClean = this.formData.zip_code?.replace(/\D/g, '');
+
+    const strategies = [
+      this.formData.street && cepClean
+        ? `${this.formData.street}, ${cepClean}, ${this.formData.city}, ${this.formData.state}, Brasil`
+        : null,
+      this.formData.street
+        ? `${this.formData.street}, ${this.formData.city}, ${this.formData.state}, Brasil`
+        : null,
+      `${this.formData.city}, ${this.formData.state}, Brasil`
+    ].filter(Boolean) as string[];
+
+    for (const address of strategies) {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=br`,
+          { headers: { 'User-Agent': 'CRM-Imobiliario/1.0' } }
+        );
+        const data = await res.json();
+        if (data?.length) {
+          this.formData.latitude = parseFloat(data[0].lat);
+          this.formData.longitude = parseFloat(data[0].lon);
+          console.log('✓ Coordenadas encontradas:', this.formData.latitude, this.formData.longitude);
+          return;
+        }
+        await new Promise(r => setTimeout(r, 1000));
+      } catch {}
+    }
+
+    console.warn('❌ Geocoding falhou');
+  }
+
 
   onDocumentSelect(event: any) {
     const files = event.target.files;

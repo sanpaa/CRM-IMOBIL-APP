@@ -13,6 +13,51 @@ export class PropertyService {
     private auth: AuthService
   ) {}
 
+  private mapFromDb(row: any): Property {
+    const {
+      total_area,
+      built_area,
+      dining_room,
+      living_room,
+      service_area,
+      ...rest
+    } = row || {};
+
+    return {
+      ...(rest as Property),
+      totalArea: total_area ?? (rest as any).totalArea ?? null,
+      builtArea: built_area ?? (rest as any).builtArea ?? null,
+      diningRoom: dining_room ?? (rest as any).diningRoom ?? false,
+      livingRoom: living_room ?? (rest as any).livingRoom ?? false,
+      serviceArea: service_area ?? (rest as any).serviceArea ?? false
+    };
+  }
+
+  private mapToDb(property: Partial<Property>): Record<string, unknown> {
+    const {
+      totalArea,
+      builtArea,
+      diningRoom,
+      livingRoom,
+      serviceArea,
+      document_files,
+      ...rest
+    } = property as any;
+
+    if (rest.owner_id === '') {
+      rest.owner_id = null;
+    }
+
+    return {
+      ...rest,
+      ...(totalArea !== undefined ? { total_area: totalArea } : {}),
+      ...(builtArea !== undefined ? { built_area: builtArea } : {}),
+      ...(diningRoom !== undefined ? { dining_room: diningRoom } : {}),
+      ...(livingRoom !== undefined ? { living_room: livingRoom } : {}),
+      ...(serviceArea !== undefined ? { service_area: serviceArea } : {})
+    };
+  }
+
   async getAll(): Promise<Property[]> {
     const user = this.auth.getCurrentUser();
     if (!user) throw new Error('User not authenticated');
@@ -24,7 +69,7 @@ export class PropertyService {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data as Property[];
+    return (data || []).map(item => this.mapFromDb(item));
   }
 
   async getById(id: string): Promise<Property | null> {
@@ -35,7 +80,7 @@ export class PropertyService {
       .single();
 
     if (error) throw error;
-    return data as Property;
+    return data ? this.mapFromDb(data) : null;
   }
 
   async create(property: Partial<Property>): Promise<Property> {
@@ -45,14 +90,14 @@ export class PropertyService {
     const { data, error } = await this.supabase
       .from('properties')
       .insert({
-        ...property,
+        ...this.mapToDb(property),
         company_id: user.company_id
       })
       .select()
       .single();
 
     if (error) throw error;
-    return data as Property;
+    return this.mapFromDb(data);
   }
 
   async uploadDocument(file: File, propertyId: string): Promise<string> {
@@ -94,13 +139,13 @@ export class PropertyService {
   async update(id: string, updates: Partial<Property>): Promise<Property> {
     const { data, error } = await this.supabase
       .from('properties')
-      .update(updates)
+      .update(this.mapToDb(updates))
       .eq('id', id)
       .select()
       .single();
 
     if (error) throw error;
-    return data as Property;
+    return this.mapFromDb(data);
   }
 
   async delete(id: string): Promise<void> {
@@ -125,7 +170,7 @@ export class PropertyService {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data as Property[];
+    return (data || []).map(item => this.mapFromDb(item));
   }
 
   async getByStatus(status: string): Promise<Property[]> {
@@ -140,7 +185,7 @@ export class PropertyService {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data as Property[];
+    return (data || []).map(item => this.mapFromDb(item));
   }
 
   async getFiltered(filters: {
@@ -193,7 +238,7 @@ export class PropertyService {
     const { data, error } = await query;
 
     if (error) throw error;
-    return data as Property[];
+    return (data || []).map(item => this.mapFromDb(item));
   }
 
   /**
@@ -324,7 +369,7 @@ export class PropertyService {
       const totalPages = Math.ceil(total / limit);
 
       return {
-        data: data as Property[],
+        data: (data || []).map(item => this.mapFromDb(item)),
         total,
         page,
         totalPages

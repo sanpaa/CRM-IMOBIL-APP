@@ -26,9 +26,9 @@
 
     <!-- Grid de imóveis (exemplo de conteúdo fixo) -->
     <section class="property-grid" *ngIf="properties && properties.length">
-      <h2>Imóveis em destaque</h2>
+      <h2>Imóveis</h2>
       <div class="property-list">
-        <div class="property-card" *ngFor="let property of properties | slice:0:6">
+        <div class="property-card" *ngFor="let property of properties">
           <img [src]="property.image_url || 'https://via.placeholder.com/300x200?text=Imóvel'" alt="Foto do imóvel" />
           <div class="property-info">
             <h3>{{ property.title }}</h3>

@@ -31,31 +31,79 @@ import { Property } from '../../models/property.model';
               <option value="comercial">Comercial</option>
             </select>
           </div>
+        </div>
+
+        <h3 class="section-title">Valores</h3>
+
+        <div class="form-row">
           <div class="form-group">
-            <label>Preço *</label>
+            <label>Valor *</label>
             <input type="number" [(ngModel)]="formData.price" name="price" class="form-control" required>
           </div>
         </div>
-        
+
+        <h3 class="section-title">Cômodos</h3>
+
         <div class="form-row">
           <div class="form-group">
-            <label>Quartos</label>
+            <label>Dormitórios</label>
             <input type="number" [(ngModel)]="formData.bedrooms" name="bedrooms" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Suítes</label>
+            <input type="number" [(ngModel)]="formData.suites" name="suites" class="form-control">
           </div>
           <div class="form-group">
             <label>Banheiros</label>
             <input type="number" [(ngModel)]="formData.bathrooms" name="bathrooms" class="form-control">
           </div>
-        </div>
-        
-        <div class="form-row">
           <div class="form-group">
-            <label>Área (m²)</label>
-            <input type="number" [(ngModel)]="formData.area" name="area" class="form-control">
+            <label>Garagens</label>
+            <input type="number" [(ngModel)]="formData.parking" name="parking" class="form-control">
           </div>
           <div class="form-group">
-            <label>Vagas</label>
-            <input type="number" [(ngModel)]="formData.parking" name="parking" class="form-control">
+            <label>Cozinhas</label>
+            <input type="number" [(ngModel)]="formData.kitchens" name="kitchens" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="formData.diningRoom" name="diningRoom">
+              Sala de Jantar
+            </label>
+          </div>
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="formData.livingRoom" name="livingRoom">
+              Sala de Estar
+            </label>
+          </div>
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="formData.serviceArea" name="serviceArea">
+              Área de Serviço
+            </label>
+          </div>
+          <div class="form-group checkbox-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="formData.closet" name="closet">
+              Closet
+            </label>
+          </div>
+        </div>
+
+        <h3 class="section-title">Medidas</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Área Total (m²)</label>
+            <input type="number" [(ngModel)]="formData.totalArea" name="totalArea" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Área Construída (m²)</label>
+            <input type="number" [(ngModel)]="formData.builtArea" name="builtArea" class="form-control">
           </div>
         </div>
 
@@ -207,6 +255,30 @@ import { Property } from '../../models/property.model';
       color: #475569;
       font-weight: 600;
       font-size: 0.9rem;
+    }
+
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      padding: 0.75rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .checkbox-group label:hover {
+      border-color: #667eea;
+      background: #f8f9fa;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
     }
 
     .form-control {
@@ -431,7 +503,11 @@ export class PropertyFormComponent implements OnInit {
   ngOnInit() {
     this.resetForm();
     if (this.editingProperty) {
-      this.formData = { ...this.editingProperty };
+      this.formData = {
+        ...this.editingProperty,
+        totalArea: this.editingProperty.totalArea ?? this.editingProperty.area ?? null,
+        builtArea: this.editingProperty.builtArea ?? null
+      };
       this.imageUrls = this.editingProperty.image_urls || [];
       this.documentUrls = this.editingProperty.document_urls || [];
       // Note: existing documents don't have File objects, only URLs
@@ -458,10 +534,18 @@ export class PropertyFormComponent implements OnInit {
       description: '',
       type: 'apartamento',
       price: 0,
-      bedrooms: 0,
-      bathrooms: 0,
-      area: 0,
-      parking: 0,
+      bedrooms: null,
+      suites: null,
+      bathrooms: null,
+      parking: null,
+      kitchens: null,
+      diningRoom: false,
+      livingRoom: false,
+      serviceArea: false,
+      closet: false,
+      totalArea: null,
+      builtArea: null,
+      area: null,
       zip_code: '',
       street: '',
       neighborhood: '',
@@ -505,17 +589,22 @@ export class PropertyFormComponent implements OnInit {
     }
     
     // Try multiple strategies to find coordinates
+    const cepClean = this.formData.zip_code?.replace(/\D/g, '');
+
     const strategies = [
-      // Strategy 1: Full address with formatted CEP
-      this.formData.street && this.formData.zip_code ? 
-        `${this.formData.street}, ${this.formData.city}, ${this.formData.state}, Brasil` : null,
-      
-      // Strategy 2: City + State + Brazil (most reliable for general area)
-      `${this.formData.city}, ${this.formData.state}, Brasil`,
-      
-      // Strategy 3: Just city and country
-      `${this.formData.city}, Brasil`
-    ].filter(s => s !== null);
+      // Mais precisa
+      this.formData.street && cepClean
+        ? `${this.formData.street}, ${cepClean}, ${this.formData.city}, ${this.formData.state}, Brasil`
+        : null,
+
+      // Fallback
+      this.formData.street
+        ? `${this.formData.street}, ${this.formData.city}, ${this.formData.state}, Brasil`
+        : null,
+
+      // Último recurso
+      `${this.formData.city}, ${this.formData.state}, Brasil`
+    ].filter(Boolean);
     
     for (const address of strategies) {
       try {
@@ -653,6 +742,9 @@ export class PropertyFormComponent implements OnInit {
     // Ensure coordinates are set before saving
     if (!this.formData.latitude || !this.formData.longitude) {
       await this.geocodeAddress();
+    }
+    if (this.formData.totalArea != null && (this.formData.area == null || this.formData.area === 0)) {
+      this.formData.area = this.formData.totalArea;
     }
     
     this.formData.image_urls = this.imageUrls;

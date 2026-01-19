@@ -3,9 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { WebsiteCustomizationService } from '../../services/website-customization.service';
-import { PropertyService } from '../../services/property.service';
 import { CompanyService } from '../../services/company.service';
-import { PublicSiteApiService } from '../../services/public-site-api.service';
+import { PublicSiteConfigService } from '../../services/public-site-config.service';
 import { AuthService } from '../../services/auth.service';
 import { WebsiteLayout, LayoutSection } from '../../models/website-layout.model';
 import { StoreSettings } from '../../models/company.model';
@@ -58,9 +57,8 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private customizationService: WebsiteCustomizationService,
-    private propertyService: PropertyService,
     private companyService: CompanyService,
-    private publicSiteApi: PublicSiteApiService,
+    private publicSiteConfig: PublicSiteConfigService,
     private authService: AuthService
   ) {}
 
@@ -116,7 +114,7 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
       // Banner e destaques: personalização futura (ignorar se não existir)
       // Se desejar, pode buscar de company.custom_data ou similar no futuro
       // Carregar imóveis para grid
-      this.properties = await this.propertyService.getAll();
+      this.properties = await this.publicSiteConfig.getPropertiesForCompany(this.companyId);
     } catch (error) {
       console.error('🔴 Error loading website:', error);
     } finally {

@@ -7,9 +7,17 @@ export interface Property {
   type: string;
   price: number;
   bedrooms?: number;
+  suites?: number;
   bathrooms?: number;
+  kitchens?: number;
   area?: number;
+  totalArea?: number;
+  builtArea?: number;
   parking?: number;
+  diningRoom?: boolean;
+  livingRoom?: boolean;
+  serviceArea?: boolean;
+  closet?: boolean;
   image_url?: string;
   image_urls?: string[];
   document_urls?: string[];

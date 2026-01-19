@@ -109,11 +109,14 @@ export class PublicSiteConfigService {
       return [];
     }
 
+    return this.getPropertiesForCompany(this.companyId, filters);
+  }
+
+  async getPropertiesForCompany(companyId: string, filters?: PropertyFilters): Promise<any[]> {
     let query = this.supabase.client
       .from('properties')
       .select('*')
-      .eq('company_id', this.companyId)
-      .eq('status', 'available'); // Only show available properties
+      .eq('company_id', companyId);
 
     // Apply filters
     if (filters?.type) {

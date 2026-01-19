@@ -78,10 +78,6 @@
                 <option value="comercial">Comercial</option>
               </select>
             </div>
-            <div class="form-group">
-              <label>Preço (R$) *</label>
-              <input type="number" [(ngModel)]="formData.price" name="price" required class="form-control">
-            </div>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -99,23 +95,77 @@
         </div>
 
         <div class="form-section">
-          <h3>Características</h3>
+          <h3>Valores</h3>
           <div class="form-row">
             <div class="form-group">
-              <label>Quartos</label>
+              <label>Valor (R$) *</label>
+              <input type="number" [(ngModel)]="formData.price" name="price" required class="form-control">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Cômodos</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Dormitórios</label>
               <input type="number" [(ngModel)]="formData.bedrooms" name="bedrooms" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Suítes</label>
+              <input type="number" [(ngModel)]="formData.suites" name="suites" class="form-control">
             </div>
             <div class="form-group">
               <label>Banheiros</label>
               <input type="number" [(ngModel)]="formData.bathrooms" name="bathrooms" class="form-control">
             </div>
             <div class="form-group">
-              <label>Área (m²)</label>
-              <input type="number" [(ngModel)]="formData.area" name="area" class="form-control">
+              <label>Garagens</label>
+              <input type="number" [(ngModel)]="formData.parking" name="parking" class="form-control">
             </div>
             <div class="form-group">
-              <label>Vagas</label>
-              <input type="number" [(ngModel)]="formData.parking" name="parking" class="form-control">
+              <label>Cozinhas</label>
+              <input type="number" [(ngModel)]="formData.kitchens" name="kitchens" class="form-control">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" [(ngModel)]="formData.diningRoom" name="diningRoom">
+                Sala de Jantar
+              </label>
+            </div>
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" [(ngModel)]="formData.livingRoom" name="livingRoom">
+                Sala de Estar
+              </label>
+            </div>
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" [(ngModel)]="formData.serviceArea" name="serviceArea">
+                Área de Serviço
+              </label>
+            </div>
+            <div class="form-group checkbox-group">
+              <label>
+                <input type="checkbox" [(ngModel)]="formData.closet" name="closet">
+                Closet
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Medidas</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Área Total (m²)</label>
+              <input type="number" [(ngModel)]="formData.totalArea" name="totalArea" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Área Construída (m²)</label>
+              <input type="number" [(ngModel)]="formData.builtArea" name="builtArea" class="form-control">
             </div>
           </div>
         </div>
@@ -125,7 +175,7 @@
           <div class="form-row">
             <div class="form-group">
               <label>CEP</label>
-              <input type="text" [(ngModel)]="formData.zip_code" name="zip_code" placeholder="00000-000" class="form-control">
+              <input type="text" [(ngModel)]="formData.zip_code" name="zip_code" placeholder="00000-000" class="form-control"  (blur)="fetchAddressFromCep()">
             </div>
             <div class="form-group">
               <label>Rua</label>

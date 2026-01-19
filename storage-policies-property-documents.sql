@@ -13,6 +13,13 @@
 -- Storage Policies for property-documents bucket
 -- ============================================
 
+-- Drop existing policies to make this script re-runnable
+DROP POLICY IF EXISTS "Users can upload documents to their company folder" ON storage.objects;
+DROP POLICY IF EXISTS "Anon can upload documents" ON storage.objects;
+DROP POLICY IF EXISTS "Users can read documents from their company folder" ON storage.objects;
+DROP POLICY IF EXISTS "Public can read all documents" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete documents from their company folder" ON storage.objects;
+
 -- Policy 1: Allow authenticated users to upload documents to their company's folder
 CREATE POLICY "Users can upload documents to their company folder"
 ON storage.objects
@@ -21,6 +28,16 @@ TO authenticated
 WITH CHECK (
   bucket_id = 'property-documents' 
   AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- Policy 1b: Allow anon users to upload documents (for custom auth setups)
+-- NOTE: This is less secure; consider moving uploads to a backend with service role.
+CREATE POLICY "Anon can upload documents"
+ON storage.objects
+FOR INSERT
+TO anon
+WITH CHECK (
+  bucket_id = 'property-documents'
 );
 
 -- Policy 2: Allow authenticated users to read documents from their company's folder
