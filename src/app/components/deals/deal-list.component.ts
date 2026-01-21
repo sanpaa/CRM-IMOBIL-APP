@@ -10,6 +10,7 @@ import { Deal } from '../../models/deal.model';
 import { Client } from '../../models/client.model';
 import { Property } from '../../models/property.model';
 import { User } from '../../models/user.model';
+import { PopupService } from '../../shared/services/popup.service';
 
 @Component({
   selector: 'app-deal-list',
@@ -648,7 +649,8 @@ export class DealListComponent implements OnInit {
     private dealService: DealService,
     private clientService: ClientService,
     private propertyService: PropertyService,
-    private userService: UserService
+    private userService: UserService,
+    private popupService: PopupService
   ) {
     this.resetForm();
   }
@@ -791,11 +793,11 @@ export class DealListComponent implements OnInit {
     try {
       // Validate required fields
       if (!this.formData.client_id) {
-        alert('Por favor, selecione um cliente');
+        this.popupService.alert('Por favor, selecione um cliente', { title: 'Aviso', tone: 'warning' });
         return;
       }
       if (!this.formData.proposed_value || this.formData.proposed_value <= 0) {
-        alert('Por favor, insira um valor proposto válido');
+        this.popupService.alert('Por favor, insira um valor proposto válido', { title: 'Aviso', tone: 'warning' });
         return;
       }
 
@@ -819,19 +821,24 @@ export class DealListComponent implements OnInit {
       await this.loadDeals();
     } catch (error) {
       console.error('Error saving deal:', error);
-      alert('Erro ao salvar negócio. Por favor, tente novamente.');
+      this.popupService.alert('Erro ao salvar negócio. Por favor, tente novamente.', { title: 'Aviso', tone: 'warning' });
     }
   }
 
   async deleteDeal(id: string) {
-    if (confirm('Tem certeza que deseja excluir este negócio?')) {
-      try {
-        await this.dealService.delete(id);
-        await this.loadDeals();
-      } catch (error) {
-        console.error('Error deleting deal:', error);
-        alert('Erro ao excluir negócio. Por favor, tente novamente.');
-      }
+    const confirmed = await this.popupService.confirm('Tem certeza que deseja excluir este negócio?', {
+      title: 'Excluir negócio',
+      confirmText: 'Excluir',
+      cancelText: 'Cancelar',
+      tone: 'danger'
+    });
+    if (!confirmed) return;
+    try {
+      await this.dealService.delete(id);
+      await this.loadDeals();
+    } catch (error) {
+      console.error('Error deleting deal:', error);
+      this.popupService.alert('Erro ao excluir negócio. Por favor, tente novamente.', { title: 'Aviso', tone: 'warning' });
     }
   }
 }

@@ -98,7 +98,7 @@ export class PropertyGridComponent implements WebsiteComponentBase, OnInit {
       case 'price':
         return sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
       case 'area':
-        return sorted.sort((a, b) => (b.area || 0) - (a.area || 0));
+        return sorted.sort((a, b) => (this.getDisplayArea(b) || 0) - (this.getDisplayArea(a) || 0));
       case 'date':
       default:
         return sorted.sort((a, b) => {
@@ -107,6 +107,10 @@ export class PropertyGridComponent implements WebsiteComponentBase, OnInit {
           return dateB - dateA;
         });
     }
+  }
+
+  getDisplayArea(property: Property): number | null {
+    return property.areaPrivativa ?? property.areaConstrutiva ?? property.areaTerreno ?? property.area ?? null;
   }
 
   private getMockProperties(): Property[] {

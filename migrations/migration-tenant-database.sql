@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS properties (
   -- Basic info
   title VARCHAR(255) NOT NULL,
   description TEXT,
-  property_type VARCHAR(50), -- 'casa', 'apartamento', 'terreno', etc.
+  type VARCHAR(50), -- 'casa', 'apartamento', 'terreno', etc.
   transaction_type VARCHAR(50), -- 'venda', 'locacao', 'ambos'
   
   -- Location
@@ -48,6 +48,9 @@ CREATE TABLE IF NOT EXISTS properties (
   -- Status
   status VARCHAR(50) DEFAULT 'active', -- 'active', 'sold', 'rented', 'archived'
   is_featured BOOLEAN DEFAULT false,
+
+  -- Quality score (0-100)
+  quality_score INTEGER,
   
   -- Media
   images JSONB DEFAULT '[]',
@@ -56,10 +59,36 @@ CREATE TABLE IF NOT EXISTS properties (
   
   -- Timestamps
   created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  updated_at TIMESTAMP DEFAULT NOW(),
+  deleted_at TIMESTAMP,
+  CONSTRAINT properties_quality_score_check CHECK (quality_score IS NULL OR (quality_score BETWEEN 0 AND 100))
 );
 
-CREATE INDEX idx_properties_type ON properties(property_type);
+-- Ensure columns exist when the table was created in an older version
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_name = 'properties'
+      AND column_name = 'property_type'
+  ) AND NOT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_name = 'properties'
+      AND column_name = 'type'
+  ) THEN
+    EXECUTE 'ALTER TABLE properties RENAME COLUMN property_type TO type';
+  END IF;
+END $$;
+
+ALTER TABLE properties
+  ADD COLUMN IF NOT EXISTS type VARCHAR(50),
+  ADD COLUMN IF NOT EXISTS transaction_type VARCHAR(50),
+  ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active',
+  ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false;
+
+CREATE INDEX idx_properties_type ON properties(type);
 CREATE INDEX idx_properties_transaction ON properties(transaction_type);
 CREATE INDEX idx_properties_city ON properties(city);
 CREATE INDEX idx_properties_status ON properties(status);
@@ -104,8 +133,12 @@ CREATE TABLE IF NOT EXISTS clients (
   -- Timestamps
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
-  last_contact_at TIMESTAMP
+  last_contact_at TIMESTAMP,
+  deleted_at TIMESTAMP
 );
+
+ALTER TABLE clients
+  ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'new';
 
 CREATE INDEX idx_clients_email ON clients(email);
 CREATE INDEX idx_clients_phone ON clients(phone);
@@ -114,7 +147,66 @@ CREATE INDEX idx_clients_status ON clients(status);
 CREATE INDEX idx_clients_assigned_user ON clients(assigned_user_id);
 
 -- ============================================================================
--- 3. VISITS TABLE (Visitas Agendadas)
+-- 3. LEADS TABLE (Central de Leads)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS leads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  -- Basic info
+  name VARCHAR(255) NOT NULL,
+  phone VARCHAR(50),
+  email VARCHAR(255),
+
+  -- Source and status
+  source VARCHAR(20) NOT NULL, -- 'WHATSAPP', 'SITE', 'PORTAL', 'MANUAL'
+  status VARCHAR(20) NOT NULL, -- 'NEW', 'CONTACTED', 'QUALIFIED', 'LOST', 'CONVERTED'
+
+  -- Assignment and conversion
+  assigned_user_id UUID,
+  converted_client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
+  last_interaction_at TIMESTAMP,
+
+  -- Timestamps
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  deleted_at TIMESTAMP,
+
+  CONSTRAINT leads_source_check CHECK (source IN ('WHATSAPP', 'SITE', 'PORTAL', 'MANUAL')),
+  CONSTRAINT leads_status_check CHECK (status IN ('NEW', 'CONTACTED', 'QUALIFIED', 'LOST', 'CONVERTED'))
+);
+
+CREATE INDEX idx_leads_status ON leads(status);
+CREATE INDEX idx_leads_assigned_user ON leads(assigned_user_id);
+CREATE INDEX idx_leads_last_interaction ON leads(last_interaction_at);
+
+-- ============================================================================
+-- 4. ACTIVITIES TABLE (Timeline Global)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS activities (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+  -- Activity details
+  entity_type VARCHAR(20) NOT NULL, -- 'LEAD', 'CLIENT', 'DEAL', 'PROPERTY'
+  entity_id UUID NOT NULL,
+  type VARCHAR(20) NOT NULL, -- 'NOTE', 'MESSAGE', 'VISIT', 'STATUS', 'SYSTEM'
+  description TEXT,
+  user_id UUID, -- NULL if system action
+
+  -- Timestamps
+  created_at TIMESTAMP DEFAULT NOW(),
+  deleted_at TIMESTAMP,
+
+  CONSTRAINT activities_entity_type_check CHECK (entity_type IN ('LEAD', 'CLIENT', 'DEAL', 'PROPERTY')),
+  CONSTRAINT activities_type_check CHECK (type IN ('NOTE', 'MESSAGE', 'VISIT', 'STATUS', 'SYSTEM'))
+);
+
+CREATE INDEX idx_activities_entity ON activities(entity_type, entity_id);
+CREATE INDEX idx_activities_created_at ON activities(created_at);
+
+-- ============================================================================
+-- 5. VISITS TABLE (Visitas Agendadas)
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS visits (
@@ -145,8 +237,12 @@ CREATE TABLE IF NOT EXISTS visits (
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   completed_at TIMESTAMP,
-  cancelled_at TIMESTAMP
+  cancelled_at TIMESTAMP,
+  deleted_at TIMESTAMP
 );
+
+ALTER TABLE visits
+  ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'scheduled';
 
 CREATE INDEX idx_visits_property_id ON visits(property_id);
 CREATE INDEX idx_visits_client_id ON visits(client_id);
@@ -155,7 +251,49 @@ CREATE INDEX idx_visits_date ON visits(visit_date);
 CREATE INDEX idx_visits_status ON visits(status);
 
 -- ============================================================================
--- 4. STORE_SETTINGS TABLE (Configurações da Loja)
+-- 6. DEAL STAGES TABLE (Pipeline de Negócios)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS deal_stages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(100) NOT NULL,
+  "order" INTEGER NOT NULL,
+  is_won BOOLEAN DEFAULT false,
+  is_lost BOOLEAN DEFAULT false,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  deleted_at TIMESTAMP,
+  CONSTRAINT deal_stages_won_lost_check CHECK (NOT (is_won AND is_lost))
+);
+
+CREATE UNIQUE INDEX idx_deal_stages_order ON deal_stages("order");
+
+-- ============================================================================
+-- 7. DEALS TABLE (Negócios)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS deals (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
+  property_id UUID REFERENCES properties(id) ON DELETE SET NULL,
+  user_id UUID,
+  stage_id UUID REFERENCES deal_stages(id) ON DELETE SET NULL,
+  proposed_value NUMERIC(14,2),
+  status VARCHAR(50),
+  created_at TIMESTAMP DEFAULT NOW(),
+  closed_at TIMESTAMP,
+  deleted_at TIMESTAMP
+);
+
+ALTER TABLE deals
+  ADD COLUMN IF NOT EXISTS status VARCHAR(50);
+
+CREATE INDEX idx_deals_stage_id ON deals(stage_id);
+CREATE INDEX idx_deals_user_id ON deals(user_id);
+CREATE INDEX idx_deals_status ON deals(status);
+
+-- ============================================================================
+-- 8. STORE_SETTINGS TABLE (Configurações da Loja)
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS store_settings (
@@ -208,19 +346,38 @@ CREATE TABLE IF NOT EXISTS website_layouts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
   -- Layout info
+  company_id UUID,
   name VARCHAR(100) NOT NULL,
-  template VARCHAR(50) NOT NULL, -- 'modern', 'classic', 'minimalist', etc.
+  page_type VARCHAR(50) NOT NULL, -- 'home', 'properties', 'contact', etc.
+  slug VARCHAR(100),
   is_active BOOLEAN DEFAULT false,
+  is_default BOOLEAN DEFAULT false,
   
   -- Configuration (JSON)
-  header_config JSONB DEFAULT '{}',
-  footer_config JSONB DEFAULT '{}',
-  sections_config JSONB DEFAULT '[]',
+  layout_config JSONB DEFAULT '{}',
+  meta_title VARCHAR(255),
+  meta_description TEXT,
+  meta_keywords TEXT,
   
   -- Timestamps
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
+
+ALTER TABLE website_layouts
+  ADD COLUMN IF NOT EXISTS company_id UUID,
+  ADD COLUMN IF NOT EXISTS page_type VARCHAR(50),
+  ADD COLUMN IF NOT EXISTS slug VARCHAR(100),
+  ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS is_default BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS layout_config JSONB DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS meta_title VARCHAR(255),
+  ADD COLUMN IF NOT EXISTS meta_description TEXT,
+  ADD COLUMN IF NOT EXISTS meta_keywords TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_website_layouts_company_id ON website_layouts(company_id);
+CREATE INDEX IF NOT EXISTS idx_website_layouts_page_type ON website_layouts(page_type);
+CREATE INDEX IF NOT EXISTS idx_website_layouts_active ON website_layouts(is_active);
 
 -- ============================================================================
 -- 6. WHATSAPP_MESSAGES TABLE (Mensagens WhatsApp)
@@ -276,7 +433,40 @@ CREATE TABLE IF NOT EXISTS property_documents (
 CREATE INDEX idx_property_documents_property_id ON property_documents(property_id);
 
 -- ============================================================================
--- 8. ACTIVITY_LOG TABLE (Log de Atividades)
+-- 8. AUTOMATION_RULES TABLE (Automacao)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS automation_rules (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trigger VARCHAR(50) NOT NULL, -- 'NEW_LEAD', 'NO_RESPONSE_24H', 'DEAL_STAGE_CHANGED'
+  condition JSONB,
+  action JSONB NOT NULL, -- 'CREATE_TASK', 'SEND_WHATSAPP', 'SEND_EMAIL'
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  deleted_at TIMESTAMP
+);
+
+CREATE INDEX idx_automation_rules_trigger ON automation_rules(trigger);
+
+-- ============================================================================
+-- 9. KPI_SNAPSHOTS TABLE (Métricas do Dashboard)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS kpi_snapshots (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  date DATE NOT NULL,
+  leads_new INTEGER DEFAULT 0,
+  visits_done INTEGER DEFAULT 0,
+  deals_won INTEGER DEFAULT 0,
+  conversion_rate NUMERIC(6,2) DEFAULT 0,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX idx_kpi_snapshots_date ON kpi_snapshots(date);
+
+-- ============================================================================
+-- 10. ACTIVITY_LOG TABLE (Log de Atividades)
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS activity_log (
@@ -323,6 +513,15 @@ CREATE TRIGGER update_visits_updated_at BEFORE UPDATE ON visits
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_store_settings_updated_at BEFORE UPDATE ON store_settings
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_leads_updated_at BEFORE UPDATE ON leads
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_deal_stages_updated_at BEFORE UPDATE ON deal_stages
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_automation_rules_updated_at BEFORE UPDATE ON automation_rules
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================================================

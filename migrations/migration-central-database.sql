@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS companies (
   document VARCHAR(50),
   email VARCHAR(255) NOT NULL,
   phone VARCHAR(50),
+  footer_config JSONB,
   
   -- Multi-tenant configuration
   database_name VARCHAR(100) NOT NULL UNIQUE,

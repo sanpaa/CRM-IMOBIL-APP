@@ -10,6 +10,7 @@ import { ComponentRegistryService } from '../../shared/website-components/compon
 import { RenderComponentDirective } from '../../shared/website-components/render-component.directive';
 import { PropertyEditorComponent } from '../../shared/property-editor/property-editor.component';
 import { ComponentMetadata } from '../../shared/website-components/component-base.interface';
+import { PopupService } from '../../shared/services/popup.service';
 
 @Component({
   selector: 'app-website-builder',
@@ -24,6 +25,15 @@ export class WebsiteBuilderComponent implements OnInit {
   sections: LayoutSection[] = [];
   
   availableComponents: ComponentMetadata[] = [];
+  componentSearch = '';
+  zoomLevels = [0.5, 0.75, 1, 1.25];
+  zoomLevel = 1;
+  hasUnsavedChanges = false;
+  autoSaveEnabled = true;
+  lastSavedAt: Date | null = null;
+  isRestoringHistory = false;
+  history: LayoutSection[][] = [];
+  historyIndex = -1;
   selectedSection: LayoutSection | null = null;
   
   loading = false;
@@ -49,15 +59,22 @@ export class WebsiteBuilderComponent implements OnInit {
     slug: ''
   };
 
+  private autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
+  private historyTimer: ReturnType<typeof setTimeout> | null = null;
+
   constructor(
     private customizationService: WebsiteCustomizationService,
     private componentRegistry: ComponentRegistryService,
-    public authService: AuthService
+    public authService: AuthService,
+    private popupService: PopupService
   ) {}
 
   async ngOnInit() {
     if (!this.authService.isAdmin()) {
-      alert('Apenas administradores podem acessar o construtor de sites');
+      await this.popupService.alert('Apenas administradores podem acessar o construtor de sites', {
+        title: 'Aviso',
+        tone: 'warning'
+      });
       return;
     }
     
@@ -78,7 +95,7 @@ export class WebsiteBuilderComponent implements OnInit {
       }
     } catch (error) {
       console.error('Error loading layouts:', error);
-      alert('Erro ao carregar layouts');
+      this.popupService.alert('Erro ao carregar layouts', { title: 'Aviso', tone: 'warning' });
     } finally {
       this.loading = false;
     }
@@ -89,11 +106,12 @@ export class WebsiteBuilderComponent implements OnInit {
     this.sections = [...(layout.layout_config?.sections || [])];
     this.sections.sort((a, b) => a.order - b.order);
     this.selectedSection = null;
+    this.resetHistory();
   }
 
   async createNewLayout() {
     if (!this.newLayoutData.name || !this.newLayoutData.page_type) {
-      alert('Preencha todos os campos obrigatórios');
+      this.popupService.alert('Preencha todos os campos obrigatórios', { title: 'Aviso', tone: 'warning' });
       return;
     }
 
@@ -119,10 +137,10 @@ export class WebsiteBuilderComponent implements OnInit {
       this.showLayoutForm = false;
       this.newLayoutData = { name: '', page_type: 'home', slug: '' };
       
-      alert('Layout criado com sucesso!');
+      this.popupService.alert('Layout criado com sucesso!', { title: 'Sucesso', tone: 'info' });
     } catch (error) {
       console.error('Error creating layout:', error);
-      alert('Erro ao criar layout');
+      this.popupService.alert('Erro ao criar layout', { title: 'Aviso', tone: 'warning' });
     } finally {
       this.saving = false;
     }
@@ -152,6 +170,9 @@ export class WebsiteBuilderComponent implements OnInit {
 
     this.sections.push(newSection);
     this.selectedSection = newSection;
+    this.updateSectionOrder();
+    this.recordHistory();
+    this.markDirty();
   }
 
 
@@ -168,6 +189,8 @@ export class WebsiteBuilderComponent implements OnInit {
     if (event.previousContainer === event.container) {
       moveItemInArray(this.sections, event.previousIndex, event.currentIndex);
       this.updateSectionOrder();
+      this.recordHistory();
+      this.markDirty();
     }
   }
 
@@ -189,6 +212,8 @@ export class WebsiteBuilderComponent implements OnInit {
       if (this.selectedSection === section) {
         this.selectedSection = null;
       }
+      this.recordHistory();
+      this.markDirty();
     }
   }
 
@@ -202,9 +227,11 @@ export class WebsiteBuilderComponent implements OnInit {
     const index = this.sections.indexOf(section);
     this.sections.splice(index + 1, 0, duplicate);
     this.updateSectionOrder();
+    this.recordHistory();
+    this.markDirty();
   }
 
-  async saveLayout() {
+  async saveLayout(silent: boolean = false) {
     if (!this.currentLayout) return;
 
     this.saving = true;
@@ -214,10 +241,14 @@ export class WebsiteBuilderComponent implements OnInit {
       };
 
       await this.customizationService.updateLayoutConfig(this.currentLayout.id, layoutConfig);
-      alert('Layout salvo com sucesso!');
+      this.hasUnsavedChanges = false;
+      this.lastSavedAt = new Date();
+      if (!silent) {
+        this.popupService.alert('Layout salvo com sucesso!', { title: 'Sucesso', tone: 'info' });
+      }
     } catch (error) {
       console.error('Error saving layout:', error);
-      alert('Erro ao salvar layout');
+      this.popupService.alert('Erro ao salvar layout', { title: 'Aviso', tone: 'warning' });
     } finally {
       this.saving = false;
     }
@@ -226,30 +257,40 @@ export class WebsiteBuilderComponent implements OnInit {
   async publishLayout() {
     if (!this.currentLayout) return;
 
-    if (confirm('Deseja publicar este layout? Ele ficará visível no site.')) {
-      try {
-        await this.customizationService.setDefaultLayout(this.currentLayout.id);
-        alert('Layout publicado com sucesso!');
-        await this.loadLayouts();
-      } catch (error) {
-        console.error('Error publishing layout:', error);
-        alert('Erro ao publicar layout');
-      }
+    const confirmed = await this.popupService.confirm('Deseja publicar este layout? Ele ficará visível no site.', {
+      title: 'Publicar layout',
+      confirmText: 'Publicar',
+      cancelText: 'Cancelar',
+      tone: 'warning'
+    });
+    if (!confirmed) return;
+    try {
+      await this.customizationService.setDefaultLayout(this.currentLayout.id);
+      this.popupService.alert('Layout publicado com sucesso!', { title: 'Sucesso', tone: 'info' });
+      await this.loadLayouts();
+    } catch (error) {
+      console.error('Error publishing layout:', error);
+      this.popupService.alert('Erro ao publicar layout', { title: 'Aviso', tone: 'warning' });
     }
   }
 
   async deleteLayout() {
     if (!this.currentLayout) return;
 
-    if (confirm('Tem certeza que deseja excluir este layout?')) {
-      try {
-        await this.customizationService.deleteLayout(this.currentLayout.id);
-        alert('Layout excluído com sucesso!');
-        await this.loadLayouts();
-      } catch (error) {
-        console.error('Error deleting layout:', error);
-        alert('Erro ao excluir layout');
-      }
+    const confirmed = await this.popupService.confirm('Tem certeza que deseja excluir este layout?', {
+      title: 'Excluir layout',
+      confirmText: 'Excluir',
+      cancelText: 'Cancelar',
+      tone: 'danger'
+    });
+    if (!confirmed) return;
+    try {
+      await this.customizationService.deleteLayout(this.currentLayout.id);
+      this.popupService.alert('Layout excluído com sucesso!', { title: 'Sucesso', tone: 'info' });
+      await this.loadLayouts();
+    } catch (error) {
+      console.error('Error deleting layout:', error);
+      this.popupService.alert('Erro ao excluir layout', { title: 'Aviso', tone: 'warning' });
     }
   }
 
@@ -283,10 +324,101 @@ export class WebsiteBuilderComponent implements OnInit {
   onConfigChange(config: any): void {
     // Config updated through property editor
     // The section reference is already updated
+    this.scheduleHistorySnapshot();
+    this.markDirty();
   }
 
   onStyleChange(style: any): void {
     // Style updated through property editor
     // The section reference is already updated
+    this.scheduleHistorySnapshot();
+    this.markDirty();
+  }
+
+  get filteredComponents(): ComponentMetadata[] {
+    const query = this.componentSearch.trim().toLowerCase();
+    if (!query) return this.availableComponents;
+    return this.availableComponents.filter(component =>
+      component.label.toLowerCase().includes(query) ||
+      component.type.toLowerCase().includes(query) ||
+      (component.description || '').toLowerCase().includes(query)
+    );
+  }
+
+  setZoom(level: number) {
+    this.zoomLevel = level;
+  }
+
+  undo() {
+    if (this.historyIndex <= 0) return;
+    this.restoreHistory(this.historyIndex - 1);
+  }
+
+  redo() {
+    if (this.historyIndex >= this.history.length - 1) return;
+    this.restoreHistory(this.historyIndex + 1);
+  }
+
+  get canUndo(): boolean {
+    return this.historyIndex > 0;
+  }
+
+  get canRedo(): boolean {
+    return this.historyIndex < this.history.length - 1;
+  }
+
+  private markDirty() {
+    this.hasUnsavedChanges = true;
+    if (this.autoSaveEnabled) {
+      this.scheduleAutoSave();
+    }
+  }
+
+  private scheduleAutoSave() {
+    if (this.autoSaveTimer) {
+      clearTimeout(this.autoSaveTimer);
+    }
+    this.autoSaveTimer = setTimeout(() => {
+      if (this.hasUnsavedChanges && !this.saving) {
+        this.saveLayout(true);
+      }
+    }, 800);
+  }
+
+  private scheduleHistorySnapshot() {
+    if (this.isRestoringHistory) return;
+    if (this.historyTimer) {
+      clearTimeout(this.historyTimer);
+    }
+    this.historyTimer = setTimeout(() => {
+      this.recordHistory();
+    }, 400);
+  }
+
+  private recordHistory() {
+    if (this.isRestoringHistory) return;
+    const snapshot = JSON.parse(JSON.stringify(this.sections)) as LayoutSection[];
+    this.history = this.history.slice(0, this.historyIndex + 1);
+    this.history.push(snapshot);
+    this.historyIndex = this.history.length - 1;
+  }
+
+  private restoreHistory(index: number) {
+    const snapshot = this.history[index];
+    if (!snapshot) return;
+    this.isRestoringHistory = true;
+    this.sections = JSON.parse(JSON.stringify(snapshot));
+    this.sections.sort((a, b) => a.order - b.order);
+    this.selectedSection = null;
+    this.historyIndex = index;
+    this.isRestoringHistory = false;
+  }
+
+  private resetHistory() {
+    this.history = [];
+    this.historyIndex = -1;
+    this.recordHistory();
+    this.hasUnsavedChanges = false;
+    this.lastSavedAt = null;
   }
 }

@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { SubscriptionService } from '../services/subscription.service';
+import { PopupService } from '../shared/services/popup.service';
 import { map, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
@@ -18,6 +19,7 @@ export function subscriptionGuard(requiredFeature?: string): CanActivateFn {
   return () => {
     const subscriptionService = inject(SubscriptionService);
     const router = inject(Router);
+    const popupService = inject(PopupService);
 
     // Se não há feature requerida, permite acesso
     if (!requiredFeature) {
@@ -30,9 +32,10 @@ export function subscriptionGuard(requiredFeature?: string): CanActivateFn {
           return true;
         } else {
           // Exibe alerta e redireciona para página de assinatura
-          alert(
+          popupService.alert(
             `Recurso '${requiredFeature}' não disponível no seu plano ${response.planName}.\n` +
-            'Faça upgrade para ter acesso a este recurso!'
+            'Faça upgrade para ter acesso a este recurso!',
+            { title: 'Aviso', tone: 'warning' }
           );
           router.navigate(['/subscription']);
           return false;

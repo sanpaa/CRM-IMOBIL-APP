@@ -6,6 +6,115 @@
   color: #1e293b;
 }
 
+.owner-modal {
+  max-width: 640px;
+  padding: 0;
+  border-radius: 16px;
+  border: 1px solid var(--color-border-light);
+  background: var(--color-bg-secondary);
+  overflow: hidden;
+}
+
+.owner-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.owner-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.owner-title-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--color-primary);
+  font-size: 1rem;
+}
+
+.owner-title-text h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+.owner-modal .close-btn {
+  background: transparent;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  color: var(--color-text-tertiary);
+  font-size: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.owner-modal .close-btn:hover {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+}
+
+.owner-form {
+  padding: 0;
+}
+
+.owner-modal-body {
+  padding: 1.5rem 2rem 1rem;
+}
+
+.owner-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+
+.owner-form-grid .form-group.full {
+  grid-column: 1 / -1;
+}
+
+.owner-form-grid label {
+  margin-bottom: 0.5rem;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.owner-form-grid .form-control {
+  border-radius: 10px;
+  background: var(--color-bg-secondary);
+}
+
+.owner-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.25rem 2rem 1.75rem;
+  border-top: 1px solid var(--color-border-light);
+  background: var(--color-bg-secondary);
+}
+
+.owner-modal-footer .btn-primary {
+  padding: 0.75rem 1.5rem;
+}
+
+.owner-modal-footer .btn-secondary {
+  background: transparent;
+}
+
 .properties-content {
   padding: 2rem;
   max-height: 500px;
@@ -62,4 +171,21 @@
   padding: 3rem;
   color: #94a3b8;
   font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .owner-modal {
+    width: 95%;
+  }
+
+  .owner-modal-header,
+  .owner-modal-body,
+  .owner-modal-footer {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .owner-form-grid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -22,7 +22,7 @@ Chart.register(...registerables);
       <header class="page-header">
         <div class="header-content">
           <div class="header-text">
-            <h1>Olá, {{ displayName }}!</h1>
+            <h1>Olá, <span class="header-name" [class.is-loading]="isLoadingStats">{{ isLoadingStats ? 'Carregando' : displayName }}</span>!</h1>
             <p class="header-subtitle">Bem-vindo de volta.</p>
           </div>
           <app-global-search class="header-search"></app-global-search>
@@ -86,6 +86,12 @@ Chart.register(...registerables);
             </div>
             <div class="chart-container chart-container-wide">
               <canvas #monthlyChart></canvas>
+              <div class="chart-overlay chart-loading" *ngIf="isLoadingStats">
+                <div class="shimmer-block shimmer-chart"></div>
+              </div>
+              <div class="chart-overlay chart-empty" *ngIf="!isLoadingStats && !hasMonthlyData">
+                <span>Sem dados para exibir</span>
+              </div>
             </div>
           </div>
 
@@ -96,6 +102,12 @@ Chart.register(...registerables);
             </div>
             <div class="chart-container">
               <canvas #clientsChart></canvas>
+              <div class="chart-overlay chart-loading" *ngIf="isLoadingStats">
+                <div class="shimmer-block shimmer-chart"></div>
+              </div>
+              <div class="chart-overlay chart-empty" *ngIf="!isLoadingStats && !hasClientsData">
+                <span>Sem dados para exibir</span>
+              </div>
             </div>
           </div>
 
@@ -106,6 +118,12 @@ Chart.register(...registerables);
             </div>
             <div class="chart-container">
               <canvas #dealsChart></canvas>
+              <div class="chart-overlay chart-loading" *ngIf="isLoadingStats">
+                <div class="shimmer-block shimmer-chart"></div>
+              </div>
+              <div class="chart-overlay chart-empty" *ngIf="!isLoadingStats && !hasDealsData">
+                <span>Sem dados para exibir</span>
+              </div>
             </div>
           </div>
         </div>
@@ -167,6 +185,30 @@ Chart.register(...registerables);
       color: var(--color-text-primary);
       font-size: 2rem;
       font-weight: 700;
+    }
+
+    .header-name {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-width: 120px;
+    }
+
+    .header-name.is-loading {
+      color: transparent;
+    }
+
+    .header-name.is-loading::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 70%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      background-size: 220% 100%;
+      animation: shimmer 1.2s ease-in-out infinite;
+      background-color: rgba(148, 163, 184, 0.35);
     }
 
     .header-subtitle {
@@ -309,6 +351,44 @@ Chart.register(...registerables);
       height: 260px;
     }
 
+    .chart-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      border-radius: 10px;
+    }
+
+    .chart-loading {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(2px);
+    }
+
+    .chart-empty span {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      background: rgba(148, 163, 184, 0.12);
+      padding: 0.4rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--color-border-light);
+    }
+
+    .shimmer-block {
+      width: 70%;
+      height: 60%;
+      border-radius: 12px;
+      background: linear-gradient(90deg, rgba(148, 163, 184, 0.2), rgba(148, 163, 184, 0.5), rgba(148, 163, 184, 0.2));
+      background-size: 200% 100%;
+      animation: shimmer 1.2s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
     .quick-actions {
       background: var(--color-bg-secondary);
       padding: 1.75rem;
@@ -424,6 +504,10 @@ Chart.register(...registerables);
     :host-context(body[data-theme='dark']) .action-icon {
       background: rgba(59, 130, 246, 0.2);
     }
+
+    :host-context(body[data-theme='dark']) .chart-loading {
+      background: rgba(15, 23, 42, 0.55);
+    }
   `]
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -443,6 +527,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private clientsData: any[] = [];
   private dealsData: any[] = [];
   private monthlyData: { clients: number[], properties: number[] } = { clients: [], properties: [] };
+
+  isLoadingStats = true;
+  hasClientsData = false;
+  hasDealsData = false;
+  hasMonthlyData = false;
 
   private charts: any[] = [];
   private themeObserver?: MutationObserver;
@@ -506,6 +595,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async loadStats() {
+    this.isLoadingStats = true;
     try {
       const [clients, properties, visits, deals] = await Promise.all([
         this.clientService.getAll(),
@@ -533,6 +623,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     } catch (error) {
       console.error('Error loading stats:', error);
+    } finally {
+      this.isLoadingStats = false;
     }
   }
 
@@ -606,6 +698,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       clients: monthlyClients,
       properties: monthlyProperties
     };
+
+    this.hasClientsData = this.sumArray(this.clientsData) > 0;
+    this.hasDealsData = this.sumArray(this.dealsData) > 0;
+    this.hasMonthlyData = (this.sumArray(monthlyClients) + this.sumArray(monthlyProperties)) > 0;
+  }
+
+  private sumArray(values: number[]): number {
+    return values.reduce((total, value) => total + (Number.isFinite(value) ? value : 0), 0);
   }
 
   getMonthDifference(date1: Date, date2: Date): number {

@@ -120,16 +120,16 @@ export class PublicSiteConfigService {
 
     // Apply filters
     if (filters?.type) {
-      query = query.eq('property_type', filters.type);
+      query = query.eq('type', filters.type);
     }
     if (filters?.city) {
       query = query.eq('city', filters.city);
     }
     if (filters?.minPrice) {
-      query = query.gte('value', filters.minPrice);
+      query = query.gte('price', filters.minPrice);
     }
     if (filters?.maxPrice) {
-      query = query.lte('value', filters.maxPrice);
+      query = query.lte('price', filters.maxPrice);
     }
 
     const { data, error } = await query.order('created_at', { ascending: false });

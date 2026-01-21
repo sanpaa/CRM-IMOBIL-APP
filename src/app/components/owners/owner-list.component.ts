@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 import { Owner } from '../../models/owner.model';
 import { Property } from '../../models/property.model';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner.component';
+import { PopupService } from '../../shared/services/popup.service';
 
 @Component({
   selector: 'app-owner-list',
@@ -35,7 +36,8 @@ export class OwnerListComponent implements OnInit {
   constructor(
     private ownerService: OwnerService,
     private propertyService: PropertyService,
-    public authService: AuthService
+    public authService: AuthService,
+    private popupService: PopupService
   ) {
     this.resetForm();
   }
@@ -104,6 +106,42 @@ export class OwnerListComponent implements OnInit {
     this.resetForm();
   }
 
+  onCpfInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const digits = (input.value || '').replace(/\D/g, '').slice(0, 11);
+    let formatted = digits;
+    if (digits.length > 3) {
+      formatted = `${digits.slice(0, 3)}.${digits.slice(3)}`;
+    }
+    if (digits.length > 6) {
+      formatted = `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+    }
+    if (digits.length > 9) {
+      formatted = `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+    }
+    this.formData.cpf = formatted;
+    input.value = formatted;
+  }
+
+  onPhoneInput(event: Event, field: 'phone' | 'whatsapp') {
+    const input = event.target as HTMLInputElement;
+    const digits = (input.value || '').replace(/\D/g, '').slice(0, 11);
+    let formatted = digits;
+    if (digits.length > 2) {
+      const ddd = digits.slice(0, 2);
+      const rest = digits.slice(2);
+      if (rest.length > 5) {
+        formatted = `(${ddd}) ${rest.slice(0, 5)}-${rest.slice(5)}`;
+      } else if (rest.length > 4) {
+        formatted = `(${ddd}) ${rest.slice(0, 4)}-${rest.slice(4)}`;
+      } else {
+        formatted = `(${ddd}) ${rest}`;
+      }
+    }
+    this.formData[field] = formatted;
+    input.value = formatted;
+  }
+
   async saveOwner() {
     try {
       if (this.editingOwner) {
@@ -115,24 +153,29 @@ export class OwnerListComponent implements OnInit {
       await this.loadOwners();
     } catch (error) {
       console.error('Error saving owner:', error);
-      alert('Erro ao salvar proprietário');
+      this.popupService.alert('Erro ao salvar proprietário', { title: 'Aviso', tone: 'warning' });
     }
   }
 
   async deleteOwner(id: string) {
     if (!this.authService.isAdmin()) {
-      alert('Apenas administradores podem excluir proprietários');
+      this.popupService.alert('Apenas administradores podem excluir proprietários', { title: 'Aviso', tone: 'warning' });
       return;
     }
     
-    if (confirm('Tem certeza que deseja excluir este proprietário?')) {
-      try {
-        await this.ownerService.delete(id);
-        await this.loadOwners();
-      } catch (error) {
-        console.error('Error deleting owner:', error);
-        alert('Erro ao excluir proprietário');
-      }
+    const confirmed = await this.popupService.confirm('Tem certeza que deseja excluir este proprietário?', {
+      title: 'Excluir proprietário',
+      confirmText: 'Excluir',
+      cancelText: 'Cancelar',
+      tone: 'danger'
+    });
+    if (!confirmed) return;
+    try {
+      await this.ownerService.delete(id);
+      await this.loadOwners();
+    } catch (error) {
+      console.error('Error deleting owner:', error);
+      this.popupService.alert('Erro ao excluir proprietário', { title: 'Aviso', tone: 'warning' });
     }
   }
 

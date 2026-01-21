@@ -7,8 +7,20 @@
     </div>
   </div>
 
+  <div class="editor-tabs">
+    <button type="button" class="tab-btn" [class.active]="activeTab === 'content'" (click)="setTab('content')">
+      Conteudo
+    </button>
+    <button type="button" class="tab-btn" [class.active]="activeTab === 'style'" (click)="setTab('style')">
+      Estilo
+    </button>
+    <button type="button" class="tab-btn" [class.active]="activeTab === 'responsive'" (click)="setTab('responsive')">
+      Responsivo
+    </button>
+  </div>
+
   <!-- Configuration Fields -->
-  <div class="editor-section" *ngIf="configFields.length > 0">
+  <div class="editor-section" *ngIf="configFields.length > 0 && activeTab === 'content'">
     <h4>Configurações</h4>
     
     <div class="form-group" *ngFor="let field of configFields; trackBy: trackByKey">
@@ -96,12 +108,14 @@
                 <label>{{ subField.label }}</label>
                 <input *ngIf="subField.type === 'text'"
                        type="text"
-                       [value]="item[subField.key]"
-                       (input)="updateArrayItem(field, i, subField.key, $any($event.target).value)"
+                       [name]="field.key + '-' + i + '-' + subField.key"
+                       [(ngModel)]="item[subField.key]"
+                       (ngModelChange)="updateArrayItem(field, i, subField.key, $event)"
                        class="form-control">
                 <textarea *ngIf="subField.type === 'textarea'"
-                          [value]="item[subField.key]"
-                          (input)="updateArrayItem(field, i, subField.key, $any($event.target).value)"
+                          [name]="field.key + '-' + i + '-' + subField.key"
+                          [(ngModel)]="item[subField.key]"
+                          (ngModelChange)="updateArrayItem(field, i, subField.key, $event)"
                           rows="2"
                           class="form-control"></textarea>
               </div>
@@ -114,7 +128,7 @@
   </div>
 
   <!-- Style Fields -->
-  <div class="editor-section" *ngIf="styleFields.length > 0">
+  <div class="editor-section" *ngIf="styleFields.length > 0 && activeTab === 'style'">
     <h4>Estilo</h4>
     
     <div class="form-group" *ngFor="let field of styleFields; trackBy: trackByKey">
@@ -148,6 +162,13 @@
         (input)="onFieldChange(field, $event, true)"
         class="form-control">
     </div>
+  </div>
+
+  <div class="editor-section" *ngIf="activeTab === 'responsive'">
+    <h4>Responsividade</h4>
+    <p class="responsive-hint">
+      Ajustes por breakpoint vao ficar disponiveis aqui. Use o preview para validar tablet e mobile.
+    </p>
   </div>
 
   <!-- Section Info -->

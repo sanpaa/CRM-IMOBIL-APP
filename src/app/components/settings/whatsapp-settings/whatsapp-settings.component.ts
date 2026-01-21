@@ -5,6 +5,7 @@ import { WhatsAppService } from '../../../services/whatsapp.service';
 import { WhatsAppConnectionStatus } from '../../../models/whatsapp-connection.model';
 import { SupabaseService } from '../../../services/supabase.service';
 import { Subscription } from 'rxjs';
+import { PopupService } from '../../../shared/services/popup.service';
 
 @Component({
   selector: 'app-whatsapp-settings',
@@ -170,12 +171,12 @@ import { Subscription } from 'rxjs';
     .settings-header h2 {
       font-size: 2rem;
       font-weight: 700;
-      color: #1a1a1a;
+      color: var(--color-text-primary);
       margin-bottom: 0.5rem;
     }
 
     .subtitle {
-      color: #666;
+      color: var(--color-text-secondary);
       font-size: 1rem;
     }
 
@@ -184,6 +185,7 @@ import { Subscription } from 'rxjs';
       border-radius: 12px;
       padding: 2rem;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--color-border-light);
       margin-bottom: 2rem;
     }
 
@@ -199,8 +201,8 @@ import { Subscription } from 'rxjs';
       align-items: center;
       justify-content: center;
       border-radius: 50%;
-      background: #f5f5f5;
-      color: #666;
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-secondary);
     }
 
     .status-icon.success {
@@ -217,11 +219,11 @@ import { Subscription } from 'rxjs';
       font-size: 1.5rem;
       font-weight: 600;
       margin-bottom: 0.5rem;
-      color: #1a1a1a;
+      color: var(--color-text-primary);
     }
 
     .status-section p {
-      color: #666;
+      color: var(--color-text-secondary);
       margin-bottom: 1.5rem;
     }
 
@@ -240,7 +242,7 @@ import { Subscription } from 'rxjs';
       background: var(--color-bg-secondary);
       padding: 1.5rem;
       border-radius: 12px;
-      border: 2px solid #e5e5e5;
+      border: 2px solid var(--color-border-light);
       margin: 1.5rem 0;
       display: inline-block;
     }
@@ -253,7 +255,7 @@ import { Subscription } from 'rxjs';
 
     .qr-instructions {
       text-align: left;
-      background: #f9fafb;
+      background: var(--color-bg-tertiary);
       padding: 1.5rem;
       border-radius: 8px;
       margin: 1.5rem 0;
@@ -266,11 +268,11 @@ import { Subscription } from 'rxjs';
 
     .qr-instructions li {
       margin: 0.5rem 0;
-      color: #4b5563;
+      color: var(--color-text-secondary);
     }
 
     .connected-info {
-      background: #f9fafb;
+      background: var(--color-bg-tertiary);
       border-radius: 8px;
       padding: 1.5rem;
       margin: 1.5rem 0;
@@ -281,7 +283,7 @@ import { Subscription } from 'rxjs';
       align-items: center;
       gap: 0.75rem;
       margin: 0.75rem 0;
-      color: #4b5563;
+      color: var(--color-text-secondary);
     }
 
     .info-item svg {
@@ -292,7 +294,7 @@ import { Subscription } from 'rxjs';
     .loading-spinner {
       width: 48px;
       height: 48px;
-      border: 4px solid #f3f3f3;
+      border: 4px solid var(--color-border-light);
       border-top: 4px solid #25D366;
       border-radius: 50%;
       animation: spin 1s linear infinite;
@@ -331,12 +333,12 @@ import { Subscription } from 'rxjs';
     }
 
     .btn-secondary {
-      background: #e5e5e5;
-      color: #666;
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-secondary);
     }
 
     .btn-secondary:hover:not(:disabled) {
-      background: #d4d4d4;
+      background: var(--color-border-light);
     }
 
     .btn-danger {
@@ -355,10 +357,10 @@ import { Subscription } from 'rxjs';
       align-items: center;
       gap: 0.75rem;
       padding: 1rem;
-      background: #fef2f2;
-      border: 1px solid #fecaca;
+      background: var(--color-danger-light);
+      border: 1px solid var(--color-danger);
       border-radius: 8px;
-      color: #dc2626;
+      color: var(--color-danger);
       margin-top: 1rem;
     }
 
@@ -367,13 +369,14 @@ import { Subscription } from 'rxjs';
       border-radius: 12px;
       padding: 2rem;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--color-border-light);
     }
 
     .info-card h3 {
       font-size: 1.25rem;
       font-weight: 600;
       margin-bottom: 1.5rem;
-      color: #1a1a1a;
+      color: var(--color-text-primary);
     }
 
     .info-content {
@@ -385,11 +388,11 @@ import { Subscription } from 'rxjs';
       font-size: 1rem;
       font-weight: 600;
       margin-bottom: 0.5rem;
-      color: #1a1a1a;
+      color: var(--color-text-primary);
     }
 
     .info-block p {
-      color: #666;
+      color: var(--color-text-secondary);
       line-height: 1.6;
       margin: 0;
     }
@@ -419,11 +422,12 @@ import { Subscription } from 'rxjs';
       background: var(--color-bg-secondary);
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--color-border-light);
     }
 
     .loading-container p {
       margin-top: 1rem;
-      color: #666;
+      color: var(--color-text-secondary);
       font-weight: 500;
     }
 
@@ -434,6 +438,7 @@ import { Subscription } from 'rxjs';
       background: var(--color-bg-secondary);
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--color-border-light);
       text-align: center;
     }
 
@@ -444,18 +449,18 @@ import { Subscription } from 'rxjs';
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #fef2f2;
+      background: var(--color-danger-light);
       border-radius: 50%;
-      color: #dc2626;
+      color: var(--color-danger);
     }
 
     .auth-error-container h3 {
-      color: #dc2626;
+      color: var(--color-danger);
       margin-bottom: 0.5rem;
     }
 
     .auth-error-container p {
-      color: #666;
+      color: var(--color-text-secondary);
       margin-bottom: 1.5rem;
       line-height: 1.6;
     }
@@ -477,7 +482,8 @@ export class WhatsAppSettingsComponent implements OnInit, OnDestroy {
   constructor(
     private whatsappService: WhatsAppService,
     private supabaseService: SupabaseService,
-    private routerService: Router
+    private routerService: Router,
+    private popupService: PopupService
   ) {
     this.router = this.routerService;
   }
@@ -543,9 +549,16 @@ export class WhatsAppSettingsComponent implements OnInit, OnDestroy {
   }
 
   async disconnectWhatsApp(): Promise<void> {
-    if (!confirm('Tem certeza que deseja desconectar o WhatsApp? Você precisará escanear o QR code novamente para reconectar.')) {
-      return;
-    }
+    const confirmed = await this.popupService.confirm(
+      'Tem certeza que deseja desconectar o WhatsApp? Você precisará escanear o QR code novamente para reconectar.',
+      {
+        title: 'Desconectar WhatsApp',
+        confirmText: 'Desconectar',
+        cancelText: 'Cancelar',
+        tone: 'danger'
+      }
+    );
+    if (!confirmed) return;
 
     try {
       this.isLoading = true;

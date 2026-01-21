@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ReminderSettingsService } from '../../services/reminder-settings.service';
 import { AuthService } from '../../services/auth.service';
 import { ReminderSettings } from '../../models/reminder-settings.model';
+import { PopupService } from '../../shared/services/popup.service';
 
 @Component({
   selector: 'app-settings',
@@ -19,7 +20,8 @@ export class SettingsComponent implements OnInit {
 
   constructor(
     private reminderSettingsService: ReminderSettingsService,
-    public authService: AuthService
+    public authService: AuthService,
+    private popupService: PopupService
   ) {}
 
   async ngOnInit() {
@@ -54,18 +56,18 @@ export class SettingsComponent implements OnInit {
 
   async saveSettings() {
     if (!this.authService.isAdmin()) {
-      alert('Apenas administradores podem alterar as configurações');
+      this.popupService.alert('Apenas administradores podem alterar as configurações', { title: 'Aviso', tone: 'warning' });
       return;
     }
 
     this.saving = true;
     try {
       await this.reminderSettingsService.createOrUpdate(this.formData);
-      alert('Configurações salvas com sucesso!');
+      this.popupService.alert('Configurações salvas com sucesso!', { title: 'Sucesso', tone: 'info' });
       await this.loadSettings();
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Erro ao salvar configurações');
+      this.popupService.alert('Erro ao salvar configurações', { title: 'Aviso', tone: 'warning' });
     } finally {
       this.saving = false;
     }

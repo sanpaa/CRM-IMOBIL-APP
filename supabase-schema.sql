@@ -8,7 +8,12 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ============================================
 -- DROP EXISTING TABLES (USE WITH CAUTION - DELETES ALL DATA!)
 -- ============================================
+DROP TABLE IF EXISTS kpi_snapshots CASCADE;
+DROP TABLE IF EXISTS automation_rules CASCADE;
+DROP TABLE IF EXISTS activities CASCADE;
+DROP TABLE IF EXISTS leads CASCADE;
 DROP TABLE IF EXISTS deals CASCADE;
+DROP TABLE IF EXISTS deal_stages CASCADE;
 DROP TABLE IF EXISTS visits CASCADE;
 DROP TABLE IF EXISTS clients CASCADE;
 DROP TABLE IF EXISTS properties CASCADE;
@@ -92,11 +97,14 @@ CREATE TABLE properties (
     contact VARCHAR(50) NOT NULL,
     featured BOOLEAN DEFAULT FALSE,
     sold BOOLEAN DEFAULT FALSE,
+    quality_score INTEGER,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    deleted_at TIMESTAMP WITH TIME ZONE,
     CONSTRAINT max_images_check CHECK (array_length(image_urls, 1) IS NULL OR array_length(image_urls, 1) <= 20),
     CONSTRAINT max_videos_check CHECK (array_length(video_urls, 1) IS NULL OR array_length(video_urls, 1) <= 3),
-    CONSTRAINT max_documents_check CHECK (array_length(document_urls, 1) IS NULL OR array_length(document_urls, 1) <= 10)
+    CONSTRAINT max_documents_check CHECK (array_length(document_urls, 1) IS NULL OR array_length(document_urls, 1) <= 10),
+    CONSTRAINT properties_quality_score_check CHECK (quality_score IS NULL OR (quality_score BETWEEN 0 AND 100))
 );
 
 -- ============================================
@@ -114,11 +122,50 @@ CREATE TABLE clients (
   notes TEXT,
   assigned_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ
 );
 
 -- ============================================
--- 6. VISITS (Agenda de Visitas)
+-- 6. LEADS (Central de Leads)
+-- ============================================
+CREATE TABLE leads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  name VARCHAR NOT NULL,
+  phone VARCHAR,
+  email VARCHAR,
+  source VARCHAR(20) NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  assigned_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  converted_client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
+  last_interaction_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ,
+  CONSTRAINT leads_source_check CHECK (source IN ('WHATSAPP', 'SITE', 'PORTAL', 'MANUAL')),
+  CONSTRAINT leads_status_check CHECK (status IN ('NEW', 'CONTACTED', 'QUALIFIED', 'LOST', 'CONVERTED'))
+);
+
+-- ============================================
+-- 7. ACTIVITIES (Timeline Global)
+-- ============================================
+CREATE TABLE activities (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  entity_type VARCHAR(20) NOT NULL,
+  entity_id UUID NOT NULL,
+  type VARCHAR(20) NOT NULL,
+  description TEXT,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ,
+  CONSTRAINT activities_entity_type_check CHECK (entity_type IN ('LEAD', 'CLIENT', 'DEAL', 'PROPERTY')),
+  CONSTRAINT activities_type_check CHECK (type IN ('NOTE', 'MESSAGE', 'VISIT', 'STATUS', 'SYSTEM'))
+);
+
+-- ============================================
+-- 8. VISITS (Agenda de Visitas)
 -- ============================================
 CREATE TABLE visits (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -130,11 +177,28 @@ CREATE TABLE visits (
   visit_time TIME NOT NULL,
   status VARCHAR,
   notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ
 );
 
 -- ============================================
--- 7. DEALS (Negócios / Propostas)
+-- 9. DEAL STAGES (Pipeline de Negócios)
+-- ============================================
+CREATE TABLE deal_stages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  name VARCHAR(100) NOT NULL,
+  "order" INTEGER NOT NULL,
+  is_won BOOLEAN DEFAULT FALSE,
+  is_lost BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ,
+  CONSTRAINT deal_stages_won_lost_check CHECK (NOT (is_won AND is_lost))
+);
+
+-- ============================================
+-- 10. DEALS (Negócios / Propostas)
 -- ============================================
 CREATE TABLE deals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -142,10 +206,41 @@ CREATE TABLE deals (
   client_id UUID REFERENCES clients(id) ON DELETE SET NULL,
   property_id UUID REFERENCES properties(id) ON DELETE SET NULL,
   user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  stage_id UUID REFERENCES deal_stages(id) ON DELETE SET NULL,
   proposed_value NUMERIC(14,2),
   status VARCHAR,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  closed_at TIMESTAMPTZ
+  closed_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ
+);
+
+-- ============================================
+-- 11. AUTOMATION_RULES (Automação)
+-- ============================================
+CREATE TABLE automation_rules (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  trigger VARCHAR(50) NOT NULL,
+  condition JSONB,
+  action JSONB NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ
+);
+
+-- ============================================
+-- 12. KPI_SNAPSHOTS (Métricas do Dashboard)
+-- ============================================
+CREATE TABLE kpi_snapshots (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  date DATE NOT NULL,
+  leads_new INTEGER DEFAULT 0,
+  visits_done INTEGER DEFAULT 0,
+  deals_won INTEGER DEFAULT 0,
+  conversion_rate NUMERIC(6,2) DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- ============================================
@@ -161,11 +256,24 @@ CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_clients_company_id ON clients(company_id);
 CREATE INDEX IF NOT EXISTS idx_clients_assigned_user_id ON clients(assigned_user_id);
+CREATE INDEX IF NOT EXISTS idx_leads_company_id ON leads(company_id);
+CREATE INDEX IF NOT EXISTS idx_leads_company_status ON leads(company_id, status);
+CREATE INDEX IF NOT EXISTS idx_leads_assigned_user ON leads(assigned_user_id);
+CREATE INDEX IF NOT EXISTS idx_leads_last_interaction ON leads(last_interaction_at DESC);
+CREATE INDEX IF NOT EXISTS idx_activities_company_id ON activities(company_id);
+CREATE INDEX IF NOT EXISTS idx_activities_entity ON activities(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_activities_created_at ON activities(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_visits_company_id ON visits(company_id);
 CREATE INDEX IF NOT EXISTS idx_visits_user_id ON visits(user_id);
 CREATE INDEX IF NOT EXISTS idx_visits_date ON visits(visit_date);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_deal_stages_company_order ON deal_stages(company_id, "order");
+CREATE INDEX IF NOT EXISTS idx_deal_stages_company_id ON deal_stages(company_id);
 CREATE INDEX IF NOT EXISTS idx_deals_company_id ON deals(company_id);
 CREATE INDEX IF NOT EXISTS idx_deals_user_id ON deals(user_id);
+CREATE INDEX IF NOT EXISTS idx_deals_company_stage ON deals(company_id, stage_id);
+CREATE INDEX IF NOT EXISTS idx_automation_rules_company ON automation_rules(company_id);
+CREATE INDEX IF NOT EXISTS idx_automation_rules_trigger ON automation_rules(trigger);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_kpi_snapshots_company_date ON kpi_snapshots(company_id, date);
 CREATE INDEX IF NOT EXISTS idx_store_settings_company_id ON store_settings(company_id);
 
 -- ============================================
@@ -176,8 +284,13 @@ ALTER TABLE users DISABLE ROW LEVEL SECURITY;
 ALTER TABLE store_settings DISABLE ROW LEVEL SECURITY;
 ALTER TABLE properties DISABLE ROW LEVEL SECURITY;
 ALTER TABLE clients DISABLE ROW LEVEL SECURITY;
+ALTER TABLE leads DISABLE ROW LEVEL SECURITY;
+ALTER TABLE activities DISABLE ROW LEVEL SECURITY;
 ALTER TABLE visits DISABLE ROW LEVEL SECURITY;
+ALTER TABLE deal_stages DISABLE ROW LEVEL SECURITY;
 ALTER TABLE deals DISABLE ROW LEVEL SECURITY;
+ALTER TABLE automation_rules DISABLE ROW LEVEL SECURITY;
+ALTER TABLE kpi_snapshots DISABLE ROW LEVEL SECURITY;
 
 -- ============================================
 -- TRIGGERS for updated_at
@@ -208,8 +321,17 @@ CREATE TRIGGER update_users_updated_at
 CREATE TRIGGER update_clients_updated_at BEFORE UPDATE ON clients
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_leads_updated_at BEFORE UPDATE ON leads
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_deal_stages_updated_at BEFORE UPDATE ON deal_stages
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_automation_rules_updated_at BEFORE UPDATE ON automation_rules
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- ============================================
--- 8. WHATSAPP_CONNECTIONS (WhatsApp Integration)
+-- 13. WHATSAPP_CONNECTIONS (WhatsApp Integration)
 -- ============================================
 CREATE TABLE IF NOT EXISTS whatsapp_connections (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -229,7 +351,7 @@ CREATE INDEX IF NOT EXISTS idx_whatsapp_connections_user ON whatsapp_connections
 CREATE INDEX IF NOT EXISTS idx_whatsapp_connections_connected ON whatsapp_connections(is_connected);
 
 -- ============================================
--- 9. WHATSAPP_MESSAGES (WhatsApp Message History)
+-- 14. WHATSAPP_MESSAGES (WhatsApp Message History)
 -- ============================================
 CREATE TABLE IF NOT EXISTS whatsapp_messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -254,7 +376,7 @@ CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_timestamp ON whatsapp_messages(
 CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_keywords ON whatsapp_messages(has_keywords);
 
 -- ============================================
--- 10. WHATSAPP_AUTO_CLIENTS (Auto-created Clients from WhatsApp)
+-- 15. WHATSAPP_AUTO_CLIENTS (Auto-created Clients from WhatsApp)
 -- ============================================
 CREATE TABLE IF NOT EXISTS whatsapp_auto_clients (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

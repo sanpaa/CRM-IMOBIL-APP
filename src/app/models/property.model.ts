@@ -11,6 +11,9 @@ export interface Property {
   bathrooms?: number;
   kitchens?: number;
   area?: number;
+  areaPrivativa?: number;
+  areaConstrutiva?: number;
+  areaTerreno?: number;
   totalArea?: number;
   builtArea?: number;
   parking?: number;

@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { CompanyService } from '../../services/company.service';
 import { AuthService } from '../../services/auth.service';
 import { HeaderConfig, FooterConfig, FooterLink } from '../../models/company.model';
+import { PopupService } from '../../shared/services/popup.service';
 
 @Component({
   selector: 'app-public-site-settings',
@@ -52,7 +53,8 @@ export class PublicSiteSettingsComponent implements OnInit {
 
   constructor(
     private companyService: CompanyService,
-    public authService: AuthService
+    public authService: AuthService,
+    private popupService: PopupService
   ) {}
 
   async ngOnInit() {
@@ -60,7 +62,7 @@ export class PublicSiteSettingsComponent implements OnInit {
     // Validate company_id is not null, 'null', or 'undefined'
     if (!companyId || companyId === 'null' || companyId === 'undefined') {
       console.error('🔴 Company ID inválido ou não encontrado no localStorage!');
-      alert('Erro: Sessão inválida. Faça login novamente.');
+      this.popupService.alert('Erro: Sessão inválida. Faça login novamente.', { title: 'Aviso', tone: 'warning' });
       return;
     }
     
@@ -103,14 +105,14 @@ export class PublicSiteSettingsComponent implements OnInit {
       console.log('✅ Configurações carregadas com sucesso!');
     } catch (error) {
       console.error('🔴 Error loading settings:', error);
-      alert('Erro ao carregar configurações: ' + error);
+      this.popupService.alert('Erro ao carregar configurações: ' + error, { title: 'Aviso', tone: 'warning' });
     }
   }
 
   async saveSettings() {
     if (!this.companyId) {
       console.error('🔴 Company ID não encontrado!');
-      alert('Erro: Company ID não encontrado');
+      this.popupService.alert('Erro: Company ID não encontrado', { title: 'Aviso', tone: 'warning' });
       return;
     }
     
@@ -135,7 +137,7 @@ export class PublicSiteSettingsComponent implements OnInit {
       }
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Erro ao salvar configurações');
+      this.popupService.alert('Erro ao salvar configurações', { title: 'Aviso', tone: 'warning' });
     } finally {
       this.saving = false;
     }

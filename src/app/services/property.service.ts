@@ -15,6 +15,9 @@ export class PropertyService {
 
   private mapFromDb(row: any): Property {
     const {
+      area_privativa,
+      area_construtiva,
+      area_terreno,
       total_area,
       built_area,
       dining_room,
@@ -23,10 +26,19 @@ export class PropertyService {
       ...rest
     } = row || {};
 
+    const resolvedAreaPrivativa = area_privativa ?? (rest as any).areaPrivativa ?? (rest as any).totalArea ?? (rest as any).area ?? total_area ?? null;
+    const resolvedAreaConstrutiva = area_construtiva ?? (rest as any).areaConstrutiva ?? (rest as any).builtArea ?? built_area ?? null;
+    const resolvedAreaTerreno = area_terreno ?? (rest as any).areaTerreno ?? null;
+    const resolvedArea = (rest as any).area ?? total_area ?? area_privativa ?? null;
+
     return {
       ...(rest as Property),
-      totalArea: total_area ?? (rest as any).totalArea ?? null,
-      builtArea: built_area ?? (rest as any).builtArea ?? null,
+      area: resolvedArea,
+      areaPrivativa: resolvedAreaPrivativa,
+      areaConstrutiva: resolvedAreaConstrutiva,
+      areaTerreno: resolvedAreaTerreno,
+      totalArea: total_area ?? (rest as any).totalArea ?? resolvedAreaPrivativa ?? null,
+      builtArea: built_area ?? (rest as any).builtArea ?? resolvedAreaConstrutiva ?? null,
       diningRoom: dining_room ?? (rest as any).diningRoom ?? false,
       livingRoom: living_room ?? (rest as any).livingRoom ?? false,
       serviceArea: service_area ?? (rest as any).serviceArea ?? false
@@ -35,6 +47,9 @@ export class PropertyService {
 
   private mapToDb(property: Partial<Property>): Record<string, unknown> {
     const {
+      areaPrivativa,
+      areaConstrutiva,
+      areaTerreno,
       totalArea,
       builtArea,
       diningRoom,
@@ -48,10 +63,14 @@ export class PropertyService {
       rest.owner_id = null;
     }
 
+    const resolvedAreaPrivativa = areaPrivativa ?? totalArea;
+    const resolvedAreaConstrutiva = areaConstrutiva ?? builtArea;
+
     return {
       ...rest,
-      ...(totalArea !== undefined ? { total_area: totalArea } : {}),
-      ...(builtArea !== undefined ? { built_area: builtArea } : {}),
+      ...(resolvedAreaPrivativa !== undefined ? { area_privativa: resolvedAreaPrivativa } : {}),
+      ...(resolvedAreaConstrutiva !== undefined ? { area_construtiva: resolvedAreaConstrutiva } : {}),
+      ...(areaTerreno !== undefined ? { area_terreno: areaTerreno } : {}),
       ...(diningRoom !== undefined ? { dining_room: diningRoom } : {}),
       ...(livingRoom !== undefined ? { living_room: livingRoom } : {}),
       ...(serviceArea !== undefined ? { service_area: serviceArea } : {})
@@ -317,11 +336,11 @@ export class PropertyService {
       }
 
       if (filters.areaMin !== undefined) {
-        query = query.gte('area', filters.areaMin);
+        query = query.gte('area_privativa', filters.areaMin);
       }
 
       if (filters.areaMax !== undefined) {
-        query = query.lte('area', filters.areaMax);
+        query = query.lte('area_privativa', filters.areaMax);
       }
 
       if (filters.priceMin !== undefined) {
@@ -404,10 +423,16 @@ export class PropertyService {
         filtered = filtered.filter(p => p.parking === filters.parking);
       }
       if (filters.areaMin !== undefined) {
-        filtered = filtered.filter(p => p.area && p.area >= (filters.areaMin as number));
+        filtered = filtered.filter(p => {
+          const areaValue = p.areaPrivativa ?? p.area;
+          return areaValue != null && areaValue >= (filters.areaMin as number);
+        });
       }
       if (filters.areaMax !== undefined) {
-        filtered = filtered.filter(p => p.area && p.area <= (filters.areaMax as number));
+        filtered = filtered.filter(p => {
+          const areaValue = p.areaPrivativa ?? p.area;
+          return areaValue != null && areaValue <= (filters.areaMax as number);
+        });
       }
       if (filters.priceMin !== undefined) {
         filtered = filtered.filter(p => p.price >= (filters.priceMin as number));

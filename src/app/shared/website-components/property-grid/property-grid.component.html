@@ -26,8 +26,8 @@
           <span *ngIf="property.bathrooms" class="detail-item">
             🚿 {{ property.bathrooms }}
           </span>
-          <span *ngIf="property.area" class="detail-item">
-            📏 {{ property.area }}m²
+          <span *ngIf="getDisplayArea(property) as displayArea" class="detail-item">
+            📏 {{ displayArea }}m²
           </span>
         </div>
       </div>

@@ -1,17 +1,17 @@
 .page-container {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: var(--color-bg-primary);
 }
 
 .page-header {
   background: var(--color-bg-secondary);
   padding: 2rem 2.5rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border-light);
 
   h1 {
     margin: 0;
-    color: #1e293b;
+    color: var(--color-text-primary);
     font-size: 2rem;
     font-weight: 700;
   }
@@ -27,7 +27,7 @@
 
 .settings-section {
   padding: 2.5rem;
-  border-bottom: 2px solid #f1f5f9;
+  border-bottom: 2px solid var(--color-border-light);
 
   &:last-of-type {
     border-bottom: none;
@@ -35,7 +35,7 @@
 
   h2 {
     margin: 0 0 0.5rem 0;
-    color: #1e293b;
+    color: var(--color-text-primary);
     font-size: 1.4rem;
     font-weight: 700;
     display: flex;
@@ -50,7 +50,7 @@
 
 .section-description {
   margin: 0.5rem 0 2rem 0;
-  color: #64748b;
+  color: var(--color-text-secondary);
   font-size: 0.95rem;
   line-height: 1.5;
 }
@@ -69,7 +69,7 @@
 
   label {
     margin-bottom: 0.5rem;
-    color: #475569;
+    color: var(--color-text-secondary);
     font-weight: 600;
     font-size: 0.95rem;
   }
@@ -78,21 +78,23 @@
 .form-control {
   width: 100%;
   padding: 0.875rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border-light);
   border-radius: 8px;
   font-size: 0.95rem;
   transition: all 0.2s ease;
   box-sizing: border-box;
   font-family: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-bg-secondary);
 
   &:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
   }
 
   &:disabled {
-    background: #f1f5f9;
+    background: var(--color-bg-tertiary);
     cursor: not-allowed;
   }
 }
@@ -108,7 +110,7 @@
 }
 
 .input-suffix {
-  color: #64748b;
+  color: var(--color-text-secondary);
   font-weight: 600;
   font-size: 0.95rem;
 }
@@ -116,7 +118,7 @@
 .form-hint {
   display: block;
   margin-top: 0.5rem;
-  color: #94a3b8;
+  color: var(--color-text-tertiary);
   font-size: 0.85rem;
   font-style: italic;
 }
@@ -132,15 +134,15 @@
   align-items: center;
   gap: 0.75rem;
   padding: 1rem 1.25rem;
-  background: #f8f9fa;
-  border: 2px solid #e5e7eb;
+  background: var(--color-bg-tertiary);
+  border: 2px solid var(--color-border-light);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: #667eea;
-    background: #f1f5f9;
+    border-color: var(--color-primary);
+    background: var(--color-bg-secondary);
   }
 
   input[type="checkbox"] {
@@ -154,7 +156,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #1e293b;
+  color: var(--color-text-primary);
   font-weight: 500;
   font-size: 0.95rem;
 }
@@ -164,13 +166,13 @@
 }
 
 .info-section {
-  background: #f8f9fa;
+  background: var(--color-bg-tertiary);
 }
 
 .info-content {
   p {
     margin: 0 0 1rem 0;
-    color: #475569;
+    color: var(--color-text-secondary);
     line-height: 1.6;
 
     &:last-child {
@@ -178,7 +180,7 @@
     }
 
     strong {
-      color: #1e293b;
+      color: var(--color-text-primary);
       font-weight: 600;
     }
   }
@@ -186,7 +188,7 @@
 
 .form-actions {
   padding: 2rem 2.5rem;
-  border-top: 2px solid #f1f5f9;
+  border-top: 2px solid var(--color-border-light);
   display: flex;
   justify-content: flex-end;
 }

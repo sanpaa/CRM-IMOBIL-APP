@@ -24,6 +24,7 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
   metadata: ComponentMetadata | undefined;
   configFields: ConfigSchemaField[] = [];
   styleFields: ConfigSchemaField[] = [];
+  activeTab: 'content' | 'style' | 'responsive' = 'content';
 
   constructor(private registry: ComponentRegistryService) {}
 
@@ -42,7 +43,12 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
     if (this.metadata) {
       this.configFields = this.metadata.schema.fields || [];
       this.styleFields = this.metadata.schema.styleFields || [];
+      this.activeTab = 'content';
     }
+  }
+
+  setTab(tab: 'content' | 'style' | 'responsive') {
+    this.activeTab = tab;
   }
 
   updateConfig(key: string, value: any): void {

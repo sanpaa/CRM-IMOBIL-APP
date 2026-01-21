@@ -18,33 +18,55 @@ interface CalendarDay {
   imports: [CommonModule],
   template: `
     <div class="calendar-container">
-      <!-- Filter Buttons -->
-      <div class="filter-buttons">
-        <button 
-          [class.active]="currentView === 'day'" 
-          (click)="setView('day')" 
-          class="filter-btn">
-          Dia
-        </button>
-        <button 
-          [class.active]="currentView === 'week'" 
-          (click)="setView('week')" 
-          class="filter-btn">
-          Semana
-        </button>
-        <button 
-          [class.active]="currentView === 'month'" 
-          (click)="setView('month')" 
-          class="filter-btn">
-          Mês
-        </button>
-      </div>
+      <div class="calendar-toolbar">
+        <div class="filter-buttons">
+          <button 
+            [class.active]="currentView === 'day'" 
+            (click)="setView('day')" 
+            class="filter-btn">
+            Dia
+          </button>
+          <button 
+            [class.active]="currentView === 'week'" 
+            (click)="setView('week')" 
+            class="filter-btn">
+            Semana
+          </button>
+          <button 
+            [class.active]="currentView === 'month'" 
+            (click)="setView('month')" 
+            class="filter-btn">
+            Mês
+          </button>
+        </div>
 
-      <!-- Calendar Header -->
-      <div class="calendar-header">
-        <button (click)="previousPeriod()" class="nav-btn">‹</button>
-        <h2>{{ getHeaderText() }}</h2>
-        <button (click)="nextPeriod()" class="nav-btn">›</button>
+        <div class="calendar-header">
+          <button (click)="previousPeriod()" class="nav-btn">‹</button>
+          <h2>{{ getHeaderText() }}</h2>
+          <button (click)="nextPeriod()" class="nav-btn">›</button>
+        </div>
+
+        <div class="calendar-tools">
+          <div class="tool-field">
+            <i class="bi bi-search"></i>
+            <input
+              type="text"
+              [value]="searchTerm"
+              (input)="onSearchInput($event)"
+              placeholder="Buscar visita"
+              aria-label="Buscar visita">
+          </div>
+          <div class="tool-field">
+            <i class="bi bi-funnel"></i>
+            <select [value]="statusFilter" (change)="onStatusChange($event)" aria-label="Filtrar status">
+              <option value="">Todos</option>
+              <option value="agendada">Agendada</option>
+              <option value="confirmada">Confirmada</option>
+              <option value="realizada">Realizada</option>
+              <option value="cancelada">Cancelada</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <!-- Month View -->
@@ -127,71 +149,129 @@ interface CalendarDay {
   styles: [`
     .calendar-container {
       background: var(--color-bg-secondary);
-      border-radius: 12px;
+      border-radius: 16px;
       padding: 1.5rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
       border: 1px solid var(--color-border-light);
     }
 
+    .calendar-toolbar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
     .filter-buttons {
       display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid var(--color-border-light);
+      gap: 0.25rem;
+      background: var(--color-bg-tertiary);
+      padding: 0.25rem;
+      border-radius: 999px;
     }
 
     .filter-btn {
-      padding: 0.5rem 1.5rem;
-      border: 2px solid var(--color-border-light);
-      background: var(--color-bg-secondary);
-      border-radius: 8px;
+      padding: 0.45rem 1.25rem;
+      border: none;
+      background: transparent;
+      border-radius: 999px;
       cursor: pointer;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--color-text-primary);
       transition: all 0.2s ease;
     }
 
     .filter-btn:hover {
-      border-color: var(--color-primary);
-      background: var(--color-bg-tertiary);
+      background: rgba(59, 130, 246, 0.08);
     }
 
     .filter-btn.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-color: transparent;
+      background: var(--color-bg-secondary);
+      color: var(--color-primary);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
     }
 
     .calendar-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 1.5rem;
+      gap: 1rem;
     }
 
     .calendar-header h2 {
       margin: 0;
       color: var(--color-text-primary);
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       font-weight: 700;
+      text-align: center;
+      flex: 1;
     }
 
     .nav-btn {
       width: 40px;
       height: 40px;
-      border: none;
-      background: var(--color-bg-tertiary);
-      border-radius: 8px;
+      border: 1px solid var(--color-border-light);
+      background: var(--color-bg-secondary);
+      border-radius: 12px;
       cursor: pointer;
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       color: var(--color-text-secondary);
       transition: all 0.2s ease;
     }
 
     .nav-btn:hover {
-      background: var(--color-bg-secondary);
+      background: var(--color-bg-tertiary);
       color: var(--color-text-primary);
+    }
+
+    .calendar-tools {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .tool-field {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0 0.75rem;
+      height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--color-border-light);
+      background: var(--color-bg-secondary);
+      color: var(--color-text-secondary);
+      transition: all 0.2s ease;
+    }
+
+    .tool-field:focus-within {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    .tool-field i {
+      font-size: 0.9rem;
+    }
+
+    .tool-field input,
+    .tool-field select {
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--color-text-primary);
+      font-size: 0.85rem;
+      font-family: inherit;
+    }
+
+    .tool-field input {
+      width: 160px;
+    }
+
+    .tool-field select {
+      width: 140px;
+    }
+
+    .tool-field select {
+      cursor: pointer;
     }
 
     .calendar-grid {
@@ -219,14 +299,14 @@ interface CalendarDay {
     .calendar-days {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
 
     .calendar-day {
-      min-height: 70px;
-      padding: 0.5rem;
+      min-height: 90px;
+      padding: 0.75rem;
       border: 1px solid var(--color-border-light);
-      border-radius: 6px;
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.2s ease;
       position: relative;
@@ -243,8 +323,8 @@ interface CalendarDay {
     }
 
     .calendar-day.today {
-      background: var(--color-bg-tertiary);
-      border-color: var(--color-primary);
+      background: rgba(59, 130, 246, 0.08);
+      border-color: rgba(59, 130, 246, 0.4);
     }
 
     .calendar-day.has-visits {
@@ -273,7 +353,7 @@ interface CalendarDay {
 
     .visit-indicators {
       display: flex;
-      gap: 0.2rem;
+      gap: 0.25rem;
       flex-wrap: wrap;
       margin-top: 0.25rem;
     }
@@ -304,8 +384,8 @@ interface CalendarDay {
     }
 
     .week-day-card {
-      border: 2px solid var(--color-border-light);
-      border-radius: 8px;
+      border: 1px solid var(--color-border-light);
+      border-radius: 12px;
       overflow: hidden;
     }
 
@@ -313,7 +393,7 @@ interface CalendarDay {
       background: var(--color-bg-tertiary);
       padding: 1rem;
       text-align: center;
-      border-bottom: 2px solid var(--color-border-light);
+      border-bottom: 1px solid var(--color-border-light);
     }
 
     .week-day-name {
@@ -353,7 +433,7 @@ interface CalendarDay {
       align-items: center;
       padding: 0.5rem;
       background: var(--color-bg-tertiary);
-      border-radius: 6px;
+      border-radius: 10px;
       margin-bottom: 0.5rem;
     }
 
@@ -415,8 +495,8 @@ interface CalendarDay {
       display: flex;
       gap: 1rem;
       padding: 1.5rem;
-      border: 2px solid var(--color-border-light);
-      border-radius: 8px;
+      border: 1px solid var(--color-border-light);
+      border-radius: 12px;
       transition: all 0.2s ease;
     }
 
@@ -451,6 +531,30 @@ interface CalendarDay {
     }
 
     @media (max-width: 768px) {
+      .calendar-toolbar {
+        grid-template-columns: 1fr;
+        justify-items: start;
+      }
+
+      .calendar-header {
+        width: 100%;
+      }
+
+      .calendar-tools {
+        width: 100%;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+      }
+
+      .tool-field {
+        width: 100%;
+      }
+
+      .tool-field input,
+      .tool-field select {
+        width: 100%;
+      }
+
       .calendar-days {
         grid-template-columns: repeat(7, 1fr);
         gap: 0.25rem;
@@ -474,8 +578,12 @@ interface CalendarDay {
 })
 export class VisitCalendarComponent implements OnInit, OnChanges {
   @Input() visits: Visit[] = [];
+  @Input() searchTerm = '';
+  @Input() statusFilter = '';
   @Output() viewChange = new EventEmitter<'day' | 'week' | 'month'>();
   @Output() dateChange = new EventEmitter<Date>();
+  @Output() searchChange = new EventEmitter<string>();
+  @Output() statusChange = new EventEmitter<string>();
 
   currentDate: Date = new Date();
   currentView: 'day' | 'week' | 'month' = 'month';
@@ -516,6 +624,18 @@ export class VisitCalendarComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     this.generateCalendar();
+  }
+
+  onSearchInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.searchTerm = input.value || '';
+    this.searchChange.emit(this.searchTerm);
+  }
+
+  onStatusChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.statusFilter = select.value || '';
+    this.statusChange.emit(this.statusFilter);
   }
 
   setView(view: 'day' | 'week' | 'month') {

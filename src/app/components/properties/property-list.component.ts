@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth.service';
 import { Property } from '../../models/property.model';
 import { Owner } from '../../models/owner.model';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner.component';
+import { PopupService } from '../../shared/services/popup.service';
 
 @Component({
   selector: 'app-property-list',
@@ -23,9 +24,11 @@ export class PropertyListComponent implements OnInit {
   showForm = false;
   editingProperty: Property | null = null;
   formData: any = {};
-  documentFiles: { name: string; file: File }[] = [];
+  priceDisplay = '';
+  imageFiles: { name: string; file: File }[] = [];
   isLoading = false;
   private static readonly CEP_REGEX = /\D/g;
+  private static readonly MAX_IMAGES = 12;
 
   loadingCep = false;
 
@@ -38,7 +41,8 @@ export class PropertyListComponent implements OnInit {
   constructor(
     private propertyService: PropertyService,
     private ownerService: OwnerService,
-    public authService: AuthService
+    public authService: AuthService,
+    private popupService: PopupService
   ) {
     this.resetForm();
   }
@@ -107,9 +111,9 @@ export class PropertyListComponent implements OnInit {
       livingRoom: false,
       serviceArea: false,
       closet: false,
-      totalArea: null,
-      builtArea: null,
-      area: null,
+      areaPrivativa: null,
+      areaConstrutiva: null,
+      areaTerreno: null,
       street: '',
       neighborhood: '',
       city: '',
@@ -122,9 +126,11 @@ export class PropertyListComponent implements OnInit {
       furnished: false,
       featured: false,
       sold: false,
-      customOptions: []
+      customOptions: [],
+      image_urls: []
     };
-    this.documentFiles = [];
+    this.priceDisplay = this.formatPriceDisplay(0);
+    this.imageFiles = [];
   }
 
   openModal(property?: Property) {
@@ -132,11 +138,16 @@ export class PropertyListComponent implements OnInit {
       this.editingProperty = property;
       this.formData = {
         ...property,
-        totalArea: property.totalArea ?? property.area ?? null,
-        builtArea: property.builtArea ?? null,
-        customOptions: (property as any).custom_options ?? []
+        areaPrivativa: property.areaPrivativa ?? property.totalArea ?? property.area ?? null,
+        areaConstrutiva: property.areaConstrutiva ?? property.builtArea ?? null,
+        areaTerreno: property.areaTerreno ?? null,
+        customOptions: (property as any).custom_options ?? [],
+        image_urls: property.image_urls || (property.image_url ? [property.image_url] : [])
       };
-      this.documentFiles = [];
+      const numericPrice = typeof property.price === 'number' ? property.price : Number(property.price || 0);
+      this.formData.price = numericPrice;
+      this.priceDisplay = this.formatPriceDisplay(numericPrice);
+      this.imageFiles = [];
     } else {
       this.editingProperty = null;
       this.resetForm();
@@ -150,12 +161,67 @@ export class PropertyListComponent implements OnInit {
     this.resetForm();
   }
 
+  adjustNumber(field: string, delta: number) {
+    const currentValue = Number(this.formData[field] ?? 0);
+    const nextValue = Math.max(0, currentValue + delta);
+    this.formData[field] = nextValue;
+  }
+
+  onPriceInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const digits = (input.value || '').replace(/\D/g, '');
+    const numericValue = digits ? Number(digits) / 100 : 0;
+    this.formData.price = numericValue;
+    this.priceDisplay = this.formatPriceDisplay(numericValue);
+    input.value = this.priceDisplay;
+  }
+
+  onCepInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const digits = (input.value || '').replace(/\D/g, '').slice(0, 8);
+    const formatted = digits.length > 5
+      ? `${digits.slice(0, 5)}-${digits.slice(5)}`
+      : digits;
+    this.formData.zip_code = formatted;
+    input.value = formatted;
+  }
+
+  onUfInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const formatted = (input.value || '').replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 2);
+    this.formData.state = formatted;
+    input.value = formatted;
+  }
+
+  onContactInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const digits = (input.value || '').replace(/\D/g, '').slice(0, 11);
+    let formatted = digits;
+    if (digits.length > 2) {
+      const ddd = digits.slice(0, 2);
+      const rest = digits.slice(2);
+      if (rest.length > 5) {
+        formatted = `(${ddd}) ${rest.slice(0, 5)}-${rest.slice(5)}`;
+      } else if (rest.length > 4) {
+        formatted = `(${ddd}) ${rest.slice(0, 4)}-${rest.slice(4)}`;
+      } else {
+        formatted = `(${ddd}) ${rest}`;
+      }
+    }
+    this.formData.contact = formatted;
+    input.value = formatted;
+  }
+
+  private formatPriceDisplay(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value || 0);
+  }
+
   async saveProperty() {
     try {
       let propertyId: string;
-      if (this.formData.totalArea != null && (this.formData.area == null || this.formData.area === 0)) {
-        this.formData.area = this.formData.totalArea;
-      }
       if (Array.isArray(this.formData.customOptions)) {
         const normalizedOptions = this.formData.customOptions
           .map((option: { label?: string; value?: boolean }) => ({
@@ -177,19 +243,19 @@ export class PropertyListComponent implements OnInit {
       }
       
       // Upload documents if any
-      if (this.documentFiles.length > 0) {
-        const files = this.documentFiles.map(d => d.file);
-        const documentUrls = await this.propertyService.uploadDocuments(files, propertyId);
+      if (this.imageFiles.length > 0) {
+        const files = this.imageFiles.map(d => d.file);
+        const imageUrls = await this.propertyService.uploadDocuments(files, propertyId);
         
-        // Merge with existing document URLs
-        const allDocumentUrls = [
-          ...(this.formData.document_urls || []),
-          ...documentUrls
+        // Merge with existing image URLs
+        const allImageUrls = [
+          ...(this.formData.image_urls || []),
+          ...imageUrls
         ];
         
-        // Update property with document URLs
+        // Update property with image URLs
         await this.propertyService.update(propertyId, {
-          document_urls: allDocumentUrls
+          image_urls: allImageUrls
         });
       }
       
@@ -197,24 +263,29 @@ export class PropertyListComponent implements OnInit {
       await this.loadProperties();
     } catch (error) {
       console.error('Error saving property:', error);
-      alert('Erro ao salvar imóvel');
+      this.popupService.alert('Erro ao salvar imóvel', { title: 'Aviso', tone: 'warning' });
     }
   }
 
   async deleteProperty(id: string) {
     if (!this.authService.isAdmin()) {
-      alert('Apenas administradores podem excluir imóveis');
+      this.popupService.alert('Apenas administradores podem excluir imóveis', { title: 'Aviso', tone: 'warning' });
       return;
     }
     
-    if (confirm('Tem certeza que deseja excluir este imóvel?')) {
-      try {
-        await this.propertyService.delete(id);
-        await this.loadProperties();
-      } catch (error) {
-        console.error('Error deleting property:', error);
-        alert('Erro ao excluir imóvel');
-      }
+    const confirmed = await this.popupService.confirm('Tem certeza que deseja excluir este imóvel?', {
+      title: 'Excluir imóvel',
+      confirmText: 'Excluir',
+      cancelText: 'Cancelar',
+      tone: 'danger'
+    });
+    if (!confirmed) return;
+    try {
+      await this.propertyService.delete(id);
+      await this.loadProperties();
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      this.popupService.alert('Erro ao excluir imóvel', { title: 'Aviso', tone: 'warning' });
     }
   }
 
@@ -282,61 +353,61 @@ export class PropertyListComponent implements OnInit {
   }
 
 
-  onDocumentSelect(event: any) {
+  onImageSelect(event: any) {
     const files = event.target.files;
     if (!files) return;
 
-    const maxDocuments = 10;
-    const totalCurrent = this.getDocumentCount();
-    const remainingSlots = maxDocuments - totalCurrent;
+    const totalCurrent = this.getImageCount();
+    const remainingSlots = PropertyListComponent.MAX_IMAGES - totalCurrent;
     const filesToAdd = Math.min(files.length, remainingSlots);
 
     for (let i = 0; i < filesToAdd; i++) {
       const file = files[i];
       
-      // Validate file extension
-      const fileExt = file.name.split('.').pop()?.toLowerCase();
-      if (!fileExt) {
-        console.warn('Arquivo sem extensão ignorado:', file.name);
+      if (!file.type?.startsWith('image/')) {
+        console.warn('Arquivo não é imagem:', file.name);
         continue;
       }
       
-      this.documentFiles.push({
+      this.imageFiles.push({
         name: file.name,
         file: file
       });
     }
 
     if (files.length > remainingSlots) {
-      alert(`Limite de ${maxDocuments} documentos. Apenas ${filesToAdd} foram adicionados.`);
+      this.popupService.alert(`Limite de ${PropertyListComponent.MAX_IMAGES} imagens. Apenas ${filesToAdd} foram adicionadas.`, {
+        title: 'Aviso',
+        tone: 'warning'
+      });
     }
 
     event.target.value = '';
   }
 
-  removeDocument(index: number) {
-    const existingCount = this.formData.document_urls?.length || 0;
+  removeImage(index: number) {
+    const existingCount = this.formData.image_urls?.length || 0;
     
     if (index < existingCount) {
-      // Remove from existing documents
-      this.formData.document_urls.splice(index, 1);
+      // Remove from existing images
+      this.formData.image_urls.splice(index, 1);
     } else {
-      // Remove from new documents
+      // Remove from new images
       const newIndex = index - existingCount;
-      this.documentFiles.splice(newIndex, 1);
+      this.imageFiles.splice(newIndex, 1);
     }
   }
 
-  getDocumentCount(): number {
-    const existingDocs = this.formData.document_urls?.length || 0;
-    return existingDocs + this.documentFiles.length;
+  getImageCount(): number {
+    const existingImages = this.formData.image_urls?.length || 0;
+    return existingImages + this.imageFiles.length;
   }
 
-  getDocumentList(): { name: string }[] {
-    const existing = (this.formData.document_urls || []).map((url: string) => ({
+  getImageList(): { name: string }[] {
+    const existing = (this.formData.image_urls || []).map((url: string) => ({
       name: this.extractFileName(url)
     }));
-    return [...existing, ...this.documentFiles];
+    return [...existing, ...this.imageFiles];
   }
 
   extractFileName(url: string): string {
@@ -349,16 +420,7 @@ export class PropertyListComponent implements OnInit {
   }
 
   getFileIcon(fileName: string): string {
-    const extension = fileName.split('.').pop()?.toLowerCase();
-    switch (extension) {
-      case 'pdf': return '📄';
-      case 'doc':
-      case 'docx': return '📝';
-      case 'xls':
-      case 'xlsx': return '📊';
-      case 'txt': return '📃';
-      default: return '📎';
-    }
+    return '🖼️';
   }
 
   addCustomOption() {

@@ -52,246 +52,276 @@
 
   <!-- Modal Form -->
   <div class="modal-overlay" *ngIf="showForm" (click)="closeModal()">
-    <div class="modal-content modal-large" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{ editingProperty ? 'Editar Imóvel' : 'Novo Imóvel' }}</h2>
-        <button class="close-btn" (click)="closeModal()">&times;</button>
-      </div>
-      <form (ngSubmit)="saveProperty()">
-        <div class="form-section">
-          <h3>Informações Básicas</h3>
-          <div class="form-group">
-            <label>Título *</label>
-            <input type="text" [(ngModel)]="formData.title" name="title" required class="form-control">
-          </div>
-          <div class="form-group">
-            <label>Descrição *</label>
-            <textarea [(ngModel)]="formData.description" name="description" rows="3" required class="form-control"></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Tipo *</label>
-              <select [(ngModel)]="formData.type" name="type" required class="form-control">
-                <option value="apartamento">Apartamento</option>
-                <option value="casa">Casa</option>
-                <option value="terreno">Terreno</option>
-                <option value="comercial">Comercial</option>
-              </select>
+    <div class="modal-content modal-large property-modal" (click)="$event.stopPropagation()">
+      <form class="property-form" (ngSubmit)="saveProperty()">
+        <div class="property-modal-header">
+          <div class="header-left">
+            <button type="button" class="icon-btn" (click)="closeModal()">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            <div class="title-stack">
+              <h2>{{ editingProperty ? 'Editar Imóvel' : 'Novo Imóvel' }} <span class="title-sep">•</span> Alta Performance</h2>
+              <p class="subtitle">
+                {{ editingProperty ? 'Atualize as informações do imóvel' : 'Complete os dados para publicar o anúncio' }}
+              </p>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Proprietário</label>
-              <select [(ngModel)]="formData.owner_id" name="owner_id" class="form-control">
-                <option value="">Nenhum</option>
-                <option *ngFor="let owner of owners" [value]="owner.id">{{ owner.name }}</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Contato *</label>
-              <input type="text" [(ngModel)]="formData.contact" name="contact" required class="form-control">
-            </div>
+          <div class="header-actions">
+            <button type="button" class="btn-secondary ghost" (click)="closeModal()">Cancelar</button>
+            <button type="submit" class="btn-primary">
+              <i class="bi bi-save"></i> Salvar Imóvel
+            </button>
           </div>
         </div>
 
-        <div class="form-section">
-          <h3>Valores</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Valor (R$) *</label>
-              <input type="number" [(ngModel)]="formData.price" name="price" required class="form-control">
-            </div>
-          </div>
-        </div>
+        <div class="property-modal-body">
+          <div class="property-modal-grid">
+            <div class="property-column">
+              <section class="property-card-section">
+                <h3><i class="bi bi-cash-coin"></i> Informações Financeiras e Medidas</h3>
+                <div class="field-grid">
+                  <div class="field-full">
+                    <label>Valor de Venda (R$)*</label>
+                    <div class="input-prefix">
+                      <span>R$</span>
+                      <input type="text"
+                             [(ngModel)]="priceDisplay"
+                             name="priceDisplay"
+                             required
+                             class="property-input"
+                             placeholder="0,00"
+                             inputmode="decimal"
+                             (input)="onPriceInput($event)">
+                    </div>
+                  </div>
+                  <div>
+                    <label>Área Privativa (m²)</label>
+                    <input type="number" [(ngModel)]="formData.areaPrivativa" name="areaPrivativa" class="property-input">
+                  </div>
+                  <div>
+                    <label>Área Total (m²)</label>
+                    <input type="number" [(ngModel)]="formData.areaTerreno" name="areaTerreno" class="property-input">
+                  </div>
+                  <div class="field-full">
+                    <label>Área Construída (m²)</label>
+                    <input type="number" [(ngModel)]="formData.areaConstrutiva" name="areaConstrutiva" class="property-input">
+                  </div>
+                </div>
+              </section>
 
-        <div class="form-section">
-          <h3>Cômodos</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Dormitórios</label>
-              <input type="number" [(ngModel)]="formData.bedrooms" name="bedrooms" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Suítes</label>
-              <input type="number" [(ngModel)]="formData.suites" name="suites" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Banheiros</label>
-              <input type="number" [(ngModel)]="formData.bathrooms" name="bathrooms" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Garagens</label>
-              <input type="number" [(ngModel)]="formData.parking" name="parking" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Cozinhas</label>
-              <input type="number" [(ngModel)]="formData.kitchens" name="kitchens" class="form-control">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" [(ngModel)]="formData.diningRoom" name="diningRoom">
-                Sala de Jantar
-              </label>
-            </div>
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" [(ngModel)]="formData.livingRoom" name="livingRoom">
-                Sala de Estar
-              </label>
-            </div>
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" [(ngModel)]="formData.serviceArea" name="serviceArea">
-                Área de Serviço
-              </label>
-            </div>
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" [(ngModel)]="formData.closet" name="closet">
-                Closet
-              </label>
-            </div>
-          </div>
-        </div>
+              <section class="property-card-section">
+                <h3><i class="bi bi-house-door"></i> Cômodos e Estrutura</h3>
+                <div class="field-grid compact">
+                  <div class="stepper-field">
+                    <label>Dormitórios</label>
+                    <div class="stepper">
+                      <button type="button" (click)="adjustNumber('bedrooms', -1); $event.preventDefault()"><span class="stepper-icon">-</span></button>
+                      <input type="number" [(ngModel)]="formData.bedrooms" name="bedrooms" class="stepper-input" min="0" inputmode="numeric">
+                      <button type="button" (click)="adjustNumber('bedrooms', 1); $event.preventDefault()"><span class="stepper-icon">+</span></button>
+                    </div>
+                  </div>
+                  <div class="stepper-field">
+                    <label>Suítes</label>
+                    <div class="stepper">
+                      <button type="button" (click)="adjustNumber('suites', -1); $event.preventDefault()"><span class="stepper-icon">-</span></button>
+                      <input type="number" [(ngModel)]="formData.suites" name="suites" class="stepper-input" min="0" inputmode="numeric">
+                      <button type="button" (click)="adjustNumber('suites', 1); $event.preventDefault()"><span class="stepper-icon">+</span></button>
+                    </div>
+                  </div>
+                  <div class="stepper-field">
+                    <label>Banheiros</label>
+                    <div class="stepper">
+                      <button type="button" (click)="adjustNumber('bathrooms', -1); $event.preventDefault()"><span class="stepper-icon">-</span></button>
+                      <input type="number" [(ngModel)]="formData.bathrooms" name="bathrooms" class="stepper-input" min="0" inputmode="numeric">
+                      <button type="button" (click)="adjustNumber('bathrooms', 1); $event.preventDefault()"><span class="stepper-icon">+</span></button>
+                    </div>
+                  </div>
+                  <div class="stepper-field">
+                    <label>Vagas Garagem</label>
+                    <div class="stepper">
+                      <button type="button" (click)="adjustNumber('parking', -1); $event.preventDefault()"><span class="stepper-icon">-</span></button>
+                      <input type="number" [(ngModel)]="formData.parking" name="parking" class="stepper-input" min="0" inputmode="numeric">
+                      <button type="button" (click)="adjustNumber('parking', 1); $event.preventDefault()"><span class="stepper-icon">+</span></button>
+                    </div>
+                  </div>
+                  <div class="stepper-field">
+                    <label>Cozinhas</label>
+                    <div class="stepper">
+                      <button type="button" (click)="adjustNumber('kitchens', -1); $event.preventDefault()"><span class="stepper-icon">-</span></button>
+                      <input type="number" [(ngModel)]="formData.kitchens" name="kitchens" class="stepper-input" min="0" inputmode="numeric">
+                      <button type="button" (click)="adjustNumber('kitchens', 1); $event.preventDefault()"><span class="stepper-icon">+</span></button>
+                    </div>
+                  </div>
+                </div>
+              </section>
 
-        <div class="form-section">
-          <h3>Medidas</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Área (m²)</label>
-              <input type="number" [(ngModel)]="formData.area" name="area" class="form-control">
+              <section class="property-card-section">
+                <h3><i class="bi bi-stars"></i> Comodidades do Imóvel</h3>
+                <div class="amenities-grid">
+                  <label class="amenity-chip">
+                    <input type="checkbox" [(ngModel)]="formData.diningRoom" name="diningRoom">
+                    <i class="bi bi-cup-hot"></i>
+                    Sala de Jantar
+                  </label>
+                  <label class="amenity-chip">
+                    <input type="checkbox" [(ngModel)]="formData.livingRoom" name="livingRoom">
+                    <i class="bi bi-tv"></i>
+                    Sala de Estar
+                  </label>
+                  <label class="amenity-chip">
+                    <input type="checkbox" [(ngModel)]="formData.serviceArea" name="serviceArea">
+                    <i class="bi bi-droplet-half"></i>
+                    Área de Serviço
+                  </label>
+                  <label class="amenity-chip">
+                    <input type="checkbox" [(ngModel)]="formData.closet" name="closet">
+                    <i class="bi bi-door-closed"></i>
+                    Closet
+                  </label>
+                  <button type="button" class="amenity-add" (click)="addCustomOption()">
+                    <i class="bi bi-plus-circle"></i>
+                    Adicionar
+                  </button>
+                </div>
+                <div class="custom-options" *ngIf="formData.customOptions?.length">
+                  <div class="custom-option" *ngFor="let option of formData.customOptions; let i = index">
+                    <input
+                      type="text"
+                      class="property-input"
+                      [(ngModel)]="option.label"
+                      name="customOptionLabel{{ i }}"
+                      placeholder="Digite a comodidade">
+                    <label class="custom-option-toggle">
+                      <input
+                        type="checkbox"
+                        [(ngModel)]="option.value"
+                        name="customOptionValue{{ i }}">
+                      Disponível
+                    </label>
+                    <button type="button" class="btn-remove-inline" (click)="removeCustomOption(i)">Remover</button>
+                  </div>
+                </div>
+              </section>
             </div>
-            <div class="form-group">
-              <label>Área Total (m²)</label>
-              <input type="number" [(ngModel)]="formData.totalArea" name="totalArea" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Área Construída (m²)</label>
-              <input type="number" [(ngModel)]="formData.builtArea" name="builtArea" class="form-control">
-            </div>
-          </div>
-        </div>
 
-        <div class="form-section">
-          <h3>Detalhes do anúncio</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Status</label>
-              <input type="text" [(ngModel)]="formData.status" name="status" class="form-control" placeholder="pronto">
-            </div>
-            <div class="form-group">
-              <label>Andar</label>
-              <input type="number" [(ngModel)]="formData.floor" name="floor" class="form-control">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" [(ngModel)]="formData.furnished" name="furnished">
-                Mobiliado
-              </label>
-            </div>
-          </div>
-        </div>
+            <div class="property-column">
+              <section class="property-card-section">
+                <h3><i class="bi bi-megaphone"></i> Sobre o Anúncio</h3>
+                <div class="field-grid">
+                  <div class="field-full">
+                    <label>Título do Anúncio *</label>
+                    <input type="text" [(ngModel)]="formData.title" name="title" required class="property-input" placeholder="Ex: Apartamento de Luxo nos Jardins">
+                  </div>
+                  <div class="field-full">
+                    <label>Descrição Completa *</label>
+                    <textarea [(ngModel)]="formData.description" name="description" rows="5" required class="property-input" placeholder="Descreva os diferenciais do imovel..."></textarea>
+                  </div>
+                  <div>
+                    <label>Tipo</label>
+                    <select [(ngModel)]="formData.type" name="type" required class="property-input">
+                      <option value="apartamento">Apartamento</option>
+                      <option value="casa">Casa</option>
+                      <option value="terreno">Terreno</option>
+                      <option value="comercial">Comercial</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label>Status</label>
+                    <select [(ngModel)]="formData.status" name="status" class="property-input">
+                      <option value="pronto">Pronto para morar</option>
+                      <option value="planta">Na planta</option>
+                      <option value="obras">Em obras</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label>Proprietário</label>
+                    <select [(ngModel)]="formData.owner_id" name="owner_id" class="property-input">
+                      <option value="">Nenhum</option>
+                      <option *ngFor="let owner of owners" [value]="owner.id">{{ owner.name }}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label>Contato *</label>
+                    <input type="text"
+                           [(ngModel)]="formData.contact"
+                           name="contact"
+                           required
+                           class="property-input"
+                           inputmode="tel"
+                           (input)="onContactInput($event)">
+                  </div>
+                  <div>
+                    <label>Andar</label>
+                    <input type="number" [(ngModel)]="formData.floor" name="floor" class="property-input">
+                  </div>
+                  <div class="inline-toggle">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="formData.furnished" name="furnished">
+                      Mobiliado
+                    </label>
+                  </div>
+                </div>
+              </section>
 
-        <div class="form-section">
-          <h3>Endereço</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label>CEP</label>
-              <input type="text" [(ngModel)]="formData.zip_code" name="zip_code" placeholder="00000-000" class="form-control"  (blur)="fetchAddressFromCep()">
-            </div>
-            <div class="form-group">
-              <label>Rua</label>
-              <input type="text" [(ngModel)]="formData.street" name="street" class="form-control">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>Bairro</label>
-              <input type="text" [(ngModel)]="formData.neighborhood" name="neighborhood" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Cidade</label>
-              <input type="text" [(ngModel)]="formData.city" name="city" class="form-control">
-            </div>
-            <div class="form-group">
-              <label>Estado</label>
-              <input type="text" [(ngModel)]="formData.state" name="state" maxlength="2" placeholder="UF" class="form-control">
-            </div>
-          </div>
-        </div>
+              <section class="property-card-section">
+                <h3><i class="bi bi-geo-alt"></i> Endereço</h3>
+                <div class="field-grid address-grid">
+                  <div>
+                    <label>CEP</label>
+                    <input type="text" [(ngModel)]="formData.zip_code" name="zip_code" placeholder="00000-000" class="property-input"  (input)="onCepInput($event)" (blur)="fetchAddressFromCep()">
+                  </div>
+                  <div class="field-full">
+                    <label>Rua / Logradouro</label>
+                    <input type="text" [(ngModel)]="formData.street" name="street" class="property-input">
+                  </div>
+                  <div>
+                    <label>Bairro</label>
+                    <input type="text" [(ngModel)]="formData.neighborhood" name="neighborhood" class="property-input">
+                  </div>
+                  <div>
+                    <label>Cidade</label>
+                    <input type="text" [(ngModel)]="formData.city" name="city" class="property-input">
+                  </div>
+                  <div>
+                    <label>UF</label>
+                    <input type="text" [(ngModel)]="formData.state" name="state" maxlength="2" placeholder="UF" class="property-input" (input)="onUfInput($event)">
+                  </div>
+                </div>
+              </section>
 
-        <div class="form-section">
-          <h3>Comodidades adicionais</h3>
-          <div class="form-group" *ngIf="formData.customOptions?.length">
-            <div class="custom-options">
-              <div class="custom-option" *ngFor="let option of formData.customOptions; let i = index">
-                <input
-                  type="text"
-                  class="form-control"
-                  [(ngModel)]="option.label"
-                  name="customOptionLabel{{ i }}"
-                  placeholder="Digite a comodidade">
-                <label class="custom-option-toggle">
-                  <input
-                    type="checkbox"
-                    [(ngModel)]="option.value"
-                    name="customOptionValue{{ i }}">
-                  Disponível
+              <section class="property-card-section">
+                <h3><i class="bi bi-image"></i> Imagens do Imóvel</h3>
+                <label class="document-dropzone">
+                  <input 
+                    type="file" 
+                    (change)="onImageSelect($event)" 
+                    accept="image/*"
+                    multiple
+                    #documentInput>
+                  <span class="drop-icon"><i class="bi bi-cloud-arrow-up"></i></span>
+                  <span class="drop-title">Clique para enviar ou arraste imagens</span>
+                  <span class="drop-hint">JPG, PNG, WEBP (Máximo de 12 imagens)</span>
                 </label>
-                <button type="button" class="btn-remove-inline" (click)="removeCustomOption(i)">Remover</button>
-              </div>
+                <div class="document-list" *ngIf="getImageCount() > 0">
+                  <div *ngFor="let doc of getImageList(); let i = index" class="document-item">
+                    <span class="document-icon">{{ getFileIcon(doc.name) }}</span>
+                    <span class="document-name">{{ doc.name }}</span>
+                    <button type="button" (click)="removeImage(i)" class="btn-remove">×</button>
+                  </div>
+                </div>
+                <div class="toggle-row">
+                  <label class="inline-toggle">
+                    <input type="checkbox" [(ngModel)]="formData.featured" name="featured">
+                    Destacado
+                  </label>
+                  <label class="inline-toggle">
+                    <input type="checkbox" [(ngModel)]="formData.sold" name="sold">
+                    Vendido
+                  </label>
+                </div>
+              </section>
             </div>
           </div>
-          <button type="button" class="btn-secondary btn-add" (click)="addCustomOption()">Adicionar comodidade</button>
-        </div>
-
-        <div class="form-section">
-          <h3>Documentos</h3>
-          <div class="form-group">
-            <label>Anexar Documentos (PDF, DOC, DOCX, XLS, XLSX, TXT - até 10)</label>
-            <input 
-              type="file" 
-              (change)="onDocumentSelect($event)" 
-              class="form-control" 
-              accept=".pdf,.doc,.docx,.xls,.xlsx,.txt"
-              multiple
-              #documentInput>
-            <small class="form-hint">{{ getDocumentCount() }}/10 documentos</small>
-          </div>
-          <div class="document-list" *ngIf="getDocumentCount() > 0">
-            <div *ngFor="let doc of getDocumentList(); let i = index" class="document-item">
-              <span class="document-icon">{{ getFileIcon(doc.name) }}</span>
-              <span class="document-name">{{ doc.name }}</span>
-              <button type="button" (click)="removeDocument(i)" class="btn-remove">×</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>Status</h3>
-          <div class="form-row">
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" [(ngModel)]="formData.featured" name="featured">
-                Destacado
-              </label>
-            </div>
-            <div class="form-group checkbox-group">
-              <label>
-                <input type="checkbox" [(ngModel)]="formData.sold" name="sold">
-                Vendido
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" (click)="closeModal()" class="btn-secondary">Cancelar</button>
-          <button type="submit" class="btn-primary">Salvar</button>
         </div>
       </form>
     </div>

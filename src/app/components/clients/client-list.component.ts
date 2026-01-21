@@ -7,6 +7,7 @@ import { ClientNoteService } from '../../services/client-note.service';
 import { AuthService } from '../../services/auth.service';
 import { Client, ClientNote } from '../../models/client.model';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner.component';
+import { PopupService } from '../../shared/services/popup.service';
 
 /**
  * ClientListComponent
@@ -48,7 +49,8 @@ export class ClientListComponent implements OnInit {
   constructor(
     private clientService: ClientService,
     private clientNoteService: ClientNoteService,
-    public authService: AuthService
+    public authService: AuthService,
+    private popupService: PopupService
   ) {
     this.resetForm();
   }
@@ -131,24 +133,29 @@ export class ClientListComponent implements OnInit {
       await this.loadClients();
     } catch (error) {
       console.error('Error saving client:', error);
-      alert('Erro ao salvar cliente');
+      this.popupService.alert('Erro ao salvar cliente', { title: 'Aviso', tone: 'warning' });
     }
   }
 
   async deleteClient(id: string) {
     if (!this.authService.isAdmin()) {
-      alert('Apenas administradores podem excluir clientes');
+      this.popupService.alert('Apenas administradores podem excluir clientes', { title: 'Aviso', tone: 'warning' });
       return;
     }
     
-    if (confirm('Tem certeza que deseja excluir este cliente?')) {
-      try {
-        await this.clientService.delete(id);
-        await this.loadClients();
-      } catch (error) {
-        console.error('Error deleting client:', error);
-        alert('Erro ao excluir cliente');
-      }
+    const confirmed = await this.popupService.confirm('Tem certeza que deseja excluir este cliente?', {
+      title: 'Excluir cliente',
+      confirmText: 'Excluir',
+      cancelText: 'Cancelar',
+      tone: 'danger'
+    });
+    if (!confirmed) return;
+    try {
+      await this.clientService.delete(id);
+      await this.loadClients();
+    } catch (error) {
+      console.error('Error deleting client:', error);
+      this.popupService.alert('Erro ao excluir cliente', { title: 'Aviso', tone: 'warning' });
     }
   }
 
@@ -178,7 +185,7 @@ export class ClientListComponent implements OnInit {
       this.selectedClientNotes = await this.clientNoteService.getByClientId(this.selectedClient.id);
     } catch (error) {
       console.error('Error adding note:', error);
-      alert('Erro ao adicionar anotação');
+      this.popupService.alert('Erro ao adicionar anotação', { title: 'Aviso', tone: 'warning' });
     }
   }
 

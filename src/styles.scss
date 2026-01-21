@@ -64,6 +64,34 @@ body {
   background: var(--color-bg-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scrollbar-color: var(--color-border-medium) transparent;
+  scrollbar-width: thin;
+}
+
+* {
+  scrollbar-color: var(--color-border-medium) transparent;
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border-medium);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+  background-clip: padding-box;
 }
 
 body[data-theme='dark'] {
@@ -84,6 +112,16 @@ body[data-theme='dark'] {
   --shadow-sm: 0 4px 8px -4px rgb(0 0 0 / 0.6);
   --shadow-md: 0 10px 22px -12px rgb(0 0 0 / 0.7);
   --shadow-lg: 0 24px 40px -20px rgb(0 0 0 / 0.8);
+}
+
+body[data-theme='dark'] *::-webkit-scrollbar-thumb {
+  background: var(--color-border-dark);
+  background-clip: padding-box;
+}
+
+body[data-theme='dark'] *::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+  background-clip: padding-box;
 }
 
 /* Typography */

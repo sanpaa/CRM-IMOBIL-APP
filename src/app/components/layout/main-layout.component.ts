@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { PopupHostComponent } from '../../shared/components/popup-host.component';
 import { AuthService } from '../../services/auth.service';
 import { CompanyService } from '../../services/company.service';
 import { User } from '../../models/user.model';
@@ -9,7 +10,7 @@ import { Company } from '../../models/company.model';
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, PopupHostComponent],
   template: `
     <div class="layout-container">
       <!-- Mobile Menu Toggle -->
@@ -21,7 +22,7 @@ import { Company } from '../../models/company.model';
       <div class="sidebar-overlay" *ngIf="sidebarOpen" (click)="closeMobileMenu()"></div>
 
       <!-- Sidebar -->
-      <aside class="sidebar" [class.sidebar-open]="sidebarOpen">
+      <aside class="sidebar" [class.sidebar-open]="sidebarOpen" [class.sidebar-collapsed]="isSidebarCollapsed">
         <div class="sidebar-header">
           <div class="logo">
             <div class="logo-mark">
@@ -32,6 +33,9 @@ import { Company } from '../../models/company.model';
               <p>Gestão Imobiliária</p>
             </div>
           </div>
+          <button class="collapse-toggle" (click)="toggleSidebarCollapse()" aria-label="Recolher menu">
+            <i class="bi" [class.bi-chevron-left]="!isSidebarCollapsed" [class.bi-chevron-right]="isSidebarCollapsed"></i>
+          </button>
           <button class="theme-toggle" (click)="toggleTheme()" aria-label="Alternar tema">
             <i class="bi" [class.bi-moon-stars]="!isDarkTheme" [class.bi-sun]="isDarkTheme"></i>
           </button>
@@ -107,10 +111,11 @@ import { Company } from '../../models/company.model';
       </aside>
 
       <!-- Main Content Area -->
-      <main class="main-content">
+      <main class="main-content" [class.content-collapsed]="isSidebarCollapsed">
         <router-outlet></router-outlet>
       </main>
     </div>
+    <app-popup-host></app-popup-host>
   `,
   styles: [`
     .layout-container {
@@ -178,6 +183,10 @@ import { Company } from '../../models/company.model';
       border-right: 1px solid var(--color-border-light);
       z-index: 1002;
       transition: transform 0.3s ease;
+    }
+
+    .sidebar.sidebar-collapsed {
+      width: 84px;
     }
 
     .mobile-close-btn {
@@ -256,7 +265,26 @@ import { Company } from '../../models/company.model';
       transition: all 0.2s ease;
     }
 
+    .collapse-toggle {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--color-border-light);
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
     .theme-toggle:hover {
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
+    }
+
+    .collapse-toggle:hover {
       background: var(--color-bg-tertiary);
       color: var(--color-text-primary);
     }
@@ -470,6 +498,47 @@ import { Company } from '../../models/company.model';
       transition: margin-left 0.3s ease;
     }
 
+    .main-content.content-collapsed {
+      margin-left: 84px;
+    }
+
+    .sidebar.sidebar-collapsed .logo-text,
+    .sidebar.sidebar-collapsed .nav-label,
+    .sidebar.sidebar-collapsed .nav-section-label,
+    .sidebar.sidebar-collapsed .user-details,
+    .sidebar.sidebar-collapsed .company-details,
+    .sidebar.sidebar-collapsed .company-label,
+    .sidebar.sidebar-collapsed .user-card-divider,
+    .sidebar.sidebar-collapsed .btn-logout span {
+      display: none;
+    }
+
+    .sidebar.sidebar-collapsed .logo {
+      justify-content: center;
+    }
+
+    .sidebar.sidebar-collapsed .sidebar-header {
+      padding: 1.25rem 1rem;
+    }
+
+    .sidebar.sidebar-collapsed .nav-item {
+      justify-content: center;
+      gap: 0;
+    }
+
+    .sidebar.sidebar-collapsed .sidebar-footer {
+      padding: 0.75rem;
+    }
+
+    .sidebar.sidebar-collapsed .user-card,
+    .sidebar.sidebar-collapsed .company-info {
+      padding: 0.65rem;
+    }
+
+    .sidebar.sidebar-collapsed .btn-logout {
+      justify-content: center;
+    }
+
     /* Responsive Design for Tablets and Mobile */
     @media (max-width: 1024px) {
       .mobile-menu-toggle {
@@ -494,6 +563,10 @@ import { Company } from '../../models/company.model';
 
       .main-content {
         margin-left: 0;
+      }
+
+      .collapse-toggle {
+        display: none;
       }
     }
 
@@ -533,6 +606,7 @@ export class MainLayoutComponent implements OnInit {
   currentUser: User | null = null;
   company: Company | null = null;
   sidebarOpen = false;
+  isSidebarCollapsed = false;
   isDarkTheme = false;
 
   constructor(
@@ -557,6 +631,10 @@ export class MainLayoutComponent implements OnInit {
 
   closeMobileMenu() {
     this.sidebarOpen = false;
+  }
+
+  toggleSidebarCollapse() {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }
 
   getUserInitials(name: string): string {

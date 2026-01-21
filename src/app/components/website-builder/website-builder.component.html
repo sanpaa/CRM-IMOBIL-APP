@@ -2,7 +2,10 @@
   <!-- Header -->
   <div class="builder-header">
     <div class="header-left">
-      <h1>🎨 Construtor de Sites</h1>
+      <div class="brand">
+        <span class="brand-icon">🎨</span>
+        <h1>Construtor de Sites</h1>
+      </div>
       <div class="layout-selector" *ngIf="currentLayout">
         <select [(ngModel)]="currentLayout" (change)="selectLayout(currentLayout!)">
           <option *ngFor="let layout of layouts" [ngValue]="layout">
@@ -11,21 +14,43 @@
           </option>
         </select>
       </div>
+      <div class="status-pill" *ngIf="currentLayout">
+        <span class="status-dot" [class.published]="currentLayout.is_default"></span>
+        <span class="status-label">{{ currentLayout.is_default ? 'Publicado' : 'Rascunho' }}</span>
+        <span class="status-divider"></span>
+        <span class="status-state" *ngIf="hasUnsavedChanges">Alterações não salvas</span>
+        <span class="status-state" *ngIf="!hasUnsavedChanges && lastSavedAt">Salvo {{ lastSavedAt | date:'HH:mm' }}</span>
+      </div>
     </div>
     
     <div class="header-actions">
+      <div class="device-toggle">
+        <button class="device-btn" [class.active]="previewDevice === 'desktop'" (click)="setPreviewDevice('desktop')" title="Desktop">
+          🖥️
+        </button>
+        <button class="device-btn" [class.active]="previewDevice === 'tablet'" (click)="setPreviewDevice('tablet')" title="Tablet">
+          📱
+        </button>
+        <button class="device-btn" [class.active]="previewDevice === 'mobile'" (click)="setPreviewDevice('mobile')" title="Mobile">
+          📱
+        </button>
+      </div>
+      <div class="history-actions">
+        <button class="btn-ghost" (click)="undo()" [disabled]="!canUndo" title="Desfazer">↶</button>
+        <button class="btn-ghost" (click)="redo()" [disabled]="!canRedo" title="Refazer">↷</button>
+      </div>
       <button class="btn-secondary" (click)="showLayoutForm = true">
         ➕ Novo Layout
       </button>
-      <a class="btn-secondary" routerLink="/public-site-settings">
-        ⚙️ Configurações do Site
-      </a>
-      <button class="btn-secondary" (click)="toggleLivePreview()">
-        {{ livePreviewEnabled ? '🔲 Ocultar Preview' : '👁️ Mostrar Preview' }}
-      </button>
       <button class="btn-secondary" (click)="togglePreview()">
-        {{ previewMode ? '✏️ Editar' : '🖥️ Preview Completo' }}
+        {{ previewMode ? '✏️ Editar' : '👁️ Pré-visualizar' }}
       </button>
+      <button class="btn-secondary" (click)="toggleLivePreview()">
+        {{ livePreviewEnabled ? '🔲 Ocultar Preview' : '👁️ Preview ao Vivo' }}
+      </button>
+      <a class="btn-secondary" routerLink="/public-site-settings">
+        ⚙️ Configurações
+      </a>
       <button class="btn-primary" (click)="saveLayout()" [disabled]="saving || !currentLayout">
         {{ saving ? 'Salvando...' : '💾 Salvar' }}
       </button>
@@ -76,7 +101,14 @@
   <div class="builder-content" *ngIf="currentLayout">
     <!-- Component Library Sidebar -->
     <div class="component-library" *ngIf="!previewMode">
-      <h3>📦 Componentes</h3>
+      <div class="library-header">
+        <h3>📦 Componentes</h3>
+        <input
+          type="text"
+          class="library-search"
+          placeholder="Buscar componente..."
+          [(ngModel)]="componentSearch">
+      </div>
       
       <div class="component-categories"
            cdkDropList
@@ -85,7 +117,7 @@
            [cdkDropListConnectedTo]="['main-sections-list']"
            [cdkDropListSortingDisabled]="true">
         <div class="component-item" 
-             *ngFor="let component of availableComponents"
+             *ngFor="let component of filteredComponents"
              cdkDrag
              [cdkDragData]="component"
              (click)="addComponent(component.type)"
@@ -99,8 +131,22 @@
     <!-- Canvas Area -->
     <div class="canvas-area" [class.preview-mode]="previewMode" [class.with-preview]="livePreviewEnabled && !previewMode">
       <div class="canvas-header">
-        <h3>{{ currentLayout.name }}</h3>
-        <span class="page-type-badge">{{ currentLayout.page_type }}</span>
+        <div class="canvas-title">
+          <h3>{{ currentLayout.name }}</h3>
+          <span class="page-type-badge">{{ currentLayout.page_type }}</span>
+        </div>
+        <div class="canvas-controls">
+          <span class="zoom-label">Zoom</span>
+          <div class="zoom-buttons">
+            <button
+              *ngFor="let level of zoomLevels"
+              class="btn-ghost"
+              [class.active]="zoomLevel === level"
+              (click)="setZoom(level)">
+              {{ level * 100 }}%
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Empty State -->
@@ -111,42 +157,46 @@
       </div>
 
       <!-- Sections List with Drag & Drop -->
-      <div class="sections-container" 
-           cdkDropList
-           id="main-sections-list"
-           [cdkDropListData]="sections"
-           (cdkDropListDropped)="onDrop($event)">
+      <div class="canvas-zoom" [style.transform]="'scale(' + zoomLevel + ')'">
+        <div class="sections-container" 
+             cdkDropList
+             id="main-sections-list"
+             [cdkDropListData]="sections"
+             (cdkDropListDropped)="onDrop($event)">
         
-        <div class="section-wrapper"
-             *ngFor="let section of sections"
-             cdkDrag
-             [class.selected]="selectedSection === section"
-             (click)="selectSection(section)">
+          <div class="section-wrapper"
+               *ngFor="let section of sections"
+               cdkDrag
+               [class.selected]="selectedSection === section"
+               (click)="selectSection(section)">
           
-          <!-- Drag Handle -->
-          <div class="drag-handle" cdkDragHandle *ngIf="!previewMode">
-            <span>⋮⋮</span>
-          </div>
+            <!-- Drag Handle -->
+            <div class="drag-handle" cdkDragHandle *ngIf="!previewMode">
+              <span>⋮⋮</span>
+            </div>
           
-          <!-- Section Actions -->
-          <div class="section-actions" *ngIf="!previewMode">
-            <button class="btn-icon" (click)="duplicateSection(section); $event.stopPropagation()" 
-                    title="Duplicar">
-              📋
-            </button>
-            <button class="btn-icon" (click)="removeSection(section); $event.stopPropagation()" 
-                    title="Remover">
-              🗑️
-            </button>
-          </div>
+            <!-- Section Actions -->
+            <div class="section-actions" *ngIf="!previewMode">
+              <button class="btn-icon" (click)="duplicateSection(section); $event.stopPropagation()" 
+                      title="Duplicar">
+                📋
+              </button>
+              <button class="btn-icon" (click)="removeSection(section); $event.stopPropagation()" 
+                      title="Remover">
+                🗑️
+              </button>
+            </div>
           
-          <!-- Dynamic Component Rendering -->
-          <ng-container *appRenderComponent="section; editMode: !previewMode"></ng-container>
+            <!-- Dynamic Component Rendering -->
+            <div class="section-render" [class.disable-pointer]="!previewMode">
+              <ng-container *appRenderComponent="section; editMode: !previewMode"></ng-container>
+            </div>
           
-          <!-- Drag Preview -->
-          <div class="drag-preview" *cdkDragPreview>
-            <div class="section-preview-compact">
-              {{ getComponentIcon(section.type) }} {{ getComponentLabel(section.type) }}
+            <!-- Drag Preview -->
+            <div class="drag-preview" *cdkDragPreview>
+              <div class="section-preview-compact">
+                {{ getComponentIcon(section.type) }} {{ getComponentLabel(section.type) }}
+              </div>
             </div>
           </div>
         </div>

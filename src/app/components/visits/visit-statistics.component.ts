@@ -19,11 +19,11 @@ interface Statistics {
   imports: [CommonModule],
   template: `
     <div class="stats-container">
-      <h3 class="stats-title">Estatísticas</h3>
+      <div class="stats-title">Estatísticas do período</div>
       
       <div class="stats-grid">
         <div class="stat-card total">
-          <div class="stat-icon">📅</div>
+          <div class="stat-icon"><i class="bi bi-calendar3"></i></div>
           <div class="stat-content">
             <div class="stat-value">{{ stats.total }}</div>
             <div class="stat-label">Total de Visitas</div>
@@ -31,7 +31,7 @@ interface Statistics {
         </div>
 
         <div class="stat-card agendada">
-          <div class="stat-icon">🕐</div>
+          <div class="stat-icon"><i class="bi bi-clock"></i></div>
           <div class="stat-content">
             <div class="stat-value">{{ stats.agendada }}</div>
             <div class="stat-label">Agendadas</div>
@@ -39,7 +39,7 @@ interface Statistics {
         </div>
 
         <div class="stat-card confirmada">
-          <div class="stat-icon">✓</div>
+          <div class="stat-icon"><i class="bi bi-patch-check"></i></div>
           <div class="stat-content">
             <div class="stat-value">{{ stats.confirmada }}</div>
             <div class="stat-label">Confirmadas</div>
@@ -47,7 +47,7 @@ interface Statistics {
         </div>
 
         <div class="stat-card realizada">
-          <div class="stat-icon">✔</div>
+          <div class="stat-icon"><i class="bi bi-check2-circle"></i></div>
           <div class="stat-content">
             <div class="stat-value">{{ stats.realizada }}</div>
             <div class="stat-label">Realizadas</div>
@@ -55,7 +55,7 @@ interface Statistics {
         </div>
 
         <div class="stat-card cancelada">
-          <div class="stat-icon">✖</div>
+          <div class="stat-icon"><i class="bi bi-x-circle"></i></div>
           <div class="stat-content">
             <div class="stat-value">{{ stats.cancelada }}</div>
             <div class="stat-label">Canceladas</div>
@@ -63,31 +63,30 @@ interface Statistics {
         </div>
       </div>
 
-      <div class="period-stats">
-        <div class="period-card">
-          <div class="period-value">{{ stats.today }}</div>
-          <div class="period-label">Hoje</div>
-        </div>
-        <div class="period-card">
-          <div class="period-value">{{ stats.thisWeek }}</div>
-          <div class="period-label">Esta Semana</div>
-        </div>
-        <div class="period-card">
-          <div class="period-value">{{ stats.thisMonth }}</div>
-          <div class="period-label">Este Mês</div>
-        </div>
-      </div>
-
       <div class="completion-rate">
         <div class="rate-header">
-          <span>Taxa de Conclusão</span>
+          <div>
+            <strong>Taxa de Conclusão</strong>
+            <small>{{ stats.realizada }} de {{ stats.total }} visitas finalizadas</small>
+          </div>
           <span class="rate-value">{{ completionRate }}%</span>
         </div>
         <div class="rate-bar">
           <div class="rate-fill" [style.width.%]="completionRate"></div>
         </div>
-        <div class="rate-details">
-          <small>{{ stats.realizada }} de {{ stats.total }} visitas realizadas</small>
+        <div class="period-inline">
+          <div>
+            <span>Hoje</span>
+            <strong>{{ stats.today }}</strong>
+          </div>
+          <div>
+            <span>Semana</span>
+            <strong>{{ stats.thisWeek }}</strong>
+          </div>
+          <div>
+            <span>Mês</span>
+            <strong>{{ stats.thisMonth }}</strong>
+          </div>
         </div>
       </div>
     </div>
@@ -103,28 +102,29 @@ interface Statistics {
     }
 
     .stats-title {
-      margin: 0 0 1.5rem 0;
-      color: var(--color-text-primary);
-      font-size: 1.25rem;
+      margin: 0 0 1.2rem 0;
+      color: var(--color-text-secondary);
+      font-size: 0.8rem;
       font-weight: 700;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid var(--color-border-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
     }
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 1rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
     }
 
     .stat-card {
       display: flex;
       gap: 1rem;
-      padding: 1.5rem;
-      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      border-radius: 14px;
       transition: all 0.3s ease;
-      cursor: pointer;
+      border: 1px solid var(--color-border-light);
+      background: var(--color-bg-secondary);
     }
 
     .stat-card:hover {
@@ -133,33 +133,35 @@ interface Statistics {
     }
 
     .stat-card.total {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      border-left: 3px solid var(--color-primary);
     }
 
     .stat-card.agendada {
-      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-      color: white;
+      border-left: 3px solid #f59e0b;
     }
 
     .stat-card.confirmada {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: white;
+      border-left: 3px solid #10b981;
     }
 
     .stat-card.realizada {
-      background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-      color: white;
+      border-left: 3px solid #3b82f6;
     }
 
     .stat-card.cancelada {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      color: white;
+      border-left: 3px solid #ef4444;
     }
 
     .stat-icon {
-      font-size: 2.5rem;
-      line-height: 1;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
     }
 
     .stat-content {
@@ -167,56 +169,24 @@ interface Statistics {
     }
 
     .stat-value {
-      font-size: 2rem;
+      font-size: 1.6rem;
       font-weight: 700;
       line-height: 1;
       margin-bottom: 0.5rem;
+      color: var(--color-text-primary);
     }
 
     .stat-label {
-      font-size: 0.9rem;
-      opacity: 0.9;
-      font-weight: 500;
-    }
-
-    .period-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      margin-bottom: 2rem;
-      padding: 1.5rem;
-      background: var(--color-bg-tertiary);
-      border-radius: 12px;
-    }
-
-    .period-card {
-      text-align: center;
-      padding: 1rem;
-      background: var(--color-bg-secondary);
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-
-    .period-value {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--color-primary);
-      margin-bottom: 0.5rem;
-    }
-
-    .period-label {
       font-size: 0.85rem;
       color: var(--color-text-secondary);
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .completion-rate {
-      padding: 1.5rem;
-      background: var(--color-bg-tertiary);
-      border-radius: 12px;
-      border: 2px solid var(--color-border-light);
+      padding: 1.25rem 1.5rem;
+      background: var(--color-bg-secondary);
+      border-radius: 14px;
+      border: 1px solid var(--color-border-light);
     }
 
     .rate-header {
@@ -224,41 +194,59 @@ interface Statistics {
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
-      font-weight: 600;
       color: var(--color-text-primary);
+    }
+
+    .rate-header strong {
+      display: block;
+      font-weight: 700;
+    }
+
+    .rate-header small {
+      display: block;
+      color: var(--color-text-secondary);
+      margin-top: 0.25rem;
     }
 
     .rate-value {
       font-size: 1.5rem;
       color: var(--color-primary);
+      font-weight: 700;
     }
 
     .rate-bar {
-      height: 12px;
-      background: var(--color-bg-secondary);
-      border-radius: 6px;
+      height: 8px;
+      background: var(--color-bg-tertiary);
+      border-radius: 999px;
       overflow: hidden;
       margin-bottom: 0.5rem;
     }
 
     .rate-fill {
       height: 100%;
-      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-      border-radius: 6px;
+      background: var(--color-primary);
+      border-radius: 999px;
       transition: width 0.6s ease;
     }
 
-    .rate-details {
-      text-align: center;
+    .period-inline {
+      margin-top: 1rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
       color: var(--color-text-secondary);
+      font-size: 0.8rem;
+    }
+
+    .period-inline strong {
+      display: block;
+      color: var(--color-text-primary);
+      font-size: 1rem;
+      margin-top: 0.2rem;
     }
 
     @media (max-width: 768px) {
       .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .period-stats {
         grid-template-columns: 1fr;
       }
 
@@ -268,6 +256,10 @@ interface Statistics {
 
       .stat-value {
         font-size: 1.5rem;
+      }
+
+      .period-inline {
+        grid-template-columns: 1fr;
       }
     }
   `]

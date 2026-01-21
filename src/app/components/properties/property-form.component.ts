@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Property } from '../../models/property.model';
+import { PopupService } from '../../shared/services/popup.service';
 
 @Component({
   selector: 'app-property-form',
@@ -98,16 +99,16 @@ import { Property } from '../../models/property.model';
 
         <div class="form-row">
           <div class="form-group">
-            <label>Área (m²)</label>
-            <input type="number" [(ngModel)]="formData.area" name="area" class="form-control">
-          </div>
-          <div class="form-group">
-            <label>Área Total (m²)</label>
-            <input type="number" [(ngModel)]="formData.totalArea" name="totalArea" class="form-control">
+            <label>Área Privativa (m²)</label>
+            <input type="number" [(ngModel)]="formData.areaPrivativa" name="areaPrivativa" class="form-control">
           </div>
           <div class="form-group">
             <label>Área Construída (m²)</label>
-            <input type="number" [(ngModel)]="formData.builtArea" name="builtArea" class="form-control">
+            <input type="number" [(ngModel)]="formData.areaConstrutiva" name="areaConstrutiva" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Área do Terreno (m²)</label>
+            <input type="number" [(ngModel)]="formData.areaTerreno" name="areaTerreno" class="form-control">
           </div>
         </div>
 
@@ -621,13 +622,16 @@ export class PropertyFormComponent implements OnInit {
   loading = false;
   loadingCep = false;
 
+  constructor(private popupService: PopupService) {}
+
   ngOnInit() {
     this.resetForm();
     if (this.editingProperty) {
       this.formData = {
         ...this.editingProperty,
-        totalArea: this.editingProperty.totalArea ?? this.editingProperty.area ?? null,
-        builtArea: this.editingProperty.builtArea ?? null,
+        areaPrivativa: this.editingProperty.areaPrivativa ?? this.editingProperty.totalArea ?? this.editingProperty.area ?? null,
+        areaConstrutiva: this.editingProperty.areaConstrutiva ?? this.editingProperty.builtArea ?? null,
+        areaTerreno: this.editingProperty.areaTerreno ?? null,
         customOptions: (this.editingProperty as any).custom_options ?? []
       };
       this.imageUrls = this.editingProperty.image_urls || [];
@@ -665,9 +669,9 @@ export class PropertyFormComponent implements OnInit {
       livingRoom: false,
       serviceArea: false,
       closet: false,
-      totalArea: null,
-      builtArea: null,
-      area: null,
+      areaPrivativa: null,
+      areaConstrutiva: null,
+      areaTerreno: null,
       zip_code: '',
       street: '',
       neighborhood: '',
@@ -782,7 +786,10 @@ export class PropertyFormComponent implements OnInit {
       }
       
       if (files.length > remainingSlots) {
-        alert(`Limite de ${PropertyFormComponent.MAX_IMAGES} imagens. Apenas ${filesToAdd} imagens foram adicionadas.`);
+        this.popupService.alert(`Limite de ${PropertyFormComponent.MAX_IMAGES} imagens. Apenas ${filesToAdd} imagens foram adicionadas.`, {
+          title: 'Aviso',
+          tone: 'warning'
+        });
       }
     }
     event.target.value = '';
@@ -821,7 +828,10 @@ export class PropertyFormComponent implements OnInit {
       }
       
       if (files.length > remainingSlots) {
-        alert(`Limite de ${PropertyFormComponent.MAX_DOCUMENTS} documentos. Apenas ${filesToAdd} documentos foram adicionados.`);
+        this.popupService.alert(`Limite de ${PropertyFormComponent.MAX_DOCUMENTS} documentos. Apenas ${filesToAdd} documentos foram adicionados.`, {
+          title: 'Aviso',
+          tone: 'warning'
+        });
       }
     }
     event.target.value = '';
@@ -870,9 +880,6 @@ export class PropertyFormComponent implements OnInit {
     // Ensure coordinates are set before saving
     if (!this.formData.latitude || !this.formData.longitude) {
       await this.geocodeAddress();
-    }
-    if (this.formData.totalArea != null && (this.formData.area == null || this.formData.area === 0)) {
-      this.formData.area = this.formData.totalArea;
     }
     if (Array.isArray(this.formData.customOptions)) {
       const normalizedOptions = this.formData.customOptions

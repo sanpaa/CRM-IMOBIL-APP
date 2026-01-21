@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SubscriptionService, TenantSubscription, SubscriptionPlan, UsageStats } from '../../services/subscription.service';
+import { PopupService } from '../../shared/services/popup.service';
 
 @Component({
   selector: 'app-subscription-management',
@@ -17,7 +18,10 @@ export class SubscriptionManagementComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  constructor(private subscriptionService: SubscriptionService) {}
+  constructor(
+    private subscriptionService: SubscriptionService,
+    private popupService: PopupService
+  ) {}
 
   ngOnInit() {
     this.loadSubscriptionData();
@@ -67,45 +71,58 @@ export class SubscriptionManagementComponent implements OnInit {
     });
   }
 
-  changePlan(planId: string, planName: string) {
+  async changePlan(planId: string, planName: string) {
     const isUpgrade = this.isUpgrade(planId);
     const action = isUpgrade ? 'fazer upgrade' : 'fazer downgrade';
     
-    if (confirm(`Deseja realmente ${action} para o plano ${planName}?`)) {
-      this.subscriptionService.changePlan(planId).subscribe({
-        next: (response) => {
-          if (response.success) {
-            alert(`Plano alterado com sucesso para ${planName}!`);
-            this.loadSubscriptionData();
-          } else {
-            alert(response.message || 'Erro ao alterar plano');
-          }
-        },
-        error: (err) => {
-          console.error('Error changing plan:', err);
-          alert('Erro ao alterar plano. Por favor, tente novamente.');
+    const confirmed = await this.popupService.confirm(`Deseja realmente ${action} para o plano ${planName}?`, {
+      title: 'Alterar plano',
+      confirmText: 'Confirmar',
+      cancelText: 'Cancelar',
+      tone: 'warning'
+    });
+    if (!confirmed) return;
+    this.subscriptionService.changePlan(planId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.popupService.alert(`Plano alterado com sucesso para ${planName}!`, { title: 'Sucesso', tone: 'info' });
+          this.loadSubscriptionData();
+        } else {
+          this.popupService.alert(response.message || 'Erro ao alterar plano', { title: 'Aviso', tone: 'warning' });
         }
-      });
-    }
+      },
+      error: (err) => {
+        console.error('Error changing plan:', err);
+        this.popupService.alert('Erro ao alterar plano. Por favor, tente novamente.', { title: 'Aviso', tone: 'warning' });
+      }
+    });
   }
 
-  cancelSubscription() {
-    if (confirm('Tem certeza que deseja cancelar sua assinatura?\n\nVocê perderá acesso aos recursos do seu plano atual.')) {
-      this.subscriptionService.cancelSubscription().subscribe({
-        next: (response) => {
-          if (response.success) {
-            alert('Assinatura cancelada com sucesso.');
-            this.loadSubscriptionData();
-          } else {
-            alert(response.message || 'Erro ao cancelar assinatura');
-          }
-        },
-        error: (err) => {
-          console.error('Error cancelling subscription:', err);
-          alert('Erro ao cancelar assinatura. Por favor, tente novamente.');
+  async cancelSubscription() {
+    const confirmed = await this.popupService.confirm(
+      'Tem certeza que deseja cancelar sua assinatura?\n\nVocê perderá acesso aos recursos do seu plano atual.',
+      {
+        title: 'Cancelar assinatura',
+        confirmText: 'Cancelar assinatura',
+        cancelText: 'Voltar',
+        tone: 'danger'
+      }
+    );
+    if (!confirmed) return;
+    this.subscriptionService.cancelSubscription().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.popupService.alert('Assinatura cancelada com sucesso.', { title: 'Sucesso', tone: 'info' });
+          this.loadSubscriptionData();
+        } else {
+          this.popupService.alert(response.message || 'Erro ao cancelar assinatura', { title: 'Aviso', tone: 'warning' });
         }
-      });
-    }
+      },
+      error: (err) => {
+        console.error('Error cancelling subscription:', err);
+        this.popupService.alert('Erro ao cancelar assinatura. Por favor, tente novamente.', { title: 'Aviso', tone: 'warning' });
+      }
+    });
   }
 
   getProgressBarColor(percentage: number): string {

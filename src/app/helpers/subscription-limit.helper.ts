@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { SubscriptionService } from '../services/subscription.service';
+import { PopupService } from '../shared/services/popup.service';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
@@ -20,7 +21,8 @@ export interface LimitCheckResult {
 export class SubscriptionLimitHelper {
   constructor(
     private subscriptionService: SubscriptionService,
-    private router: Router
+    private router: Router,
+    private popupService: PopupService
   ) {}
 
   /**
@@ -137,17 +139,25 @@ export class SubscriptionLimitHelper {
       this.checkCanAddUser().subscribe(result => {
         if (!result.allowed) {
           // Block and show error
-          if (confirm(
+          this.popupService.confirm(
             `${result.message}\n\n` +
-            'Deseja ir para a página de planos para fazer upgrade?'
-          )) {
-            this.router.navigate(['/subscription']);
-          }
+            'Deseja ir para a página de planos para fazer upgrade?',
+            {
+              title: 'Limite do plano',
+              confirmText: 'Ver planos',
+              cancelText: 'Agora não',
+              tone: 'warning'
+            }
+          ).then(confirmed => {
+            if (confirmed) {
+              this.router.navigate(['/subscription']);
+            }
+          });
           resolve(false);
         } else {
           // Allow but show warning if applicable
           if (result.message) {
-            alert(result.message);
+            this.popupService.alert(result.message, { title: 'Aviso', tone: 'warning' });
           }
           resolve(true);
         }
@@ -164,17 +174,25 @@ export class SubscriptionLimitHelper {
       this.checkCanAddProperty().subscribe(result => {
         if (!result.allowed) {
           // Block and show error
-          if (confirm(
+          this.popupService.confirm(
             `${result.message}\n\n` +
-            'Deseja ir para a página de planos para fazer upgrade?'
-          )) {
-            this.router.navigate(['/subscription']);
-          }
+            'Deseja ir para a página de planos para fazer upgrade?',
+            {
+              title: 'Limite do plano',
+              confirmText: 'Ver planos',
+              cancelText: 'Agora não',
+              tone: 'warning'
+            }
+          ).then(confirmed => {
+            if (confirmed) {
+              this.router.navigate(['/subscription']);
+            }
+          });
           resolve(false);
         } else {
           // Allow but show warning if applicable
           if (result.message) {
-            alert(result.message);
+            this.popupService.alert(result.message, { title: 'Aviso', tone: 'warning' });
           }
           resolve(true);
         }
