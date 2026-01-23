@@ -76,6 +76,10 @@ export const routes: Routes = [
       {
         path: 'website-builder',
         loadComponent: () => import('./components/website-builder/website-builder.component').then(m => m.WebsiteBuilderComponent)
+      },
+      {
+        path: 'website-templates',
+        loadComponent: () => import('./components/website-templates/website-templates.component').then(m => m.WebsiteTemplatesComponent)
       }
     ]
   },

@@ -8,28 +8,37 @@
 
   <!-- Filters Section -->
   <div class="filters-card">
+    <div class="filters-header">
+      <h2>Buscar Cliente</h2>
+    </div>
     <div class="filter-row">
       <div class="filter-group">
         <label>Buscar</label>
-        <input 
-          type="text" 
-          [(ngModel)]="searchTerm" 
-          placeholder="Nome, email, telefone, CPF..." 
-          class="filter-input">
+        <div class="input-with-icon">
+          <i class="bi bi-search"></i>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm" 
+            placeholder="Nome, email, telefone, CPF..." 
+            class="filter-input with-icon">
+        </div>
       </div>
       <div class="filter-group">
         <label>Status</label>
-        <select [(ngModel)]="filterStatus" class="filter-input">
-          <option value="">Todos</option>
-          <option value="lead">Lead</option>
-          <option value="interessado">Interessado</option>
-          <option value="fechamento">Fechamento</option>
-          <option value="cliente">Cliente</option>
-        </select>
+        <div class="input-with-icon">
+          <i class="bi bi-funnel"></i>
+          <select [(ngModel)]="filterStatus" class="filter-input with-icon">
+            <option value="">Todos</option>
+            <option value="lead">Lead</option>
+            <option value="interessado">Interessado</option>
+            <option value="fechamento">Fechamento</option>
+            <option value="cliente">Cliente</option>
+          </select>
+        </div>
       </div>
       <div class="filter-actions">
         <button (click)="applyFilters()" class="btn-primary">Buscar</button>
-        <button (click)="clearFilters()" class="btn-secondary">Limpar Filtros</button>
+        <button (click)="clearFilters()" class="btn-secondary">Limpar</button>
       </div>
     </div>
   </div>
@@ -137,23 +146,25 @@
     <table class="data-table" *ngIf="!isLoading">
       <thead>
         <tr>
-          <th>Nome</th>
+          <th>Cliente</th>
           <th>CPF</th>
           <th>Email</th>
           <th>Telefone</th>
           <th>Status</th>
-          <th>Interesse</th>
           <th>Ações</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let client of filteredClients">
           <td>
-            <div class="client-name-cell">
-              <span class="client-name">{{ client.name }}</span>
-              <span class="status-badge" [ngClass]="getStatusClass(client.status)">
-                {{ getStatusLabel(client.status) }}
-              </span>
+            <div class="client-cell">
+              <div class="client-avatar">
+                {{ (client.name || '?').slice(0, 1) }}
+              </div>
+              <div class="client-meta">
+                <span class="client-name">{{ client.name }}</span>
+                <span class="client-subtitle">{{ client.interest || 'Sem interesse informado' }}</span>
+              </div>
             </div>
           </td>
           <td>{{ formatCPF(client.cpf) }}</td>
@@ -164,22 +175,41 @@
               {{ getStatusLabel(client.status) }}
             </span>
           </td>
-          <td>{{ client.interest || '-' }}</td>
           <td>
-            <button (click)="openModal(client)" class="btn-sm">Editar</button>
-            <button (click)="openNotesModal(client)" class="btn-sm btn-info">Anotações</button>
-            <button 
-              *ngIf="authService.isAdmin()" 
-              (click)="deleteClient(client.id)" 
-              class="btn-sm btn-danger">
-              Excluir
-            </button>
+            <div class="action-buttons">
+              <button (click)="openModal(client)" class="icon-btn edit" aria-label="Editar">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button (click)="openNotesModal(client)" class="icon-btn doc" aria-label="Documento">
+                <i class="bi bi-file-earmark-text"></i>
+              </button>
+              <button 
+                *ngIf="authService.isAdmin()" 
+                (click)="deleteClient(client.id)" 
+                class="icon-btn danger"
+                aria-label="Excluir">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
           </td>
         </tr>
         <tr *ngIf="filteredClients.length === 0">
-          <td colspan="7" class="text-center">Nenhum cliente encontrado</td>
+          <td colspan="6" class="text-center">Nenhum cliente encontrado</td>
         </tr>
       </tbody>
     </table>
+    <div class="table-footer" *ngIf="!isLoading">
+      <div class="table-summary">
+        Mostrando {{ filteredClients.length }} de {{ clients.length }} leads
+      </div>
+      <div class="pagination">
+        <button class="icon-btn ghost" disabled aria-label="Página anterior">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button class="icon-btn ghost" disabled aria-label="Próxima página">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </div>
   </div>
 </div>

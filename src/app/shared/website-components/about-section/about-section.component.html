@@ -2,8 +2,8 @@
   <div class="container" [class]="getImagePositionClass()">
     <div class="about-media">
       <div class="image-frame">
-        <img *ngIf="config.imageUrl" [src]="config.imageUrl" alt="Foto do corretor" />
-        <div class="image-placeholder" *ngIf="!config.imageUrl">Imagem do corretor</div>
+        <img *ngIf="config.imageUrl && !editMode" [src]="config.imageUrl" alt="Foto do corretor" />
+        <div class="image-placeholder" *ngIf="editMode || !config.imageUrl">Imagem do corretor</div>
         <div class="image-highlight" *ngIf="config.highlightText">{{ config.highlightText }}</div>
       </div>
     </div>

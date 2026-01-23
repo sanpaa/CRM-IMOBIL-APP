@@ -1,61 +1,6 @@
-<div class="public-website">
-  <!-- Header FIXO - sempre visível -->
-  <app-header-component 
-    [editMode]="false"
-    [config]="headerConfig">
-  </app-header-component>
-
-  <!-- Conteúdo fixo e personalizável apenas em pontos específicos -->
-  <main class="main-content" *ngIf="!loading">
-    <!-- Banner personalizável -->
-    <section class="banner" [ngStyle]="{'background': bannerConfig.background}">
-      <img *ngIf="bannerConfig.imageUrl" [src]="bannerConfig.imageUrl" alt="Banner" class="banner-img" />
-      <div class="banner-content">
-        <h1 [ngStyle]="{'color': bannerConfig.titleColor}">{{ bannerConfig.title }}</h1>
-        <p [ngStyle]="{'color': bannerConfig.subtitleColor}">{{ bannerConfig.subtitle }}</p>
-      </div>
-    </section>
-
-    <!-- Seção de destaques/textos principais -->
-    <section class="highlights" *ngIf="highlights && highlights.length">
-      <div class="highlight" *ngFor="let item of highlights">
-        <h2>{{ item.title }}</h2>
-        <p>{{ item.text }}</p>
-      </div>
-    </section>
-
-    <!-- Grid de imóveis (exemplo de conteúdo fixo) -->
-    <section class="property-grid" *ngIf="properties && properties.length">
-      <h2>Imóveis</h2>
-      <div class="property-list">
-        <div class="property-card" *ngFor="let property of properties">
-          <img [src]="property.image_url || 'https://via.placeholder.com/300x200?text=Imóvel'" alt="Foto do imóvel" />
-          <div class="property-info">
-            <h3>{{ property.title }}</h3>
-            <p>
-              {{ property.street || '' }}
-              <span *ngIf="property.neighborhood">, {{ property.neighborhood }}</span>
-              <span *ngIf="property.city"> - {{ property.city }}</span>
-              <span *ngIf="property.state">/{{ property.state }}</span>
-            </p>
-            <span class="price">{{ property.price | currency:'BRL' }}</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Loading State -->
-  <div class="loading-container" *ngIf="loading">
-    <div class="spinner"></div>
-    <p>Carregando...</p>
-  </div>
-
-  <!-- Footer FIXO - sempre visível -->
-  <app-footer-component 
-    [editMode]="false"
-    [config]="footerConfig">
-  </app-footer-component>
+<div class="public-website" *ngIf="!loading">
+  <style [innerHTML]="layoutCss"></style>
+  <div class="grapes-output" [innerHTML]="layoutHtml"></div>
 
   <a *ngIf="whatsappNumber"
      class="whatsapp-float"
@@ -67,5 +12,8 @@
   </a>
 </div>
 
-<!-- No Layout Found -->
+<div class="loading-container" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Carregando...</p>
+</div>
 

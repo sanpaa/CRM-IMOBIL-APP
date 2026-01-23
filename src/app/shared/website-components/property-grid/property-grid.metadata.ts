@@ -10,6 +10,18 @@ export const PROPERTY_GRID_METADATA: ComponentMetadata = {
   schema: {
     fields: [
       {
+        key: 'eyebrow',
+        label: 'Etiqueta superior',
+        type: 'text',
+        defaultValue: 'Exclusividade'
+      },
+      {
+        key: 'title',
+        label: 'Titulo da secao',
+        type: 'text',
+        defaultValue: 'Imoveis em destaque'
+      },
+      {
         key: 'limit',
         label: 'Quantidade de imoveis',
         type: 'number',
@@ -44,6 +56,30 @@ export const PROPERTY_GRID_METADATA: ComponentMetadata = {
         description: 'Exibe a barra de filtros no topo'
       },
       {
+        key: 'showViewAll',
+        label: 'Mostrar botao ver todos',
+        type: 'checkbox',
+        defaultValue: true
+      },
+      {
+        key: 'viewAllLabel',
+        label: 'Texto ver todos',
+        type: 'text',
+        defaultValue: 'Ver todos os imoveis'
+      },
+      {
+        key: 'viewAllLink',
+        label: 'Link ver todos',
+        type: 'text',
+        defaultValue: '#'
+      },
+      {
+        key: 'showCarousel',
+        label: 'Usar carrossel',
+        type: 'checkbox',
+        defaultValue: true
+      },
+      {
         key: 'sortBy',
         label: 'Ordenacao',
         type: 'select',
@@ -74,10 +110,16 @@ export const PROPERTY_GRID_METADATA: ComponentMetadata = {
   },
   
   defaultConfig: {
+    eyebrow: 'Exclusividade',
+    title: 'Imoveis em destaque',
     limit: 6,
     showFeatured: true,
     columns: 3,
     showFilters: false,
+    showViewAll: true,
+    viewAllLabel: 'Ver todos os imoveis',
+    viewAllLink: '#',
+    showCarousel: true,
     sortBy: 'date'
   },
   

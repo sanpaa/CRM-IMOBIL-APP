@@ -1,0 +1,53 @@
+<div class="component-search">
+  <form class="search-form" [class.vertical]="config.orientation === 'vertical'" (ngSubmit)="onSubmit()">
+    <input
+      *ngIf="hasField('term')"
+      type="text"
+      [(ngModel)]="term"
+      name="term"
+      [placeholder]="config.placeholder || 'Buscar im?veis...'"
+    />
+
+    <input
+      *ngIf="hasField('type')"
+      type="text"
+      [(ngModel)]="type"
+      name="type"
+      placeholder="Tipo de im?vel"
+    />
+
+    <input
+      *ngIf="hasField('city')"
+      type="text"
+      [(ngModel)]="city"
+      name="city"
+      placeholder="Cidade ou bairro"
+    />
+
+    <input
+      *ngIf="hasField('priceRange')"
+      type="number"
+      [(ngModel)]="priceMin"
+      name="priceMin"
+      placeholder="Pre?o m?nimo"
+    />
+
+    <input
+      *ngIf="hasField('priceRange')"
+      type="number"
+      [(ngModel)]="priceMax"
+      name="priceMax"
+      placeholder="Pre?o m?ximo"
+    />
+
+    <input
+      *ngIf="hasField('bedrooms')"
+      type="number"
+      [(ngModel)]="bedrooms"
+      name="bedrooms"
+      placeholder="Quartos"
+    />
+
+    <button type="submit" class="search-button">{{ config.buttonText || 'Buscar' }}</button>
+  </form>
+</div>

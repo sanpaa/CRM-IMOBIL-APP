@@ -11,11 +11,11 @@ import { RouterLink } from '@angular/router';
             [style.background-color]="config?.backgroundColor || '#ffffff'"
             [style.color]="config?.textColor || '#333333'">
       <div class="header-content">
-        <div class="logo" *ngIf="config?.showLogo && config?.logoUrl">
+        <div class="logo" *ngIf="config?.showLogo && config?.logoUrl && !editMode">
           <img [src]="config.logoUrl" alt="Logo" class="logo-image">
         </div>
 
-        <div class="brand" *ngIf="!config?.showLogo || !config?.logoUrl">
+        <div class="brand" *ngIf="editMode || !config?.showLogo || !config?.logoUrl">
           <h1>{{ config?.companyName }}</h1>
         </div>
 

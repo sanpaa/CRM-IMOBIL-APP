@@ -1,0 +1,107 @@
+<div class="templates-container" *ngIf="!loading">
+  <div class="templates-header">
+    <div class="title-area">
+      <h1>Templates de Website</h1>
+      <p>Escolha um template e aplique no site do cliente quando quiser.</p>
+    </div>
+    <div class="header-actions" *ngIf="isAdminUser">
+      <button class="btn-secondary" (click)="openCreateModal()">
+        ? Novo Template
+      </button>
+    </div>
+  </div>
+
+  <div class="templates-filters">
+    <div class="filter-group">
+      <label>Buscar</label>
+      <input type="text" [(ngModel)]="search" placeholder="Nome do template" />
+    </div>
+    <div class="filter-group">
+      <label>Tipo de pagina</label>
+      <select [(ngModel)]="pageTypeFilter">
+        <option value="">Todos</option>
+        <option *ngFor="let type of pageTypes" [value]="type.value">{{ type.label }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="templates-grid">
+    <div class="template-card" *ngFor="let template of filteredTemplates()">
+      <div class="template-preview-wrap">
+        <iframe
+          class="template-preview"
+          [attr.srcdoc]="buildPreview(template)"
+          sandbox="allow-same-origin allow-scripts">
+        </iframe>
+      </div>
+      <div class="template-body">
+        <div class="template-title">
+          <h3>{{ template.name }}</h3>
+          <span class="type-badge">{{ template.page_type }}</span>
+        </div>
+        <div class="template-actions">
+          <button class="btn-primary" (click)="applyTemplate(template)">Aplicar</button>
+          <button class="btn-ghost" *ngIf="isAdminUser" (click)="deleteTemplate(template)">Excluir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && filteredTemplates().length === 0">
+    <div class="empty-icon">??</div>
+    <h2>Nenhum template encontrado</h2>
+    <p>Crie seu primeiro template para aplicar nos sites.</p>
+    <button class="btn-primary" *ngIf="isAdminUser" (click)="openCreateModal()">? Criar Template</button>
+  </div>
+</div>
+
+<div class="loading-state" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Carregando templates...</p>
+</div>
+
+<div class="modal-overlay" *ngIf="showCreateModal && isAdminUser" (click)="closeCreateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h2>Novo Template</h2>
+    <form (ngSubmit)="createTemplate()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" [(ngModel)]="newTemplate.name" name="name" required />
+        </div>
+        <div class="form-group">
+          <label>Tipo de pagina *</label>
+          <select [(ngModel)]="newTemplate.page_type" name="page_type" required>
+            <option *ngFor="let type of pageTypes" [value]="type.value">{{ type.label }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>HTML *</label>
+        <textarea [(ngModel)]="newTemplate.html" name="html" rows="8" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>CSS</label>
+        <textarea [(ngModel)]="newTemplate.css" name="css" rows="6"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Meta Title</label>
+          <input type="text" [(ngModel)]="newTemplate.meta_title" name="meta_title" />
+        </div>
+        <div class="form-group">
+          <label>Meta Description</label>
+          <input type="text" [(ngModel)]="newTemplate.meta_description" name="meta_description" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="saving">{{ saving ? 'Salvando...' : 'Salvar Template' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

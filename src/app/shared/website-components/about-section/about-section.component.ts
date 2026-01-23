@@ -52,7 +52,7 @@ export class AboutSectionComponent implements WebsiteComponentBase {
       color: this.style?.textColor || 'inherit'
     };
 
-    if (backgroundValue) {
+    if (typeof backgroundValue === 'string' && backgroundValue.trim()) {
       if (backgroundValue.includes('gradient') || backgroundValue.includes('url(')) {
         styles.background = backgroundValue;
       } else {

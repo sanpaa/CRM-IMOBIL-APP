@@ -86,14 +86,14 @@ export class HeroComponent implements WebsiteComponentBase {
   getBackgroundStyle(): any {
     const styles: any = {};
 
-    if (this.config.backgroundImage) {
+    if (this.config.backgroundImage && !this.editMode) {
       styles['background-image'] = `url(${this.config.backgroundImage})`;
       styles['background-size'] = 'cover';
       styles['background-position'] = 'center';
     }
 
     const backgroundValue = this.style?.background || this.style?.backgroundColor;
-    if (backgroundValue) {
+    if (typeof backgroundValue === 'string' && backgroundValue.trim()) {
       if (backgroundValue.includes('gradient') || backgroundValue.includes('url(')) {
         styles.background = backgroundValue;
       } else {

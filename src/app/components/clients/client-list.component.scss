@@ -40,6 +40,19 @@
   border: 1px solid var(--color-border-light);
 }
 
+.filters-header {
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+}
+
 .filter-row {
   display: grid;
   grid-template-columns: 2fr 1fr auto;
@@ -76,8 +89,29 @@
   }
 }
 
+.input-with-icon {
+  position: relative;
+
+  i {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-tertiary);
+    font-size: 1rem;
+    pointer-events: none;
+  }
+
+  .filter-input.with-icon {
+    padding-left: 2.5rem;
+  }
+}
+
 .filter-actions {
   padding-bottom: 0.25rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
 }
 
 /* Modal */
@@ -255,23 +289,33 @@ select.form-control { cursor: pointer; background-color: var(--color-bg-secondar
 }
 
 /* client name layout */
-.client-name-cell { display:flex; align-items:center; gap:0.75rem; }
-.client-name { font-weight:600; color: var(--color-text-primary); }
-.status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight:600;
-  text-transform:uppercase;
-  letter-spacing:0.3px;
+.client-cell { display:flex; align-items:center; gap:1rem; }
+.client-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e5edff;
+  color: #1e40af;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
 }
+.client-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.client-name { font-weight: 700; color: var(--color-text-primary); }
+.client-subtitle { font-size: 0.85rem; color: var(--color-text-tertiary); }
 
 .badge { padding: 0.35rem 0.85rem; border-radius:20px; font-size:0.8rem; font-weight:600; text-transform:uppercase; display:inline-block; }
 
 /* status colors */
 .status-lead { background:#dbeafe; color:#1e40af; }
-.status-interessado { background:#fef3c7; color:#92400e; }
-.status-fechamento { background:#fce7f3; color:#9f1239; }
+.status-interessado { background:#dcfce7; color:#15803d; }
+.status-fechamento { background:#ffedd5; color:#c2410c; }
 .status-cliente { background:#d1fae5; color:#065f46; }
 
 /* Buttons */
@@ -320,6 +364,79 @@ select.form-control { cursor: pointer; background-color: var(--color-bg-secondar
 
 .btn-info { background: #3b82f6; &:hover { background: #2563eb; } }
 .btn-danger { background: #ef4444; &:hover { background: #dc2626; } }
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-light);
+  background: var(--color-bg-secondary);
+  display: grid;
+  place-items: center;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i { font-size: 1rem; }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.icon-btn.edit {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+.icon-btn.doc {
+  background: #f5f3ff;
+  color: #7c3aed;
+  border-color: #ddd6fe;
+}
+
+.icon-btn.danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.icon-btn.ghost {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border-light);
+}
+
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--color-border-light);
+  background: var(--color-bg-secondary);
+}
+
+.table-summary {
+  color: var(--color-text-tertiary);
+  font-size: 0.85rem;
+}
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+}
 
 .text-center { text-align:center; padding:2rem; color: var(--color-text-tertiary); font-style:italic; }
 
@@ -371,13 +488,12 @@ select.form-control { cursor: pointer; background-color: var(--color-bg-secondar
   }
 
   /* Use nth-child to add explicit labels (since HTML not changed) */
-  .data-table tr td:nth-child(1)::before { content: "Nome"; }
+  .data-table tr td:nth-child(1)::before { content: "Cliente"; }
   .data-table tr td:nth-child(2)::before { content: "CPF"; }
   .data-table tr td:nth-child(3)::before { content: "Email"; }
   .data-table tr td:nth-child(4)::before { content: "Telefone"; }
   .data-table tr td:nth-child(5)::before { content: "Status"; }
-  .data-table tr td:nth-child(6)::before { content: "Interesse"; }
-  .data-table tr td:nth-child(7)::before { content: "Ações"; }
+  .data-table tr td:nth-child(6)::before { content: "Ações"; }
 
   /* make cells wrap and align */
   .data-table td span, .data-table td .badge, .data-table td .status-badge {
@@ -387,14 +503,13 @@ select.form-control { cursor: pointer; background-color: var(--color-bg-secondar
   }
 
   /* Actions become stacked full-width buttons */
-  .data-table tr td:nth-child(7) {
+  .data-table tr td:nth-child(6) {
     flex-direction: column;
     gap: 0.5rem;
     align-items: flex-end;
   }
-  .data-table tr td:nth-child(7) .btn-sm {
-    width: 100%;
-    margin: 0;
+  .data-table tr td:nth-child(6) .action-buttons {
+    justify-content: flex-end;
   }
 
   /* Adjust footer & spacing inside card so last items not hidden */
@@ -405,6 +520,12 @@ select.form-control { cursor: pointer; background-color: var(--color-bg-secondar
 
   /* reduce table font-size a bit for density */
   .data-table { font-size: 0.92rem; }
+
+  .table-footer {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
 
   /* ensure notes list and modal scroll nicely */
   .notes-list { max-height: 40vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }

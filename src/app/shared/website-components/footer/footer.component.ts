@@ -17,7 +17,7 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
         <div class="footer-grid">
           <!-- Coluna 1: Informações da Empresa -->
           <div class="footer-column company-info">
-            <div class="footer-brand" *ngIf="config.showLogo && config.logoUrl">
+            <div class="footer-brand" *ngIf="config.showLogo && config.logoUrl && !editMode">
               <img [src]="config.logoUrl" alt="Logo" class="logo-image">
             </div>
             <h3 class="company-name">{{ config.companyName }}</h3>

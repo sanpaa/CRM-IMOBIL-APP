@@ -1,45 +1,132 @@
-<div class="property-grid-container">
-  <div class="loading-spinner" *ngIf="loading">
-    <p>Carregando imóveis...</p>
-  </div>
-  
-  <div class="properties-grid" 
-       *ngIf="!loading && properties.length > 0"
-       [style.grid-template-columns]="getGridColumns()">
-    <div *ngFor="let property of properties" class="property-card">
-      <div class="property-image" 
-           [style.background-image]="property.image_url ? 'url(' + property.image_url + ')' : 'none'">
-        <span *ngIf="property.featured" class="badge-featured">Destaque</span>
+<div #host>
+  <section class="py-20 property-grid-container">
+    <div class="max-w-[1200px] mx-auto px-6">
+    <div class="flex items-end justify-between mb-12">
+      <div>
+        <span class="text-primary font-bold text-sm uppercase tracking-widest">{{ eyebrow }}</span>
+        <h2 class="text-3xl md:text-4xl font-black mt-2 tracking-tight">{{ title }}</h2>
       </div>
-      
-      <div class="property-info">
-        <h3 class="property-title">{{ property.title }}</h3>
-        <p class="property-location">
-          {{ property.city }}<span *ngIf="property.state">, {{ property.state }}</span>
-        </p>
-        <p class="property-price">{{ formatPrice(property.price) }}</p>
-        
-        <div class="property-details">
-          <span *ngIf="property.bedrooms" class="detail-item">
-            🛏️ {{ property.bedrooms }}
-          </span>
-          <span *ngIf="property.bathrooms" class="detail-item">
-            🚿 {{ property.bathrooms }}
-          </span>
-          <span *ngIf="getDisplayArea(property) as displayArea" class="detail-item">
-            📏 {{ displayArea }}m²
-          </span>
+      <a *ngIf="showViewAll" [href]="viewAllLink" class="hidden md:flex items-center text-primary font-bold hover:underline transition-all">
+        {{ viewAllLabel }}
+        <span class="material-symbols-outlined ml-1">arrow_forward</span>
+      </a>
+    </div>
+
+    <div class="loading-spinner" *ngIf="loading">
+      <p>Carregando imóveis...</p>
+    </div>
+
+    <div class="empty-state" *ngIf="!loading && properties.length === 0">
+      <p>Nenhum imóvel encontrado.</p>
+    </div>
+
+    <ng-container *ngIf="!loading && properties.length > 0">
+      <swiper-container *ngIf="showCarousel"
+                        #swiperRef
+                        init="false"
+                        class="property-swiper">
+        <swiper-slide *ngFor="let property of properties">
+          <div class="group bg-white dark:bg-background-dark rounded-xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 property-card"
+               (click)="openProperty(property)">
+            <div class="relative h-64">
+              <div class="absolute inset-0 bg-cover bg-center property-image"
+                   [style.background-image]="property.image_url ? 'url(' + property.image_url + ')' : 'none'"></div>
+              <div class="absolute top-4 left-4 flex gap-2" *ngIf="property.featured">
+                <span class="bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Destaque</span>
+              </div>
+              <button class="absolute top-4 right-4 bg-white/20 backdrop-blur-md hover:bg-white p-2 rounded-full transition-all group-hover:text-red-500" type="button">
+                <span class="material-symbols-outlined text-xl">favorite</span>
+              </button>
+            </div>
+            <div class="p-6 property-info">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold group-hover:text-primary transition-colors property-title">{{ property.title }}</h3>
+                <span class="text-primary font-black text-lg">{{ formatPrice(property.price) }}</span>
+              </div>
+              <p class="text-gray-500 dark:text-gray-400 text-sm flex items-center mb-6 property-location">
+                <span class="material-symbols-outlined text-sm mr-1">location_on</span>
+                {{ property.city }}<span *ngIf="property.state">, {{ property.state }}</span>
+              </p>
+              <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/10 text-gray-500 dark:text-gray-400 property-details">
+                <span *ngIf="getDisplayArea(property) as displayArea" class="detail-item">
+                  📏 {{ displayArea }}m²
+                </span>
+                <span *ngIf="property.bedrooms" class="detail-item">
+                  🛏️ {{ property.bedrooms }}
+                </span>
+                <span *ngIf="property.parking" class="detail-item">
+                  🚗 {{ property.parking }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </swiper-slide>
+      </swiper-container>
+
+      <div *ngIf="!showCarousel"
+           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 properties-grid"
+           [style.grid-template-columns]="getGridColumns()">
+        <div *ngFor="let property of properties"
+             class="group bg-white dark:bg-background-dark rounded-xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 property-card"
+             (click)="openProperty(property)">
+          <div class="relative h-64">
+            <div class="absolute inset-0 bg-cover bg-center property-image"
+                 [style.background-image]="property.image_url ? 'url(' + property.image_url + ')' : 'none'"></div>
+            <div class="absolute top-4 left-4 flex gap-2" *ngIf="property.featured">
+              <span class="bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Destaque</span>
+            </div>
+          </div>
+          <div class="p-6 property-info">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="text-xl font-bold group-hover:text-primary transition-colors property-title">{{ property.title }}</h3>
+              <span class="text-primary font-black text-lg">{{ formatPrice(property.price) }}</span>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-sm flex items-center mb-6 property-location">
+              <span class="material-symbols-outlined text-sm mr-1">location_on</span>
+              {{ property.city }}<span *ngIf="property.state">, {{ property.state }}</span>
+            </p>
+            <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/10 text-gray-500 dark:text-gray-400 property-details">
+              <span *ngIf="getDisplayArea(property) as displayArea" class="detail-item">
+                📏 {{ displayArea }}m²
+              </span>
+              <span *ngIf="property.bedrooms" class="detail-item">
+                🛏️ {{ property.bedrooms }}
+              </span>
+              <span *ngIf="property.parking" class="detail-item">
+                🚗 {{ property.parking }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-controls" *ngIf="showCarousel && properties.length > 1">
+        <button type="button" class="grid-btn" (click)="swiperPrev()" aria-label="Anterior">‹</button>
+        <button type="button" class="grid-btn" (click)="swiperNext()" aria-label="Próximo">›</button>
+      </div>
+    </ng-container>
+    </div>
+
+    <div class="property-modal" *ngIf="selectedProperty && !editMode" (click)="closeProperty()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <button class="modal-close" type="button" (click)="closeProperty()">×</button>
+        <div class="modal-media">
+          <button class="media-nav prev" type="button" (click)="prevImage()">‹</button>
+          <div class="media-image"
+               [style.background-image]="getActiveImage() ? 'url(' + getActiveImage() + ')' : 'none'"></div>
+          <button class="media-nav next" type="button" (click)="nextImage()">›</button>
+        </div>
+        <div class="modal-body">
+          <h3>{{ selectedProperty.title }}</h3>
+          <p class="modal-location">{{ selectedProperty.city }}<span *ngIf="selectedProperty.state">, {{ selectedProperty.state }}</span></p>
+          <p class="modal-price">{{ formatPrice(selectedProperty.price) }}</p>
+          <p class="modal-description">{{ selectedProperty.description }}</p>
         </div>
       </div>
     </div>
-  </div>
-  
-  <div class="empty-state" *ngIf="!loading && properties.length === 0">
-    <p>Nenhum imóvel encontrado.</p>
-  </div>
-  
-  <!-- Edit Mode Overlay -->
-  <div class="edit-overlay" *ngIf="editMode">
-    <span class="edit-badge">Property Grid</span>
-  </div>
+
+    <div class="edit-overlay" *ngIf="editMode">
+      <span class="edit-badge">Property Grid</span>
+    </div>
+  </section>
 </div>

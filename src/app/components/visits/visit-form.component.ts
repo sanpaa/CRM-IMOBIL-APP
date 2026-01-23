@@ -99,7 +99,7 @@ import { PopupService } from '../../shared/services/popup.service';
                     {{ getInitials(getBrokerName()) }}
                   </div>
                   <div class="member-info">
-                    <span>Broker</span>
+                    <span>Corretor</span>
                     <select [(ngModel)]="formData.broker_id" name="broker_id" [class.invalid]="fieldErrors.broker" (change)="clearFieldError('broker')">
                       <option value="">Vincular corretor</option>
                       <option *ngFor="let broker of brokers" [value]="broker.id">{{ broker.name || broker.email }}</option>
@@ -873,14 +873,37 @@ export class VisitFormComponent implements OnInit, OnChanges {
       const user = this.authService.getCurrentUser();
       if (!user) return;
 
-      const { data, error } = await this.supabaseService
+      const { data: activeData, error: activeError } = await this.supabaseService
         .from('users')
         .select('*')
         .eq('company_id', user.company_id)
         .eq('active', true);
 
-      if (error) throw error;
-      this.brokers = data || [];
+      let brokers = activeData || [];
+
+      if (activeError) {
+        const { data: fallbackData, error: fallbackError } = await this.supabaseService
+          .from('users')
+          .select('*')
+          .eq('company_id', user.company_id);
+
+        if (fallbackError) throw fallbackError;
+        brokers = fallbackData || [];
+      } else if (brokers.length === 0) {
+        const { data: fallbackData, error: fallbackError } = await this.supabaseService
+          .from('users')
+          .select('*')
+          .eq('company_id', user.company_id);
+
+        if (fallbackError) throw fallbackError;
+        brokers = fallbackData || [];
+      }
+
+      if (user && !brokers.find(broker => broker.id === user.id)) {
+        brokers = [...brokers, user as User];
+      }
+
+      this.brokers = brokers;
     } catch (error) {
       console.error('Error loading brokers:', error);
     }
@@ -1304,7 +1327,7 @@ export class VisitFormComponent implements OnInit, OnChanges {
 
   getBrokerName(): string {
     const found = this.brokers.find(broker => broker.id === this.formData.broker_id);
-    return found?.name || found?.email || 'Broker';
+    return found?.name || found?.email || 'Corretor';
   }
 
   getOwnerName(): string {

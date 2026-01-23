@@ -509,3 +509,90 @@ section {
     padding: 0.75rem 1rem;
   }
 }
+
+.grapes-output {
+  min-height: 100vh;
+}
+
+.property-carousel {
+  @media (max-width: 768px) {
+    display: flex !important;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+.property-carousel > * {
+  @media (max-width: 768px) {
+    flex: 0 0 85%;
+    scroll-snap-align: start;
+  }
+}
+
+.property-preview-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 1.5rem;
+}
+
+.property-preview-card {
+  position: relative;
+  width: min(900px, 95vw);
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.35);
+}
+
+.preview-close {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(15, 23, 42, 0.08);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.preview-media {
+  height: 320px;
+  background-size: cover;
+  background-position: center;
+  background-color: #e2e8f0;
+}
+
+.preview-body {
+  padding: 1.5rem 2rem 2rem;
+}
+
+.preview-body h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.6rem;
+}
+
+.preview-location {
+  color: #64748b;
+  margin: 0 0 0.75rem;
+}
+
+.preview-price {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #004AAD;
+  margin: 0 0 1rem;
+}
+
+.preview-description {
+  color: #334155;
+  line-height: 1.6;
+}

@@ -79,6 +79,10 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
     const value = isStyle ? this.getStyleValue(field.key) : this.getConfigValue(field.key);
     let finalValue = value !== undefined && value !== null ? value : field.defaultValue;
     
+    if (field.type === 'array' && !Array.isArray(finalValue)) {
+      finalValue = [];
+    }
+
     // Fix: input type="color" doesn't accept "transparent", convert to white
     if (field.type === 'color' && (finalValue === 'transparent' || !finalValue)) {
       finalValue = '#ffffff';
@@ -110,6 +114,10 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
 
   trackByKey(index: number, field: ConfigSchemaField): string {
     return field.key;
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   /**
@@ -176,5 +184,10 @@ export class PropertyEditorComponent implements OnInit, OnChanges {
     const newValue = [...currentValue];
     newValue[index] = { ...newValue[index], [subKey]: value };
     this.updateConfig(field.key, newValue);
+  }
+
+  onArrayItemInput(field: ConfigSchemaField): void {
+    const currentValue = this.getFieldValue(field) || [];
+    this.updateConfig(field.key, currentValue);
   }
 }

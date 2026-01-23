@@ -98,7 +98,7 @@
       <!-- Array Editor -->
       <div *ngIf="field.type === 'array'" class="array-editor">
         <div class="array-items">
-          <div *ngFor="let item of getFieldValue(field); let i = index" class="array-item">
+          <div *ngFor="let item of getFieldValue(field); let i = index; trackBy: trackByIndex" class="array-item">
             <div class="array-item-header">
               <strong>Item {{ i + 1 }}</strong>
               <button type="button" class="btn-danger-small" (click)="removeArrayItem(field, i)">✕</button>
@@ -110,12 +110,14 @@
                        type="text"
                        [name]="field.key + '-' + i + '-' + subField.key"
                        [(ngModel)]="item[subField.key]"
-                       (ngModelChange)="updateArrayItem(field, i, subField.key, $event)"
+                       [ngModelOptions]="{ standalone: true }"
+                       (ngModelChange)="onArrayItemInput(field)"
                        class="form-control">
                 <textarea *ngIf="subField.type === 'textarea'"
                           [name]="field.key + '-' + i + '-' + subField.key"
                           [(ngModel)]="item[subField.key]"
-                          (ngModelChange)="updateArrayItem(field, i, subField.key, $event)"
+                          [ngModelOptions]="{ standalone: true }"
+                          (ngModelChange)="onArrayItemInput(field)"
                           rows="2"
                           class="form-control"></textarea>
               </div>

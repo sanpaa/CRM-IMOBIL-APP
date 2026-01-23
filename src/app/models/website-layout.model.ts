@@ -7,6 +7,8 @@ export interface WebsiteLayout {
   is_active: boolean;
   is_default: boolean;
   layout_config: LayoutConfig;
+  html?: string;
+  css?: string;
   meta_title?: string;
   meta_description?: string;
   meta_keywords?: string;

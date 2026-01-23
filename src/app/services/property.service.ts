@@ -91,6 +91,17 @@ export class PropertyService {
     return (data || []).map(item => this.mapFromDb(item));
   }
 
+  async getByCompanyId(companyId: string): Promise<Property[]> {
+    const { data, error } = await this.supabase
+      .from('properties')
+      .select('*')
+      .eq('company_id', companyId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []).map(item => this.mapFromDb(item));
+  }
+
   async getById(id: string): Promise<Property | null> {
     const { data, error } = await this.supabase
       .from('properties')

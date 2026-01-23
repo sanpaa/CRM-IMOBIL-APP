@@ -32,7 +32,8 @@ export class SupabaseService {
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: true,
-          storage: new CustomStorageAdapter()
+          storage: new CustomStorageAdapter(),
+          lock: async (_key, _acquireTimeout, fn) => await fn()
         }
       }
     );

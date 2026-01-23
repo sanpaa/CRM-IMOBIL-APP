@@ -5,6 +5,7 @@ import { ComponentRegistryService } from './component-registry.service';
 import { HeroComponent } from './hero/hero.component';
 import { HeaderComponent } from './header/header.component';
 import { PropertyGridComponent } from './property-grid/property-grid.component';
+import { SearchBarComponent } from './search-bar/search-bar.component';
 import { TextBlockComponent } from './text-block/text-block.component';
 import { FooterComponent } from './footer/footer.component';
 import { DividerComponent } from './divider/divider.component';
@@ -22,6 +23,7 @@ import { CtaButtonComponent } from './cta-button/cta-button.component';
 import { HERO_METADATA } from './hero/hero.metadata';
 import { HEADER_METADATA } from './header/header.metadata';
 import { PROPERTY_GRID_METADATA } from './property-grid/property-grid.metadata';
+import { SEARCH_BAR_METADATA } from './search-bar/search-bar.metadata';
 import { TEXT_BLOCK_METADATA } from './text-block/text-block.metadata';
 import { FOOTER_METADATA } from './footer/footer.metadata';
 import { DIVIDER_METADATA } from './divider/divider.metadata';
@@ -53,6 +55,7 @@ export class ComponentInitializerService {
     // Register all components
     this.registry.register('header', HeaderComponent, HEADER_METADATA);
     this.registry.register('hero', HeroComponent, HERO_METADATA);
+    this.registry.register('search-bar', SearchBarComponent, SEARCH_BAR_METADATA);
     this.registry.register('property-grid', PropertyGridComponent, PROPERTY_GRID_METADATA);
     this.registry.register('text-block', TextBlockComponent, TEXT_BLOCK_METADATA);
     this.registry.register('footer', FooterComponent, FOOTER_METADATA);

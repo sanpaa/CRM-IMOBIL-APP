@@ -1,48 +1,49 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { WebsiteCustomizationService } from '../../services/website-customization.service';
 import { AuthService } from '../../services/auth.service';
-import { WebsiteLayout, LayoutSection, ComponentType } from '../../models/website-layout.model';
-import { ComponentRegistryService } from '../../shared/website-components/component-registry.service';
-import { RenderComponentDirective } from '../../shared/website-components/render-component.directive';
-import { PropertyEditorComponent } from '../../shared/property-editor/property-editor.component';
-import { ComponentMetadata } from '../../shared/website-components/component-base.interface';
+import { WebsiteLayout } from '../../models/website-layout.model';
 import { PopupService } from '../../shared/services/popup.service';
+import { GrapesEditorHostComponent } from '../../builder/grapes/grapes-editor-host.component';
 
 @Component({
   selector: 'app-website-builder',
   standalone: true,
-  imports: [CommonModule, FormsModule, DragDropModule, RouterLink, RenderComponentDirective, PropertyEditorComponent],
+  imports: [CommonModule, FormsModule, RouterLink, GrapesEditorHostComponent],
   templateUrl: './website-builder.component.html',
   styleUrls: ['./website-builder.component.scss']
 })
-export class WebsiteBuilderComponent implements OnInit {
+export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
+  private _grapesHost?: GrapesEditorHostComponent;
+
+  @ViewChild(GrapesEditorHostComponent)
+  set grapesHost(host: GrapesEditorHostComponent | undefined) {
+    this._grapesHost = host;
+    if (host && this.pendingProjectData) {
+      console.log('[builder] grapes host ready, loading pending data', {
+        htmlLength: this.pendingProjectData.html?.length ?? 0,
+        cssLength: this.pendingProjectData.css?.length ?? 0
+      });
+      host.load(this.pendingProjectData);
+      this.pendingProjectData = null;
+    }
+  }
+
+  get grapesHost(): GrapesEditorHostComponent | undefined {
+    return this._grapesHost;
+  }
   layouts: WebsiteLayout[] = [];
   currentLayout: WebsiteLayout | null = null;
-  sections: LayoutSection[] = [];
   
-  availableComponents: ComponentMetadata[] = [];
-  componentSearch = '';
-  zoomLevels = [0.5, 0.75, 1, 1.25];
-  zoomLevel = 1;
   hasUnsavedChanges = false;
   autoSaveEnabled = true;
   lastSavedAt: Date | null = null;
-  isRestoringHistory = false;
-  history: LayoutSection[][] = [];
-  historyIndex = -1;
-  selectedSection: LayoutSection | null = null;
   
   loading = false;
   saving = false;
-  previewMode = false;
-  livePreviewEnabled = true;
-  fullScreenPreview = false;
-  previewDevice: 'desktop' | 'tablet' | 'mobile' = 'desktop';
-  
+
   pageTypes = [
     { value: 'home', label: 'Home Page' },
     { value: 'properties', label: 'Properties Listing' },
@@ -60,11 +61,13 @@ export class WebsiteBuilderComponent implements OnInit {
   };
 
   private autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
-  private historyTimer: ReturnType<typeof setTimeout> | null = null;
+  private pendingProjectData: any = null;
+  private draftSaveTimer: ReturnType<typeof setTimeout> | null = null;
+  private lastKnownHtml = '';
+  private lastKnownCss = '';
 
   constructor(
     private customizationService: WebsiteCustomizationService,
-    private componentRegistry: ComponentRegistryService,
     public authService: AuthService,
     private popupService: PopupService
   ) {}
@@ -78,8 +81,14 @@ export class WebsiteBuilderComponent implements OnInit {
       return;
     }
     
-    this.availableComponents = this.componentRegistry.getAllMetadata();
     await this.loadLayouts();
+  }
+
+  ngAfterViewInit(): void {
+    if (this.pendingProjectData) {
+      this.grapesHost?.load(this.pendingProjectData);
+      this.pendingProjectData = null;
+    }
   }
 
   async loadLayouts() {
@@ -103,10 +112,38 @@ export class WebsiteBuilderComponent implements OnInit {
 
   async selectLayout(layout: WebsiteLayout) {
     this.currentLayout = layout;
-    this.sections = [...(layout.layout_config?.sections || [])];
-    this.sections.sort((a, b) => a.order - b.order);
-    this.selectedSection = null;
-    this.resetHistory();
+    const html = layout.html ?? (layout.layout_config as any)?.html ?? '';
+    const css = layout.css ?? (layout.layout_config as any)?.css ?? '';
+    console.log('[builder] selectLayout', {
+      id: layout.id,
+      htmlLength: html?.length ?? 0,
+      cssLength: css?.length ?? 0
+    });
+    const draft = this.getDraft(layout.id);
+    const shouldRestoreDraft = this.shouldRestoreDraft(layout, draft);
+    if (draft && shouldRestoreDraft) {
+      const confirmed = await this.popupService.confirm(
+        'Encontramos um rascunho local mais recente para este layout. Deseja restaurar?',
+        {
+          title: 'Restaurar rascunho',
+          confirmText: 'Restaurar',
+          cancelText: 'Descartar',
+          tone: 'warning'
+        }
+      );
+      if (confirmed) {
+        this.applyLayoutToEditor(draft.html || '', draft.css || '');
+      } else {
+        this.clearDraft(layout.id);
+        this.applyLayoutToEditor(html, css);
+      }
+    } else {
+      this.applyLayoutToEditor(html, css);
+    }
+    this.lastKnownHtml = html || '';
+    this.lastKnownCss = css || '';
+    this.hasUnsavedChanges = false;
+    this.lastSavedAt = null;
   }
 
   async createNewLayout() {
@@ -124,9 +161,13 @@ export class WebsiteBuilderComponent implements OnInit {
         this.newLayoutData.page_type,
         user.company_id
       );
+      const emptyProjectData = { pages: [] } as any;
 
       const newLayout = await this.customizationService.createLayout({
         ...template,
+        layout_config: emptyProjectData,
+        html: '',
+        css: '',
         name: this.newLayoutData.name,
         slug: this.newLayoutData.slug || undefined
       });
@@ -146,103 +187,29 @@ export class WebsiteBuilderComponent implements OnInit {
     }
   }
 
-  /**
-   * Generate a unique section ID
-   */
-  private generateSectionId(): string {
-    return `section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  addComponent(componentType: string) {
-    const metadata = this.componentRegistry.getMetadata(componentType);
-    if (!metadata) {
-      console.error(`Component metadata not found for type: ${componentType}`);
-      return;
-    }
-
-    const newSection: LayoutSection = {
-      id: this.generateSectionId(),
-      type: componentType as ComponentType,
-      order: this.sections.length,
-      config: { ...metadata.defaultConfig },
-      style: metadata.defaultStyle ? { ...metadata.defaultStyle } : undefined
-    };
-
-    this.sections.push(newSection);
-    this.selectedSection = newSection;
-    this.updateSectionOrder();
-    this.recordHistory();
-    this.markDirty();
-  }
-
-
-
-  onDrop(event: CdkDragDrop<any>) {
-    // Se veio da biblioteca de componentes, adiciona novo
-    if (event.previousContainer.id === 'component-library') {
-      const componentMetadata = event.item.data as ComponentMetadata;
-      this.addComponent(componentMetadata.type);
-      return;
-    }
-
-    // Se está movendo dentro da mesma lista
-    if (event.previousContainer === event.container) {
-      moveItemInArray(this.sections, event.previousIndex, event.currentIndex);
-      this.updateSectionOrder();
-      this.recordHistory();
-      this.markDirty();
-    }
-  }
-
-  updateSectionOrder() {
-    this.sections.forEach((section, index) => {
-      section.order = index;
-    });
-  }
-
-  selectSection(section: LayoutSection) {
-    this.selectedSection = section;
-  }
-
-  removeSection(section: LayoutSection) {
-    const index = this.sections.indexOf(section);
-    if (index > -1) {
-      this.sections.splice(index, 1);
-      this.updateSectionOrder();
-      if (this.selectedSection === section) {
-        this.selectedSection = null;
-      }
-      this.recordHistory();
-      this.markDirty();
-    }
-  }
-
-  duplicateSection(section: LayoutSection) {
-    const duplicate: LayoutSection = {
-      ...section,
-      id: this.generateSectionId(),
-      order: section.order + 1
-    };
-    
-    const index = this.sections.indexOf(section);
-    this.sections.splice(index + 1, 0, duplicate);
-    this.updateSectionOrder();
-    this.recordHistory();
-    this.markDirty();
-  }
-
   async saveLayout(silent: boolean = false) {
     if (!this.currentLayout) return;
 
     this.saving = true;
     try {
-      const layoutConfig = {
-        sections: this.sections
-      };
-
-      await this.customizationService.updateLayoutConfig(this.currentLayout.id, layoutConfig);
+      const data = this.grapesHost?.save() || { html: '', css: '' };
+      if (this.isBlank(data.html) && this.isBlank(data.css) && !this.isBlank(this.lastKnownHtml)) {
+        console.warn('[builder] blocked empty save');
+        this.popupService.alert(
+          'O editor retornou HTML/CSS vazios. Para evitar perda, o salvamento foi bloqueado.',
+          { title: 'Salvamento bloqueado', tone: 'warning' }
+        );
+        return;
+      }
+      await this.customizationService.updateLayout(this.currentLayout.id, {
+        html: data.html || '',
+        css: data.css || ''
+      } as any);
       this.hasUnsavedChanges = false;
       this.lastSavedAt = new Date();
+      this.lastKnownHtml = data.html || '';
+      this.lastKnownCss = data.css || '';
+      this.clearDraft(this.currentLayout.id);
       if (!silent) {
         this.popupService.alert('Layout salvo com sucesso!', { title: 'Sucesso', tone: 'info' });
       }
@@ -294,81 +261,9 @@ export class WebsiteBuilderComponent implements OnInit {
     }
   }
 
-  togglePreview() {
-    this.previewMode = !this.previewMode;
-    this.selectedSection = null;
-  }
-
-  toggleLivePreview() {
-    this.livePreviewEnabled = !this.livePreviewEnabled;
-  }
-
-  toggleFullScreenPreview() {
-    this.fullScreenPreview = !this.fullScreenPreview;
-  }
-
-  setPreviewDevice(device: 'desktop' | 'tablet' | 'mobile') {
-    this.previewDevice = device;
-  }
-
-  getComponentIcon(type: ComponentType): string {
-    const metadata = this.componentRegistry.getMetadata(type);
-    return metadata?.icon || '📦';
-  }
-
-  getComponentLabel(type: ComponentType): string {
-    const metadata = this.componentRegistry.getMetadata(type);
-    return metadata?.label || type;
-  }
-
-  onConfigChange(config: any): void {
-    // Config updated through property editor
-    // The section reference is already updated
-    this.scheduleHistorySnapshot();
-    this.markDirty();
-  }
-
-  onStyleChange(style: any): void {
-    // Style updated through property editor
-    // The section reference is already updated
-    this.scheduleHistorySnapshot();
-    this.markDirty();
-  }
-
-  get filteredComponents(): ComponentMetadata[] {
-    const query = this.componentSearch.trim().toLowerCase();
-    if (!query) return this.availableComponents;
-    return this.availableComponents.filter(component =>
-      component.label.toLowerCase().includes(query) ||
-      component.type.toLowerCase().includes(query) ||
-      (component.description || '').toLowerCase().includes(query)
-    );
-  }
-
-  setZoom(level: number) {
-    this.zoomLevel = level;
-  }
-
-  undo() {
-    if (this.historyIndex <= 0) return;
-    this.restoreHistory(this.historyIndex - 1);
-  }
-
-  redo() {
-    if (this.historyIndex >= this.history.length - 1) return;
-    this.restoreHistory(this.historyIndex + 1);
-  }
-
-  get canUndo(): boolean {
-    return this.historyIndex > 0;
-  }
-
-  get canRedo(): boolean {
-    return this.historyIndex < this.history.length - 1;
-  }
-
-  private markDirty() {
+  onEditorChange(): void {
     this.hasUnsavedChanges = true;
+    this.scheduleDraftSave();
     if (this.autoSaveEnabled) {
       this.scheduleAutoSave();
     }
@@ -385,40 +280,79 @@ export class WebsiteBuilderComponent implements OnInit {
     }, 800);
   }
 
-  private scheduleHistorySnapshot() {
-    if (this.isRestoringHistory) return;
-    if (this.historyTimer) {
-      clearTimeout(this.historyTimer);
+  private applyLayoutToEditor(html: string, css: string) {
+    if (this.grapesHost) {
+      this.grapesHost.load({ html, css });
+    } else {
+      this.pendingProjectData = { html, css };
     }
-    this.historyTimer = setTimeout(() => {
-      this.recordHistory();
-    }, 400);
   }
 
-  private recordHistory() {
-    if (this.isRestoringHistory) return;
-    const snapshot = JSON.parse(JSON.stringify(this.sections)) as LayoutSection[];
-    this.history = this.history.slice(0, this.historyIndex + 1);
-    this.history.push(snapshot);
-    this.historyIndex = this.history.length - 1;
+  private scheduleDraftSave() {
+    if (this.draftSaveTimer) {
+      clearTimeout(this.draftSaveTimer);
+    }
+    this.draftSaveTimer = setTimeout(() => {
+      if (!this.currentLayout) return;
+      const html = this.grapesHost?.getHtml() || '';
+      const css = this.grapesHost?.getCss() || '';
+      if (this.isBlank(html) && this.isBlank(css)) return;
+      this.saveDraft(this.currentLayout.id, html, css);
+    }, 600);
   }
 
-  private restoreHistory(index: number) {
-    const snapshot = this.history[index];
-    if (!snapshot) return;
-    this.isRestoringHistory = true;
-    this.sections = JSON.parse(JSON.stringify(snapshot));
-    this.sections.sort((a, b) => a.order - b.order);
-    this.selectedSection = null;
-    this.historyIndex = index;
-    this.isRestoringHistory = false;
+  private saveDraft(layoutId: string, html: string, css: string) {
+    try {
+      const payload = {
+        html,
+        css,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem(this.getDraftKey(layoutId), JSON.stringify(payload));
+    } catch (error) {
+      console.warn('[builder] failed to save draft', error);
+    }
   }
 
-  private resetHistory() {
-    this.history = [];
-    this.historyIndex = -1;
-    this.recordHistory();
-    this.hasUnsavedChanges = false;
-    this.lastSavedAt = null;
+  private getDraft(layoutId: string): { html: string; css: string; updatedAt: string } | null {
+    try {
+      const raw = localStorage.getItem(this.getDraftKey(layoutId));
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return null;
+      return {
+        html: typeof parsed.html === 'string' ? parsed.html : '',
+        css: typeof parsed.css === 'string' ? parsed.css : '',
+        updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : ''
+      };
+    } catch (error) {
+      console.warn('[builder] failed to read draft', error);
+      return null;
+    }
+  }
+
+  private clearDraft(layoutId: string) {
+    try {
+      localStorage.removeItem(this.getDraftKey(layoutId));
+    } catch (error) {
+      console.warn('[builder] failed to clear draft', error);
+    }
+  }
+
+  private getDraftKey(layoutId: string) {
+    return `website-builder:draft:${layoutId}`;
+  }
+
+  private shouldRestoreDraft(layout: WebsiteLayout, draft: { updatedAt: string } | null): boolean {
+    if (!draft?.updatedAt) return false;
+    const draftTime = Date.parse(draft.updatedAt);
+    const layoutTime = Date.parse(layout.updated_at);
+    if (Number.isNaN(draftTime)) return false;
+    if (Number.isNaN(layoutTime)) return true;
+    return draftTime > layoutTime;
+  }
+
+  private isBlank(value?: string | null): boolean {
+    return !value || value.trim().length === 0;
   }
 }
