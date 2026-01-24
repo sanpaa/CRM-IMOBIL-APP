@@ -123,6 +123,62 @@
   font-style: italic;
 }
 
+.integration-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--color-border-light);
+  background: var(--color-bg-tertiary);
+}
+
+.integration-status {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.status-pill {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+.status-pill.connected {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.status-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.status-subtitle {
+  margin-top: 0.35rem;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.integration-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.calendar-preferences {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .checkbox-list {
   display: flex;
   flex-direction: column;
@@ -215,6 +271,49 @@
     cursor: not-allowed;
     transform: none;
   }
+}
+
+.btn-secondary {
+  padding: 0.875rem 1.5rem;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border: 2px solid var(--color-border-light);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: var(--color-primary);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-outline-danger {
+  padding: 0.875rem 1.5rem;
+  background: transparent;
+  color: #dc2626;
+  border: 2px solid rgba(239, 68, 68, 0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-danger:hover:not(:disabled) {
+  border-color: #dc2626;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.btn-outline-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .alert-warning {

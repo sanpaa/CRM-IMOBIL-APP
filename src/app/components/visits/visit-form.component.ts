@@ -6,6 +6,7 @@ import { ClientService } from '../../services/client.service';
 import { OwnerService } from '../../services/owner.service';
 import { PropertyService } from '../../services/property.service';
 import { SupabaseService } from '../../services/supabase.service';
+import { GoogleCalendarService } from 'src/app/services/google-calendar.service';
 import { Visit, VisitProperty, VisitEvaluation, InterestLevel } from '../../models/visit.model';
 import { Client } from '../../models/client.model';
 import { Owner } from '../../models/owner.model';
@@ -833,7 +834,8 @@ export class VisitFormComponent implements OnInit, OnChanges {
     private propertyService: PropertyService,
     private authService: AuthService,
     private supabaseService: SupabaseService,
-    private popupService: PopupService
+    private popupService: PopupService,
+    private googleCalendarService: GoogleCalendarService
   ) {}
 
   async ngOnInit() {
@@ -1066,12 +1068,15 @@ export class VisitFormComponent implements OnInit, OnChanges {
       };
 
       let visitId: string;
+      let savedVisit: Visit | null = null;
       if (this.editingVisit) {
         const updated = await this.visitService.update(this.editingVisit.id, visitData);
         visitId = updated.id;
+        savedVisit = updated;
       } else {
         const created = await this.visitService.create(visitData);
         visitId = created.id;
+        savedVisit = created;
       }
 
       // Save properties
@@ -1111,6 +1116,25 @@ export class VisitFormComponent implements OnInit, OnChanges {
               await this.visitService.addVisitEvaluation(evaluation);
             }
           }
+        }
+      }
+
+      if (savedVisit) {
+        try {
+          if (savedVisit.status === 'cancelada') {
+            await this.googleCalendarService.syncVisitFromVisit(savedVisit, {
+              title: 'Visita cancelada',
+              details: this.buildCancelDetails(savedVisit)
+            });
+          } else {
+            await this.googleCalendarService.syncVisitFromVisit(savedVisit);
+          }
+        } catch (syncError) {
+          console.error('Error syncing visit to Google Calendar:', syncError);
+          this.popupService.alert('Visita salva, mas nao foi possivel sincronizar com o Google Agenda.', {
+            title: 'Aviso',
+            tone: 'warning'
+          });
         }
       }
 
@@ -1337,5 +1361,15 @@ export class VisitFormComponent implements OnInit, OnChanges {
 
   private showError(message: string) {
     this.popupService.alert(message, { title: 'Aviso', tone: 'warning' });
+  }
+
+  private buildCancelDetails(visit: Visit): string {
+    const lines: string[] = [];
+    lines.push('Status: cancelada');
+    if (visit.property_id) lines.push(`Imovel: ${visit.property_id}`);
+    if (visit.client_id) lines.push(`Cliente: ${visit.client_id}`);
+    if (visit.notes) lines.push(`Observacoes: ${visit.notes}`);
+    lines.push(`Visita ID: ${visit.id}`);
+    return lines.join('\n');
   }
 }

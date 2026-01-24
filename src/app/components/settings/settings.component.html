@@ -113,6 +113,79 @@
         </div>
       </div>
 
+      <!-- Google Calendar Integration -->
+      <div class="settings-section">
+        <h2>
+          <span class="section-icon">📅</span>
+          Google Agenda
+        </h2>
+        <p class="section-description">
+          Vincule sua agenda para sincronizar automaticamente as visitas.
+        </p>
+
+        <div class="integration-card">
+          <div class="integration-status">
+            <span class="status-pill" [class.connected]="calendarStatus?.connected">
+              {{ calendarStatus?.connected ? 'Conectado' : 'Nao conectado' }}
+            </span>
+            <div class="status-details">
+              <div class="status-title">
+                {{ calendarStatus?.connected ? 'Sincronizacao ativa' : 'Sincronizacao desativada' }}
+              </div>
+              <div class="status-subtitle" *ngIf="calendarStatus?.email">
+                Conta vinculada: {{ calendarStatus?.email }}
+              </div>
+              <div class="status-subtitle" *ngIf="calendarStatus?.lastSyncAt">
+                Ultima sincronizacao: {{ calendarStatus?.lastSyncAt | date:'dd/MM/yyyy HH:mm' }}
+              </div>
+              <div class="status-subtitle" *ngIf="!calendarStatus && !calendarLoading">
+                Status indisponivel. Clique em "Atualizar status".
+              </div>
+            </div>
+          </div>
+
+          <div class="calendar-preferences">
+            <div class="form-group">
+              <label>Calendario (opcional)</label>
+              <input
+                type="text"
+                class="form-control"
+                name="calendar_id_override"
+                [(ngModel)]="calendarIdOverride"
+                placeholder="primary ou ID do calendario">
+              <small class="form-hint">
+                Use "primary" para a agenda principal ou informe um ID especifico. Deixe vazio para usar o padrao do Google.
+              </small>
+            </div>
+            <button type="button" class="btn-secondary" (click)="saveCalendarPreference()" [disabled]="calendarIdSaving">
+              {{ calendarIdSaving ? 'Salvando...' : 'Salvar calendario' }}
+            </button>
+          </div>
+
+          <div class="integration-actions">
+            <button type="button" class="btn-secondary" (click)="loadCalendarStatus()" [disabled]="calendarLoading">
+              {{ calendarLoading ? 'Atualizando...' : 'Atualizar status' }}
+            </button>
+            <button *ngIf="!calendarStatus?.connected" type="button" class="btn-primary" (click)="connectGoogleCalendar()"
+                    [disabled]="calendarConnecting">
+              {{ calendarConnecting ? 'Conectando...' : 'Conectar Google' }}
+            </button>
+            <button *ngIf="calendarStatus?.connected" type="button" class="btn-primary" (click)="reconnectGoogleCalendar()"
+                    [disabled]="calendarConnecting">
+              {{ calendarConnecting ? 'Conectando...' : 'Trocar conta' }}
+            </button>
+            <button type="button" class="btn-outline-danger" (click)="disconnectGoogleCalendar()"
+                    [disabled]="calendarDisconnecting || !calendarStatus?.connected">
+              {{ calendarDisconnecting ? 'Desconectando...' : 'Desconectar' }}
+            </button>
+          </div>
+        </div>
+
+        <small class="form-hint">
+          Depois de conectado, toda visita criada ou atualizada sera enviada automaticamente ao Google Agenda.
+        </small>
+      </div>
+
       <!-- System Information Section -->
       <div class="settings-section info-section">
         <h2>

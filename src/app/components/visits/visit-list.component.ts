@@ -9,6 +9,7 @@ import { VisitStatisticsComponent } from './visit-statistics.component';
 import { VisitPdfService } from '../../services/visit-pdf.service';
 import { VisitFormComponent } from './visit-form.component';
 import { PopupService } from '../../shared/services/popup.service';
+import { GoogleCalendarService } from 'src/app/services/google-calendar.service';
 
 @Component({
   selector: 'app-visit-list',
@@ -72,8 +73,11 @@ import { PopupService } from '../../shared/services/popup.service';
                 <td><span class="badge" [class]="'badge-' + visit.status">{{ visit.status || 'agendada' }}</span></td>
                 <td>
                   <button (click)="editVisit(visit)" class="btn-icon" title="Editar"><i class="bi bi-pencil"></i></button>
-                  <button (click)="deleteVisit(visit.id)" class="btn-icon danger" title="Excluir"><i class="bi bi-trash"></i></button>
+                  <button (click)="deleteVisit(visit)" class="btn-icon danger" title="Excluir"><i class="bi bi-trash"></i></button>
                   <button (click)="generatePdf(visit.id)" class="btn-icon" title="Gerar PDF"><i class="bi bi-file-earmark-pdf"></i></button>
+                  <button (click)="openGoogleCalendar(visit)" class="btn-icon google" title="Adicionar ao Google Agenda">
+                    <i class="bi bi-calendar-plus"></i>
+                  </button>
                 </td>
               </tr>
               <tr *ngIf="filteredVisits.length === 0">
@@ -252,6 +256,11 @@ import { PopupService } from '../../shared/services/popup.service';
       border-color: rgba(239, 68, 68, 0.2);
     }
 
+    .btn-icon.google {
+      color: #1a73e8;
+      border-color: rgba(26, 115, 232, 0.25);
+    }
+
     .text-center {
       text-align: center;
       padding: 2rem;
@@ -289,7 +298,8 @@ export class VisitListComponent implements OnInit {
   constructor(
     private visitService: VisitService,
     private pdfService: VisitPdfService,
-    private popupService: PopupService
+    private popupService: PopupService,
+    private googleCalendarService: GoogleCalendarService
   ) {}
 
   async ngOnInit() {
@@ -324,7 +334,7 @@ export class VisitListComponent implements OnInit {
     await this.loadVisits();
   }
 
-  async deleteVisit(id: string) {
+  async deleteVisit(visit: Visit) {
     const confirmed = await this.popupService.confirm('Tem certeza que deseja excluir esta visita?', {
       title: 'Excluir visita',
       confirmText: 'Excluir',
@@ -333,7 +343,15 @@ export class VisitListComponent implements OnInit {
     });
     if (!confirmed) return;
     try {
-      await this.visitService.delete(id);
+      try {
+        await this.googleCalendarService.syncVisitFromVisit(visit, {
+          title: 'Visita excluida',
+          details: this.buildDeletionDetails(visit)
+        });
+      } catch (syncError) {
+        console.error('Error syncing deletion to Google Calendar:', syncError);
+      }
+      await this.visitService.delete(visit.id);
       await this.loadVisits();
     } catch (error) {
       console.error('Error deleting visit:', error);
@@ -375,8 +393,28 @@ export class VisitListComponent implements OnInit {
     }
   }
 
+  async openGoogleCalendar(visit: Visit) {
+    try {
+      await this.googleCalendarService.syncVisitFromVisit(visit);
+      this.popupService.alert('Visita sincronizada com o Google Agenda.', { title: 'Sucesso', tone: 'info' });
+    } catch (error) {
+      console.error('Error syncing visit to Google Calendar:', error);
+      this.showError('Nao foi possivel sincronizar. Verifique se o Google Agenda esta conectado nas configuracoes.');
+    }
+  }
+
   private showError(message: string) {
     this.popupService.alert(message, { title: 'Aviso', tone: 'warning' });
+  }
+
+  private buildDeletionDetails(visit: Visit): string {
+    const lines: string[] = [];
+    lines.push('Status: excluida no CRM');
+    if (visit.property_id) lines.push(`Imovel: ${visit.property_id}`);
+    if (visit.client_id) lines.push(`Cliente: ${visit.client_id}`);
+    if (visit.notes) lines.push(`Observacoes: ${visit.notes}`);
+    lines.push(`Visita ID: ${visit.id}`);
+    return lines.join('\n');
   }
 
   private applyFilter() {
