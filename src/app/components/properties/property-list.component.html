@@ -1,52 +1,71 @@
-<div class="page-container">
-  <div class="page-header">
-    <h1>Imóveis</h1>
-    <button (click)="openModal()" class="btn-primary">
-      + Novo Imóvel
+<div class="page-container properties-page">
+  <div class="properties-header">
+    <div class="header-title">
+      <h1>Imóveis</h1>
+      <span>{{ filteredProperties.length }} imóveis</span>
+    </div>
+    <button (click)="openModal()" class="primary-action">
+      <span class="material-symbols-outlined">add</span>
+      Novo Imóvel
     </button>
   </div>
 
-  <!-- Filters Section -->
-  <div class="filters-card">
-    <div class="filter-row">
-      <div class="filter-group">
-        <label>Buscar</label>
-        <input 
-          type="text" 
-          [(ngModel)]="searchTerm" 
-          placeholder="Título, endereço, bairro..." 
-          class="filter-input">
+  <app-smart-filter-bar
+    [searchTerm]="searchTerm"
+    (searchTermChange)="searchTerm = $event"
+    [filterType]="filterType"
+    (filterTypeChange)="filterType = $event"
+    [filterCity]="filterCity"
+    (filterCityChange)="filterCity = $event"
+    [filterSold]="filterSold"
+    (filterSoldChange)="filterSold = $event"
+    (apply)="applyFilters()"
+    (clear)="clearFilters()"
+  ></app-smart-filter-bar>
+
+  <div class="results-meta"> {{ filteredProperties.length }} imóveis encontrados</div>
+
+  <div class="list-header">
+    <span>Imóvel</span>
+    <span class="right">Valor</span>
+    <span class="center">Status</span>
+    <span class="right">Ações</span>
+  </div>
+
+  <div class="property-skeleton" *ngIf="isLoading">
+    <div class="skeleton-row" *ngFor="let _ of skeletonRows">
+      <div class="skeleton-thumb"></div>
+      <div class="skeleton-content">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
       </div>
-      <div class="filter-group">
-        <label>Tipo</label>
-        <select [(ngModel)]="filterType" class="filter-input">
-          <option value="">Todos</option>
-          <option value="apartamento">Apartamento</option>
-          <option value="casa">Casa</option>
-          <option value="terreno">Terreno</option>
-          <option value="comercial">Comercial</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>Cidade</label>
-        <input 
-          type="text" 
-          [(ngModel)]="filterCity" 
-          placeholder="Filtrar por cidade" 
-          class="filter-input">
-      </div>
-      <div class="filter-group">
-        <label>Status</label>
-        <select [(ngModel)]="filterSold" class="filter-input">
-          <option value="">Todos</option>
-          <option value="false">Disponível</option>
-          <option value="true">Vendido</option>
-        </select>
-      </div>
-      <div class="filter-actions">
-        <button (click)="applyFilters()" class="btn-primary">Buscar</button>
-        <button (click)="clearFilters()" class="btn-secondary">Limpar</button>
-      </div>
+    </div>
+  </div>
+
+  <div class="property-list" *ngIf="!isLoading && filteredProperties.length">
+    <app-property-row
+      *ngFor="let property of filteredProperties"
+      [property]="property"
+      [canDelete]="authService.isAdmin()"
+      (edit)="openModal($event)"
+      (remove)="deleteProperty($event)"
+    ></app-property-row>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && filteredProperties.length === 0">
+    <span class="material-symbols-outlined">home_work</span>
+    <h3>Nenhum imóvel encontrado</h3>
+    <p>Refine os filtros ou cadastre um novo imóvel.</p>
+  </div>
+
+  <div class="list-footer">
+    <span>Mostrando {{ filteredProperties.length ? 1 : 0 }} a {{ filteredProperties.length }} de {{ properties.length }} resultados</span>
+    <div class="pagination" *ngIf="filteredProperties.length > pageSize">
+      <button type="button"><span class="material-symbols-outlined">chevron_left</span></button>
+      <button type="button" class="active">1</button>
+      <button type="button">2</button>
+      <button type="button">3</button>
+      <button type="button"><span class="material-symbols-outlined">chevron_right</span></button>
     </div>
   </div>
 
@@ -327,54 +346,5 @@
     </div>
   </div>
 
-  <!-- Table -->
-  <div class="table-card">
-    <app-loading-spinner *ngIf="isLoading" message="Carregando imóveis..."></app-loading-spinner>
-    <table class="data-table" *ngIf="!isLoading">
-      <thead>
-        <tr>
-          <th>Título</th>
-          <th>Tipo</th>
-          <th>Endereço</th>
-          <th>Cidade</th>
-          <th>Proprietário</th>
-          <th>Valor</th>
-          <th>Status</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let property of filteredProperties">
-          <td>
-            <div class="property-title">
-              {{ property.title }}
-              <span *ngIf="property.featured" class="featured-badge">⭐ Destaque</span>
-            </div>
-          </td>
-          <td>{{ property.type || '-' }}</td>
-          <td>{{ property.street || '-' }}, {{ property.neighborhood || '-' }}</td>
-          <td>{{ property.city || '-' }}</td>
-          <td>{{ getOwnerName(property.owner_id) }}</td>
-          <td>{{ property.price | currency:'BRL' }}</td>
-          <td>
-            <span class="badge" [ngClass]="property.sold ? 'badge-sold' : 'badge-available'">
-              {{ property.sold ? 'Vendido' : 'Disponível' }}
-            </span>
-          </td>
-          <td>
-            <button (click)="openModal(property)" class="btn-sm">Editar</button>
-            <button 
-              *ngIf="authService.isAdmin()" 
-              (click)="deleteProperty(property.id)" 
-              class="btn-sm btn-danger">
-              Excluir
-            </button>
-          </td>
-        </tr>
-        <tr *ngIf="filteredProperties.length === 0">
-          <td colspan="8" class="text-center">Nenhum imóvel encontrado</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <!-- Table removed - replaced by card rows -->
 </div>

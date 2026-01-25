@@ -1,11 +1,116 @@
-<!doctype html>
-<html lang="pt-BR">
+﻿<!doctype html>
+<html class="light" lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <title>HSP CRM - Sistema de Gestão Imobiliário</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏠</text></svg>">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "rgb(19 91 236 / <alpha-value>)",
+            "royal-blue": "rgb(0 35 102 / <alpha-value>)",
+            "enterprise-dark": "#0a0c10",
+          },
+          fontFamily: {
+            "sans": ["Inter", "sans-serif"]
+          },
+          animation: {
+            'ken-burns-smooth': 'kenburnsSmooth 20s ease-in-out infinite alternate',
+            'fade-in': 'fadeIn 1.5s ease-out forwards',
+            'fade-in-up-card': 'fadeInUpCard 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'stagger-in': 'staggerIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'fluid-gradient': 'fluidGradient 10s ease infinite',
+            'shimmer': 'shimmer 2.5s infinite linear',
+            'float-soft': 'floatSoft 4s ease-in-out infinite',
+          },
+          keyframes: {
+            kenburnsSmooth: {
+              '0%': { transform: 'scale(1)' },
+              '100%': { transform: 'scale(1.05)' },
+            },
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            fadeInUpCard: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            staggerIn: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            fluidGradient: {
+              '0%, 100%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' },
+            },
+            shimmer: {
+              '0%': { transform: 'translateX(-150%)' },
+              '100%': { transform: 'translateX(150%)' },
+            },
+            floatSoft: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-5px)' },
+            }
+          }
+        },
+      },
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer base {
+      body { @apply font-sans antialiased; }
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+    }
+    .dark .glass-card {
+      background: rgba(10, 12, 16, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .dynamic-overlay {
+      background: linear-gradient(-45deg, rgba(10, 12, 16, 0.9), rgba(19, 91, 236, 0.3), rgba(0, 35, 102, 0.6));
+      background-size: 400% 400%;
+    }
+    .input-container {
+      @apply relative transition-all duration-300 border border-slate-200 dark:border-slate-800 rounded-xl bg-white/50 dark:bg-slate-900/50;
+    }
+    .input-container:focus-within {
+      @apply border-transparent ring-1 ring-primary/30;
+      box-shadow: 0 0 15px rgba(19, 91, 236, 0.15);
+      background: linear-gradient(white, white) padding-box,
+                  linear-gradient(to right, #135bec, #002366) border-box;
+    }
+    .dark .input-container:focus-within {
+      background: linear-gradient(#0a0c10, #0a0c10) padding-box,
+                  linear-gradient(to right, #135bec, #002366) border-box;
+    }
+    .floating-label {
+      @apply absolute left-12 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none transition-all duration-300 ease-out;
+    }
+    .floating-input:focus ~ .floating-label,
+    .floating-input:not(:placeholder-shown) ~ .floating-label {
+      @apply top-3 text-xs font-bold text-primary translate-y-0;
+    }
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    .delay-300 { animation-delay: 300ms; }
+    .delay-400 { animation-delay: 400ms; }
+    .delay-500 { animation-delay: 500ms; }
+    .delay-700 { animation-delay: 700ms; }
+  </style>
 </head>
 <body>
   <app-root></app-root>

@@ -63,6 +63,18 @@ export class SettingsComponent implements OnInit {
     };
   }
 
+  incrementDays() {
+    const current = Number(this.formData?.days_without_change ?? 0);
+    const next = Number.isFinite(current) ? current + 1 : 1;
+    this.formData.days_without_change = Math.min(90, Math.max(1, next));
+  }
+
+  decrementDays() {
+    const current = Number(this.formData?.days_without_change ?? 0);
+    const next = Number.isFinite(current) ? current - 1 : 1;
+    this.formData.days_without_change = Math.min(90, Math.max(1, next));
+  }
+
   async saveSettings() {
     if (!this.authService.isAdmin()) {
       this.popupService.alert('Apenas administradores podem alterar as configurações', { title: 'Aviso', tone: 'warning' });

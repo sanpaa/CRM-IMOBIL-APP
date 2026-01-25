@@ -18,10 +18,16 @@ import { Subscription } from 'rxjs';
 export class AppComponent implements OnInit, OnDestroy {
   title = 'HSP CRM';
   private authSubscription?: Subscription;
+  private systemThemeQuery?: MediaQueryList;
   private themeListener = (event: StorageEvent) => {
     if (event.key === 'theme' && (event.newValue === 'dark' || event.newValue === 'light')) {
-      document.body.setAttribute('data-theme', event.newValue);
+      this.applyTheme(event.newValue);
     }
+  };
+  private systemThemeListener = (event: MediaQueryListEvent) => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' || savedTheme === 'light') return;
+    this.applyTheme(event.matches ? 'dark' : 'light');
   };
 
   constructor(
@@ -32,6 +38,8 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.applyInitialTheme();
     window.addEventListener('storage', this.themeListener);
+    this.systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    this.systemThemeQuery.addEventListener('change', this.systemThemeListener);
 
     // Subscribe to authentication changes
     this.authSubscription = this.authService.currentUser$.subscribe(user => {
@@ -51,15 +59,22 @@ export class AppComponent implements OnInit, OnDestroy {
     }
     this.inactivityService.stopTracking();
     window.removeEventListener('storage', this.themeListener);
+    this.systemThemeQuery?.removeEventListener('change', this.systemThemeListener);
   }
 
   private applyInitialTheme() {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark' || savedTheme === 'light') {
-      document.body.setAttribute('data-theme', savedTheme);
+      this.applyTheme(savedTheme);
       return;
     }
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.body.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    this.applyTheme(prefersDark ? 'dark' : 'light');
+  }
+
+  private applyTheme(theme: 'light' | 'dark') {
+    document.body.setAttribute('data-theme', theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.classList.toggle('light', theme === 'light');
   }
 }

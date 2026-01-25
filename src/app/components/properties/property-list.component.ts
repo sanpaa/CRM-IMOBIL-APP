@@ -1,19 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { PropertyService } from '../../services/property.service';
 import { OwnerService } from '../../services/owner.service';
 import { AuthService } from '../../services/auth.service';
 import { Property } from '../../models/property.model';
 import { Owner } from '../../models/owner.model';
-import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner.component';
 import { PopupService } from '../../shared/services/popup.service';
+import { SmartFilterBarComponent } from './ui/smart-filter-bar.component';
+import { PropertyRowComponent } from './ui/property-row.component';
 
 @Component({
   selector: 'app-property-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, LoadingSpinnerComponent],
+  imports: [CommonModule, FormsModule, SmartFilterBarComponent, PropertyRowComponent],
   templateUrl: './property-list.component.html',
   styleUrls: ['./property-list.component.scss']
 })
@@ -29,6 +29,8 @@ export class PropertyListComponent implements OnInit {
   isLoading = false;
   private static readonly CEP_REGEX = /\D/g;
   private static readonly MAX_IMAGES = 12;
+  skeletonRows = Array.from({ length: 6 });
+  readonly pageSize = 10;
 
   loadingCep = false;
 

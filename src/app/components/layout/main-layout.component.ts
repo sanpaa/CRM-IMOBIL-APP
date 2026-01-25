@@ -684,6 +684,8 @@ export class MainLayoutComponent implements OnInit {
 
   private setTheme(theme: 'light' | 'dark') {
     document.body.setAttribute('data-theme', theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.classList.toggle('light', theme === 'light');
     localStorage.setItem('theme', theme);
   }
 }
