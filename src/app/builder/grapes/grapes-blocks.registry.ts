@@ -41,15 +41,19 @@ export class GrapesBlocksRegistry {
     switch (type) {
       case 'header':
         return `
-          <header class="component-header">
-            <div class="navbar">
-              <div class="navbar-brand"><h1>Imobiliaria</h1></div>
-              <ul class="navbar-nav">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Imoveis</a></li>
-                <li><a href="#">Sobre</a></li>
-                <li><a href="#">Contato</a></li>
-              </ul>
+          <header class="site-header">
+            <div class="header-container">
+              <div class="brand">
+                <img src="/assets/logo.png" alt="Logo" />
+                <span class="brand-text">Sua Imobiliaria</span>
+              </div>
+              <nav class="nav">
+                <a href="#imoveis">Imoveis</a>
+                <a href="#sobre">Sobre</a>
+                <a href="#contato">Contato</a>
+                <a class="cta" href="#anunciar">Anunciar Imovel</a>
+              </nav>
+              <button class="menu-toggle" aria-label="Abrir menu">☰</button>
             </div>
           </header>
         `;

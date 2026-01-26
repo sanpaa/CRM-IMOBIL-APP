@@ -10,20 +10,20 @@ import { VisitPdfService } from '../../services/visit-pdf.service';
 import { VisitFormComponent } from './visit-form.component';
 import { PopupService } from '../../shared/services/popup.service';
 import { GoogleCalendarService } from 'src/app/services/google-calendar.service';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
 
 @Component({
   selector: 'app-visit-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, VisitCalendarComponent, VisitStatisticsComponent, VisitFormComponent],
+  imports: [CommonModule, FormsModule, RouterLink, VisitCalendarComponent, VisitStatisticsComponent, VisitFormComponent, PageHeaderComponent],
   template: `
     <div class="page-container">
-      <div class="page-header">
-        <h1>Agenda de Visitas</h1>
-        <button (click)="openForm()" class="btn-primary">
+      <app-page-header title="Agenda de Visitas">
+        <button header-actions (click)="openForm()" class="btn-primary">
           <i class="bi bi-plus-lg"></i>
           Nova Visita
         </button>
-      </div>
+      </app-page-header>
 
       <div class="content-wrapper">
         <!-- Statistics Section -->
@@ -103,19 +103,12 @@ import { GoogleCalendarService } from 'src/app/services/google-calendar.service'
       background: var(--color-bg-primary);
     }
 
-    .page-header {
-      background: transparent;
-      padding: 2.5rem 2.5rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .page-header h1 {
-      margin: 0;
-      color: var(--color-text-primary);
-      font-size: 2.4rem;
-      font-weight: 700;
+    app-page-header {
+      --page-header-bg: transparent;
+      --page-header-shadow: none;
+      --page-header-border: none;
+      --page-header-padding: 2.5rem 2.5rem 1rem;
+      --page-header-title-size: 2.4rem;
     }
 
     .content-wrapper {
@@ -269,7 +262,12 @@ import { GoogleCalendarService } from 'src/app/services/google-calendar.service'
     }
 
     @media (max-width: 768px) {
-      .page-header, .content-wrapper {
+      app-page-header {
+        --page-header-padding: 1.5rem;
+        margin: 1rem;
+      }
+
+      .content-wrapper {
         margin: 1rem;
         padding: 1.5rem;
       }

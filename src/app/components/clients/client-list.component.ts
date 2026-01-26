@@ -7,6 +7,7 @@ import { ClientNoteService } from '../../services/client-note.service';
 import { AuthService } from '../../services/auth.service';
 import { Client, ClientNote } from '../../models/client.model';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner.component';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { PopupService } from '../../shared/services/popup.service';
 
 /**
@@ -24,7 +25,7 @@ import { PopupService } from '../../shared/services/popup.service';
 @Component({
   selector: 'app-client-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, LoadingSpinnerComponent],
+  imports: [CommonModule, FormsModule, RouterLink, LoadingSpinnerComponent, PageHeaderComponent],
   templateUrl: './client-list.component.html',
   styleUrls: ['./client-list.component.scss']
 })

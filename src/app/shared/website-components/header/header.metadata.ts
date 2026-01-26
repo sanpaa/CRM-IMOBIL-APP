@@ -66,6 +66,26 @@ export const HEADER_METADATA: ComponentMetadata = {
         type: 'text',
         defaultValue: '',
         placeholder: 'Ex: 11 99999-9999'
+      },
+      {
+        key: 'showCta',
+        label: 'Mostrar botao CTA',
+        type: 'checkbox',
+        defaultValue: true
+      },
+      {
+        key: 'ctaLabel',
+        label: 'Texto do CTA',
+        type: 'text',
+        defaultValue: 'Anunciar Imovel',
+        placeholder: 'Ex: Anunciar Imovel'
+      },
+      {
+        key: 'ctaLink',
+        label: 'Link do CTA',
+        type: 'link',
+        defaultValue: '',
+        placeholder: 'Ex: https://seusite.com/anunciar'
       }
     ],
     
@@ -95,7 +115,10 @@ export const HEADER_METADATA: ComponentMetadata = {
       { label: 'Imóveis', link: '/properties' },
       { label: 'Contato', link: '/contact' }
     ],
-    phone: ''
+    phone: '',
+    showCta: true,
+    ctaLabel: 'Anunciar Imovel',
+    ctaLink: ''
   },
   
   defaultStyle: {

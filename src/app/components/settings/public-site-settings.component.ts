@@ -6,11 +6,12 @@ import { CompanyService } from '../../services/company.service';
 import { AuthService } from '../../services/auth.service';
 import { HeaderConfig, FooterConfig, FooterLink } from '../../models/company.model';
 import { PopupService } from '../../shared/services/popup.service';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
 
 @Component({
   selector: 'app-public-site-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, PageHeaderComponent],
   templateUrl: './public-site-settings.component.html',
   styleUrls: ['./public-site-settings.component.scss']
 })

@@ -123,6 +123,7 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
     this.addScript(head, 'https://cdn.tailwindcss.com?plugins=forms,container-queries', 'tw-cdn');
     this.addLink(head, 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap', 'font-inter');
     this.addLink(head, 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1', 'font-material');
+    this.addLink(head, '/assets/website-components.css', 'website-components');
   }
 
   private addScript(head: HTMLHeadElement, src: string, id: string) {
@@ -147,8 +148,108 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
     const root = this.host.nativeElement.querySelector('.grapes-output') as HTMLElement | null;
     if (!root) return;
 
+    this.hydrateHeader(root);
     this.bindSearchBar(root);
+    this.bindHeaderMenu(root);
     void this.renderPropertyGrid(root);
+  }
+
+  private hydrateHeader(root: HTMLElement) {
+    const header = root.querySelector('header.site-header, header.component-header') as HTMLElement | null;
+    if (!header) return;
+
+    const config = this.safeParse(header.getAttribute('data-config')) || {};
+    const style = this.safeParse(header.getAttribute('data-style')) || {};
+
+    const brandText = header.querySelector('.brand-text, .navbar-brand h1') as HTMLElement | null;
+    if (brandText) {
+      const name = (config.companyName || brandText.textContent || 'Sua Imobiliaria').toString();
+      brandText.textContent = name;
+    }
+
+    const logo = header.querySelector('.brand img, .logo img') as HTMLImageElement | null;
+    if (logo) {
+      const logoUrl = (config.logoUrl || '').toString().trim();
+      const showLogo = config.showLogo !== false && !!logoUrl;
+      if (showLogo) {
+        logo.src = logoUrl;
+        logo.style.display = 'block';
+      } else {
+        logo.style.display = 'none';
+      }
+    }
+
+    const nav = header.querySelector('.nav') as HTMLElement | null;
+    if (nav) {
+      const navigation = Array.isArray(config.navigation) && config.navigation.length
+        ? config.navigation
+        : [
+            { label: 'Imoveis', link: '#imoveis' },
+            { label: 'Sobre', link: '#sobre' },
+            { label: 'Contato', link: '#contato' }
+          ];
+
+      nav.innerHTML = '';
+      navigation.forEach((item: any) => {
+        const anchor = document.createElement('a');
+        anchor.textContent = (item?.label || '').toString();
+        anchor.href = (item?.link || '#').toString();
+        nav.appendChild(anchor);
+      });
+
+      const showCta = config.showCta !== false;
+      const ctaLabel = (config.ctaLabel || 'Anunciar Imovel').toString();
+      const ctaLink = (config.ctaLink || '').toString().trim();
+      const phone = (config.phone || '').toString();
+      const normalized = phone.replace(/\D/g, '');
+      const whatsappLink = normalized ? `https://wa.me/${normalized}` : '';
+      const finalCtaLink = ctaLink || whatsappLink;
+
+      if (showCta && finalCtaLink) {
+        const cta = document.createElement('a');
+        cta.className = 'cta';
+        cta.textContent = ctaLabel;
+        cta.href = finalCtaLink;
+        nav.appendChild(cta);
+      }
+    }
+
+    const bg = (style.backgroundColor || config.backgroundColor || '').toString().trim();
+    const text = (style.textColor || config.textColor || '').toString().trim();
+    if (bg) header.style.setProperty('--header-bg', bg);
+    if (text) header.style.setProperty('--header-text', text);
+  }
+
+  private bindHeaderMenu(root: HTMLElement) {
+    const header = root.querySelector('header.site-header') as HTMLElement | null;
+    if (!header) return;
+    const toggle = header.querySelector('.menu-toggle') as HTMLButtonElement | null;
+    const nav = header.querySelector('.nav') as HTMLElement | null;
+    if (!toggle || !nav) return;
+
+    toggle.addEventListener('click', () => {
+      nav.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', nav.classList.contains('open') ? 'true' : 'false');
+    });
+
+    nav.addEventListener('click', event => {
+      const target = event.target as HTMLElement | null;
+      if (!target || target.tagName !== 'A') return;
+      if (window.innerWidth <= 900) {
+        nav.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  private safeParse(raw: string | null): any {
+    if (!raw) return {};
+    try {
+      return JSON.parse(raw);
+    } catch (error) {
+      console.warn('[public-site] invalid JSON', error);
+      return {};
+    }
   }
 
   private bindSearchBar(root: HTMLElement) {

@@ -11,16 +11,16 @@ import { Client } from '../../models/client.model';
 import { Property } from '../../models/property.model';
 import { User } from '../../models/user.model';
 import { PopupService } from '../../shared/services/popup.service';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
 
 @Component({
   selector: 'app-deal-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, PageHeaderComponent],
   template: `
     <div class="page-container">
-      <div class="page-header">
-        <h1>Negócios / Propostas</h1>
-        <div class="header-actions">
+      <app-page-header title="Negócios / Propostas">
+        <div header-actions>
           <button (click)="showFilters = true" class="btn-secondary">
             Filtros
           </button>
@@ -28,7 +28,7 @@ import { PopupService } from '../../shared/services/popup.service';
             {{ showForm ? 'Cancelar' : '+ Novo Negócio' }}
           </button>
         </div>
-      </div>
+      </app-page-header>
 
       <!-- Filters Modal -->
       <div class="modal-overlay" *ngIf="showFilters" (click)="closeFilters()">
@@ -207,27 +207,9 @@ import { PopupService } from '../../shared/services/popup.service';
       background: var(--color-bg-primary);
     }
 
-    .page-header {
-      background: var(--color-bg-secondary);
-      padding: 2rem 2.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border-bottom: 1px solid #E5E7EB;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .page-header h1 {
-      margin: 0;
-      color: var(--color-text-primary);
-      font-size: 2rem;
-      font-weight: 700;
+    app-page-header {
+      --page-header-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --page-header-border: 1px solid #E5E7EB;
     }
 
     .btn-primary {
@@ -604,9 +586,9 @@ import { PopupService } from '../../shared/services/popup.service';
         padding: 1.5rem;
       }
 
-      .page-header {
+      app-page-header {
+        --page-header-padding: 1.5rem;
         margin: 1rem;
-        padding: 1.5rem;
       }
 
       .modal-content {

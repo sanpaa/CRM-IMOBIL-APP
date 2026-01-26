@@ -193,6 +193,9 @@ export class WebsiteCustomizationService {
                 logoUrl: '',
                 showLogo: true,
                 showMenu: true,
+                showCta: true,
+                ctaLabel: 'Anunciar Imovel',
+                ctaLink: '',
                 phone: '',
                 navigation: [
                   { label: 'Home', link: '/' },

@@ -1,27 +1,28 @@
 import { Component, Input, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-header-component',
   standalone: true,
   imports: [CommonModule, RouterLink],
+  encapsulation: ViewEncapsulation.None,
   template: `
-    <header class="header-container"
-            [style.background-color]="config?.backgroundColor || '#ffffff'"
-            [style.color]="config?.textColor || '#333333'">
-      <div class="header-content">
-        <div class="logo" *ngIf="config?.showLogo && config?.logoUrl && !editMode">
-          <img [src]="config.logoUrl" alt="Logo" class="logo-image">
+    <header
+      class="site-header"
+      [style.--header-bg]="config?.backgroundColor || 'rgba(15, 23, 42, 0.85)'"
+      [style.--header-text]="config?.textColor || '#ffffff'">
+      <div class="header-container">
+        <div class="brand">
+          <img
+            *ngIf="config?.showLogo && config?.logoUrl && !editMode"
+            [src]="config.logoUrl"
+            alt="Logo" />
+          <span class="brand-text">{{ config?.companyName || 'Sua Imobiliária' }}</span>
         </div>
 
-        <div class="brand" *ngIf="editMode || !config?.showLogo || !config?.logoUrl">
-          <h1>{{ config?.companyName }}</h1>
-        </div>
-
-      <div class="nav-right">
-        <!-- Menu de navegação -->
-        <nav class="nav-menu" *ngIf="config?.showMenu" role="navigation" [class.open]="isMenuOpen">
+        <nav class="nav" *ngIf="config?.showMenu" [class.open]="isMenuOpen">
           <ng-container *ngFor="let item of getNavigation()">
             <ng-container *ngIf="isExternalLink(item.link); else internalNav">
               <a [href]="getCleanUrl(item.link)"
@@ -40,32 +41,40 @@ import { RouterLink } from '@angular/router';
               </a>
             </ng-template>
           </ng-container>
+          <ng-container *ngIf="shouldShowCta()">
+            <ng-container *ngIf="isExternalLink(getCtaLink()); else internalCta">
+              <a
+                class="cta"
+                [href]="getCleanUrl(getCtaLink())"
+                target="_blank"
+                rel="noopener noreferrer"
+                [class.edit-mode-link]="editMode"
+                (click)="editMode ? $event.preventDefault() : null">
+                {{ getCtaLabel() }}
+              </a>
+            </ng-container>
+            <ng-template #internalCta>
+              <a
+                class="cta"
+                [routerLink]="getCtaLink()"
+                [class.edit-mode-link]="editMode"
+                (click)="onNavClick($event)">
+                {{ getCtaLabel() }}
+              </a>
+            </ng-template>
+          </ng-container>
         </nav>
 
-        <a *ngIf="config?.phone"
-           class="whatsapp-cta"
-           [href]="getWhatsappLink()"
-           target="_blank"
-           rel="noopener noreferrer"
-           [class.edit-mode-link]="editMode"
-           (click)="editMode ? $event.preventDefault() : null">
-          WhatsApp
-        </a>
-
-        <!-- Hamburger button (visible em telas pequenas) -->
         <button
-          class="hamburger"
+          class="menu-toggle"
           *ngIf="config?.showMenu"
-          aria-label="Alternar navegação"
+          aria-label="Abrir menu"
           [attr.aria-expanded]="isMenuOpen"
           (click)="toggleMenu()"
           [class.edit-mode-button]="editMode">
-          <span class="bar"></span>
-          <span class="bar"></span>
-          <span class="bar"></span>
+          ☰
         </button>
       </div>
-    </div>
 
       <!-- Edit Mode Overlay -->
       <div class="edit-overlay" *ngIf="editMode">
@@ -76,122 +85,133 @@ import { RouterLink } from '@angular/router';
   styles: [`
     :host { display: block; position: relative; }
 
-    .header-container { position: relative; padding: 1rem 2rem; }
-    .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; position: relative; }
+    :host {
+      --primary: #1f6aff;
+      --dark: #0f172a;
+      --light: #ffffff;
+      --border: rgba(255, 255, 255, 0.1);
+    }
 
-    .logo-image { height: 40px; display: block; }
-    .brand h1 { margin: 0; font-size: 1.25rem; }
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      background: var(--header-bg);
+      color: var(--header-text);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
 
-    .nav-right {
-      margin-left: auto;
+    .header-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 12px 32px;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      justify-content: space-between;
+      gap: 1.5rem;
     }
 
-    /* Menu desktop */
-    .nav-menu {
+    .brand {
       display: flex;
-      gap: 1rem;
       align-items: center;
-      transition: transform 250ms ease, opacity 250ms ease;
+      gap: 12px;
+      min-width: 0;
     }
 
-    .nav-menu a {
-      text-decoration: none;
-      color: inherit;
-      padding: 0.5rem 0.75rem;
-      border-radius: 4px;
-    }
-
-    .nav-menu a:hover { background: rgba(0,0,0,0.04); }
-
-    .whatsapp-cta {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-      background: #0ea5e9;
-      color: #0f172a;
-      font-weight: 600;
-      text-decoration: none;
-      box-shadow: 0 10px 24px rgba(14, 165, 233, 0.3);
-      transition: transform 200ms ease, box-shadow 200ms ease;
-    }
-
-    .whatsapp-cta:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 12px 28px rgba(14, 165, 233, 0.35);
-    }
-
-    /* Hamburger - hidden on desktop */
-    .hamburger {
-      display: none;
-      margin-left: auto;
-      width: 40px;
-      height: 30px;
-      background: transparent;
-      border: none;
-      padding: 0;
-      cursor: pointer;
-      align-items: center;
-      justify-content: center;
-    }
-    .hamburger .bar {
+    .brand img {
+      height: 42px;
       display: block;
-      width: 22px;
-      height: 2px;
-      background: currentColor;
-      margin: 4px 0;
-      transition: transform 200ms ease, opacity 200ms ease;
     }
 
-    /* Mobile styles */
-    @media (max-width: 768px) {
-      .nav-right {
-        gap: 0.5rem;
-      }
+    .brand-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--light);
+      white-space: nowrap;
+    }
 
-      .nav-menu {
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: #e5e7eb;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .nav a::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: var(--primary);
+      transition: 0.3s ease;
+    }
+
+    .nav a:hover::after {
+      width: 100%;
+    }
+
+    .cta {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .cta:hover {
+      transform: translateY(-1px);
+      opacity: 0.9;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 26px;
+      color: #ffffff;
+      cursor: pointer;
+    }
+
+    @media (max-width: 900px) {
+      .nav {
+        display: none;
         position: absolute;
         top: 100%;
-        right: 1rem;
-        background: var(--header-bg, #fff);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-        border-radius: 8px;
-        padding: 0.5rem;
+        right: 16px;
+        background: var(--header-bg);
+        border: 1px solid var(--border);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
         flex-direction: column;
-        gap: 0;
-        min-width: 180px;
-        opacity: 0;
-        transform: translateY(-8px) scale(0.98);
-        pointer-events: none;
+        gap: 0.75rem;
+        min-width: 200px;
         z-index: 1200;
       }
 
-      .nav-menu.open {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        pointer-events: auto;
+      .nav.open {
+        display: flex;
       }
 
-      .nav-menu a {
+      .nav a::after {
+        display: none;
+      }
+
+      .menu-toggle {
         display: block;
-        padding: 0.75rem 1rem;
       }
-
-      .hamburger { display: flex; }
-
-      .whatsapp-cta {
-        padding: 0.45rem 0.85rem;
-        font-size: 0.85rem;
-      }
-
-      /* optional: animate hamburger to X when open */
-      .hamburger.open .bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-      .hamburger.open .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
-      .hamburger.open .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
     }
 
     /* Edit-mode visuals */
@@ -225,6 +245,10 @@ export class HeaderComponent {
       this.updateHamburgerClass();
     }
   }
+  constructor() {
+    document.body.classList.add('header-css-loaded');
+  }
+
 
   @HostListener('window:resize')
   onResize() {
@@ -237,7 +261,7 @@ export class HeaderComponent {
 
   // aplica/remover classe .open ao botão hamburger (apenas para animação)
   private updateHamburgerClass() {
-    const btn = document.querySelector('.hamburger');
+    const btn = document.querySelector('.menu-toggle');
     if (!btn) return;
     if (this.isMenuOpen) btn.classList.add('open');
     else btn.classList.remove('open');
@@ -247,6 +271,22 @@ export class HeaderComponent {
     const rawPhone = (this.config?.phone || '').toString();
     const normalized = rawPhone.replace(/\D/g, '');
     return normalized ? `https://wa.me/${normalized}` : '#';
+  }
+
+  getCtaLabel(): string {
+    return (this.config?.ctaLabel || 'Anunciar Imovel').toString();
+  }
+
+  getCtaLink(): string {
+    const raw = (this.config?.ctaLink || '').toString().trim();
+    if (raw) return raw;
+    const whatsapp = this.getWhatsappLink();
+    return whatsapp !== '#' ? whatsapp : '';
+  }
+
+  shouldShowCta(): boolean {
+    if (this.config?.showCta === false) return false;
+    return !!this.getCtaLink();
   }
 
   getNavigation(): Array<{ label: string; link: string }> {
@@ -265,13 +305,17 @@ export class HeaderComponent {
   isExternalLink(url: string): boolean {
     if (!url) return false;
     const cleanUrl = url.startsWith('/') ? url.substring(1) : url;
-    return cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://');
+    return cleanUrl.startsWith('http://')
+      || cleanUrl.startsWith('https://')
+      || cleanUrl.startsWith('#')
+      || cleanUrl.startsWith('mailto:')
+      || cleanUrl.startsWith('tel:');
   }
 
   getCleanUrl(url: string): string {
     if (!url) return url;
     if (this.isExternalLink(url)) {
-      return url.startsWith('/') ? url.substring(1) : url;
+      return url.startsWith('/') && !url.startsWith('//') ? url.substring(1) : url;
     }
     return url;
   }

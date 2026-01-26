@@ -8,12 +8,13 @@ import { AuthService } from '../../services/auth.service';
 import { Owner } from '../../models/owner.model';
 import { Property } from '../../models/property.model';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner.component';
+import { PageHeaderComponent } from '../../shared/components/page-header.component';
 import { PopupService } from '../../shared/services/popup.service';
 
 @Component({
   selector: 'app-owner-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, LoadingSpinnerComponent],
+  imports: [CommonModule, FormsModule, RouterLink, LoadingSpinnerComponent, PageHeaderComponent],
   templateUrl: './owner-list.component.html',
   styleUrls: ['./owner-list.component.scss']
 })

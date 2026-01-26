@@ -1,14 +1,12 @@
 <div class="page-container">
-  <div class="page-header">
-    <div class="header-top">
-      <a class="btn-back" routerLink="/website-builder" aria-label="Voltar ao Construtor">
-        <span class="btn-back-icon"><i class="bi bi-arrow-left"></i></span>
-        <span>Voltar ao Construtor</span>
-      </a>
-    </div>
-    <h1>⚙️ Configurações do Site Público</h1>
-    <p class="subtitle">Configure o header, footer e informações de contato do seu site</p>
-  </div>
+  <app-page-header
+    title="⚙️ Configurações do Site Público"
+    subtitle="Configure o header, footer e informações de contato do seu site">
+    <a header-top class="btn-back" routerLink="/website-builder" aria-label="Voltar ao Construtor">
+      <span class="btn-back-icon"><i class="bi bi-arrow-left"></i></span>
+      <span>Voltar ao Construtor</span>
+    </a>
+  </app-page-header>
 
   <form (ngSubmit)="saveSettings()">
     
