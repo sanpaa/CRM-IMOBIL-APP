@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://crm-imobil.onrender.com/api',
+  apiUrl: 'https://phshomelab.com.br/api',
   supabase: {
     url: 'YOUR_SUPABASE_URL',
     anonKey: 'YOUR_SUPABASE_ANON_KEY'

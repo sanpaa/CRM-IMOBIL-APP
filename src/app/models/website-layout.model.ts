@@ -9,6 +9,10 @@ export interface WebsiteLayout {
   layout_config: LayoutConfig;
   html?: string;
   css?: string;
+  /** URL do Storage para HTML grande (quando html está vazio) */
+  html_url?: string;
+  /** URL do Storage para CSS grande (quando css está vazio) */
+  css_url?: string;
   meta_title?: string;
   meta_description?: string;
   meta_keywords?: string;
@@ -55,7 +59,7 @@ export interface LayoutSection {
   style?: ComponentStyle;
 }
 
-export type ComponentType = 
+export type ComponentType =
   | 'header'
   | 'footer'
   | 'hero'

@@ -25,7 +25,7 @@ export class GrapesEditorHostComponent implements AfterViewInit, OnDestroy {
 
   private editor: any;
   private isLoaded = false;
-  private pendingLayout: { html: string; css: string } | null = null;
+  private pendingLayout: { html: string; css: string; projectData?: any } | null = null;
 
   constructor(private blocksRegistry: GrapesBlocksRegistry) { }
 
@@ -43,6 +43,7 @@ export class GrapesEditorHostComponent implements AfterViewInit, OnDestroy {
     let data: any = json;
     let html = '';
     let css = '';
+    let projectData = null;
 
     if (typeof data === 'string') {
       try {
@@ -63,34 +64,63 @@ export class GrapesEditorHostComponent implements AfterViewInit, OnDestroy {
       if (typeof data.css === 'string') {
         css = data.css;
       }
+      // Verifica se tem projectData
+      if (data.projectData) {
+        projectData = data.projectData;
+      }
     }
 
-    if (typeof html !== 'string') {
-      console.error('Grapes load(): formato inválido. Esperado { html: string, css: string }');
+    if (!projectData && typeof html !== 'string') {
+      console.error('Grapes load(): formato inválido. Esperado projectData ou html');
       return;
     }
 
     console.log('[gjs] load() called', {
       isLoaded: this.isLoaded,
+      hasProjectData: !!projectData,
       htmlLength: html?.length ?? 0,
       cssLength: css?.length ?? 0
     });
-    this.pendingLayout = { html, css };
+
+    // Se tiver projectData, preferimos ele
+    if (projectData) {
+      this.pendingLayout = { html, css, projectData };
+    } else {
+      this.pendingLayout = { html, css };
+    }
 
     if (this.isLoaded && this.editor) {
-      console.log('[gjs] applying pending layout now');
+      this.applyPendingLayout();
+    }
+  }
+
+  private applyPendingLayout() {
+    if (!this.pendingLayout || !this.editor) return;
+
+    console.log('[gjs] applying layout', { hasProjectData: !!this.pendingLayout.projectData });
+
+    if (this.pendingLayout.projectData) {
+      // Carregamento fiel via JSON do projeto
+      this.editor.loadProjectData(this.pendingLayout.projectData);
+
+      // Opcionalmente, pode ser necessário forçar refresh
+      this.editor.refresh();
+    } else {
+      // Carregamento legado via HTML/CSS (perda de dados possível)
       this.editor.setComponents(this.pendingLayout.html);
       this.editor.setStyle(this.pendingLayout.css);
       this.editor.refresh();
-      this.pendingLayout = null;
     }
+
+    this.pendingLayout = null;
   }
 
   save(): any {
     if (!this.editor) return null;
     return {
       html: this.editor.getHtml(),
-      css: this.editor.getCss() || ''
+      css: this.editor.getCss() || '',
+      projectData: this.editor.getProjectData() // Importante: salva o estado completo
     };
   }
 
@@ -137,7 +167,8 @@ export class GrapesEditorHostComponent implements AfterViewInit, OnDestroy {
           // Tailwind config (se precisar JS)
           'https://cdn.tailwindcss.com?plugins=forms,container-queries'
         ]
-      }    });
+      }
+    });
 
 
     this.blocksRegistry.registerAll(this.editor);

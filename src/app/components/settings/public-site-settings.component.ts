@@ -19,7 +19,7 @@ export class PublicSiteSettingsComponent implements OnInit {
   companyId: string | null = null;
   saving = false;
   saved = false;
-  
+
   // Header Config
   headerConfig: HeaderConfig = {
     logoUrl: '',
@@ -28,7 +28,7 @@ export class PublicSiteSettingsComponent implements OnInit {
     backgroundColor: '#ffffff',
     textColor: '#333333'
   };
-  
+
   // Footer Config
   footerConfig: FooterConfig = {
     companyName: '',
@@ -47,7 +47,7 @@ export class PublicSiteSettingsComponent implements OnInit {
     backgroundColor: '#1a1a1a',
     textColor: '#ffffff'
   };
-  
+
   // Temporary fields for adding links
   newQuickLink: FooterLink = { label: '', route: '' };
   newService: FooterLink = { label: '', route: '' };
@@ -56,7 +56,7 @@ export class PublicSiteSettingsComponent implements OnInit {
     private companyService: CompanyService,
     public authService: AuthService,
     private popupService: PopupService
-  ) {}
+  ) { }
 
   async ngOnInit() {
     const companyId = localStorage.getItem('company_id');
@@ -66,32 +66,32 @@ export class PublicSiteSettingsComponent implements OnInit {
       this.popupService.alert('Erro: Sessão inválida. Faça login novamente.', { title: 'Aviso', tone: 'warning' });
       return;
     }
-    
+
     this.companyId = companyId;
     console.log('🟢 Company ID do localStorage:', this.companyId);
-    
+
     await this.loadSettings();
   }
 
   async loadSettings() {
     try {
       console.log('🟢 Carregando configurações da empresa:', this.companyId);
-      
+
       const company = await this.companyService.getById(this.companyId!);
-      
+
       if (!company) {
         console.error('🔴 Empresa não encontrada!');
         return;
       }
-      
+
       console.log('🟢 Empresa carregada:', company.name);
-      
+
       // Carregar header_config se existir
       if (company.header_config) {
         console.log('🟢 Header config encontrado:', company.header_config);
         this.headerConfig = company.header_config as any;
       }
-      
+
       // Carregar footer_config se existir
       if (company.footer_config) {
         console.log('🟢 Footer config encontrado:', company.footer_config);
@@ -102,7 +102,7 @@ export class PublicSiteSettingsComponent implements OnInit {
         this.footerConfig.email = company.email || '';
         this.footerConfig.phone = company.phone || '';
       }
-      
+
       console.log('✅ Configurações carregadas com sucesso!');
     } catch (error) {
       console.error('🔴 Error loading settings:', error);
@@ -116,19 +116,19 @@ export class PublicSiteSettingsComponent implements OnInit {
       this.popupService.alert('Erro: Company ID não encontrado', { title: 'Aviso', tone: 'warning' });
       return;
     }
-    
+
     this.saving = true;
     try {
       console.log('🟢 Salvando configurações...');
       console.log('🟢 Company ID:', this.companyId);
       console.log('🟢 Header Config:', this.headerConfig);
       console.log('🟢 Footer Config:', this.footerConfig);
-      
+
       const success = await this.companyService.updateStoreSettings(this.companyId, {
         header_config: this.headerConfig,
         footer_config: this.footerConfig
       });
-      
+
       if (success) {
         console.log('✅ Configurações salvas com sucesso!');
         this.saved = true;

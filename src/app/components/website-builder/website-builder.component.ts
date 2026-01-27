@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { WebsiteCustomizationService } from '../../services/website-customization.service';
 import { AuthService } from '../../services/auth.service';
+import { LayoutStorageService } from '../../services/layout-storage.service';
 import { WebsiteLayout } from '../../models/website-layout.model';
 import { PopupService } from '../../shared/services/popup.service';
 import { GrapesEditorHostComponent } from '../../builder/grapes/grapes-editor-host.component';
@@ -36,11 +37,11 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
   }
   layouts: WebsiteLayout[] = [];
   currentLayout: WebsiteLayout | null = null;
-  
+
   hasUnsavedChanges = false;
   autoSaveEnabled = true;
   lastSavedAt: Date | null = null;
-  
+
   loading = false;
   saving = false;
 
@@ -69,8 +70,9 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
   constructor(
     private customizationService: WebsiteCustomizationService,
     public authService: AuthService,
-    private popupService: PopupService
-  ) {}
+    private popupService: PopupService,
+    private layoutStorage: LayoutStorageService
+  ) { }
 
   async ngOnInit() {
     if (!this.authService.isAdmin()) {
@@ -80,7 +82,7 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
       });
       return;
     }
-    
+
     await this.loadLayouts();
   }
 
@@ -97,7 +99,7 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
       const user = this.authService.getCurrentUser();
       if (user?.company_id) {
         this.layouts = await this.customizationService.getLayouts(user.company_id);
-        
+
         if (this.layouts.length > 0) {
           await this.selectLayout(this.layouts[0]);
         }
@@ -112,38 +114,55 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
 
   async selectLayout(layout: WebsiteLayout) {
     this.currentLayout = layout;
-    const html = layout.html ?? (layout.layout_config as any)?.html ?? '';
-    const css = layout.css ?? (layout.layout_config as any)?.css ?? '';
-    console.log('[builder] selectLayout', {
-      id: layout.id,
-      htmlLength: html?.length ?? 0,
-      cssLength: css?.length ?? 0
-    });
-    const draft = this.getDraft(layout.id);
-    const shouldRestoreDraft = this.shouldRestoreDraft(layout, draft);
-    if (draft && shouldRestoreDraft) {
-      const confirmed = await this.popupService.confirm(
-        'Encontramos um rascunho local mais recente para este layout. Deseja restaurar?',
-        {
-          title: 'Restaurar rascunho',
-          confirmText: 'Restaurar',
-          cancelText: 'Descartar',
-          tone: 'warning'
+    this.loading = true;
+
+    try {
+      // Carrega conteúdo - do Storage se necessário
+      const content = await this.layoutStorage.loadLayoutContent(layout);
+      const html = content.html || (layout.layout_config as any)?.html || '';
+      const css = content.css || (layout.layout_config as any)?.css || '';
+      const projectData = content.projectData;
+
+      console.log('[builder] selectLayout', {
+        id: layout.id,
+        htmlLength: html?.length ?? 0,
+        cssLength: css?.length ?? 0,
+        hasProjectData: !!projectData,
+        fromStorage: !!(layout.html_url || layout.css_url)
+      });
+
+      const draft = this.getDraft(layout.id);
+      const shouldRestoreDraft = this.shouldRestoreDraft(layout, draft);
+      if (draft && shouldRestoreDraft) {
+        const confirmed = await this.popupService.confirm(
+          'Encontramos um rascunho local mais recente para este layout. Deseja restaurar?',
+          {
+            title: 'Restaurar rascunho',
+            confirmText: 'Restaurar',
+            cancelText: 'Descartar',
+            tone: 'warning'
+          }
+        );
+        if (confirmed) {
+          // Rascunhos antigos podem não ter projectData, mas ok
+          this.applyLayoutToEditor(draft.html || '', draft.css || '');
+        } else {
+          this.clearDraft(layout.id);
+          this.applyLayoutToEditor(html, css, projectData);
         }
-      );
-      if (confirmed) {
-        this.applyLayoutToEditor(draft.html || '', draft.css || '');
       } else {
-        this.clearDraft(layout.id);
-        this.applyLayoutToEditor(html, css);
+        this.applyLayoutToEditor(html, css, projectData);
       }
-    } else {
-      this.applyLayoutToEditor(html, css);
+      this.lastKnownHtml = html || '';
+      this.lastKnownCss = css || '';
+      this.hasUnsavedChanges = false;
+      this.lastSavedAt = null;
+    } catch (error) {
+      console.error('[builder] Erro ao carregar layout:', error);
+      this.popupService.alert('Erro ao carregar o conteúdo do layout', { title: 'Erro', tone: 'warning' });
+    } finally {
+      this.loading = false;
     }
-    this.lastKnownHtml = html || '';
-    this.lastKnownCss = css || '';
-    this.hasUnsavedChanges = false;
-    this.lastSavedAt = null;
   }
 
   async createNewLayout() {
@@ -174,10 +193,10 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
 
       this.layouts.unshift(newLayout);
       await this.selectLayout(newLayout);
-      
+
       this.showLayoutForm = false;
       this.newLayoutData = { name: '', page_type: 'home', slug: '' };
-      
+
       this.popupService.alert('Layout criado com sucesso!', { title: 'Sucesso', tone: 'info' });
     } catch (error) {
       console.error('Error creating layout:', error);
@@ -192,30 +211,104 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
 
     this.saving = true;
     try {
-      const data = this.grapesHost?.save() || { html: '', css: '' };
-      if (this.isBlank(data.html) && this.isBlank(data.css) && !this.isBlank(this.lastKnownHtml)) {
+      const data = this.grapesHost?.save() || { html: '', css: '', projectData: null };
+      const html = data.html || '';
+      const css = data.css || '';
+      const projectData = data.projectData;
+
+      // Debug logging
+      const htmlSize = new Blob([html]).size;
+      const cssSize = new Blob([css]).size;
+      console.log('[builder] saveLayout - dados a salvar:', {
+        layoutId: this.currentLayout.id,
+        htmlSize: `${(htmlSize / 1024).toFixed(2)} KB`,
+        cssSize: `${(cssSize / 1024).toFixed(2)} KB`,
+        hasProjectData: !!projectData
+      });
+
+      if (this.isBlank(html) && this.isBlank(css) && !this.isBlank(this.lastKnownHtml)) {
         console.warn('[builder] blocked empty save');
         this.popupService.alert(
-          'O editor retornou HTML/CSS vazios. Para evitar perda, o salvamento foi bloqueado.',
+          'O editor retornou HTML/CSS vazios. Bloqueado.',
           { title: 'Salvamento bloqueado', tone: 'warning' }
         );
         return;
       }
-      await this.customizationService.updateLayout(this.currentLayout.id, {
-        html: data.html || '',
-        css: data.css || ''
-      } as any);
+
+      // Usa o LayoutStorageService (agora suporta projectData)
+      const storageResult = await this.layoutStorage.saveLayoutContent(
+        this.currentLayout.id,
+        html,
+        css,
+        projectData
+      );
+
+      console.log('[builder] resultado do storage:', {
+        usouStorageHtml: !!storageResult.html_url,
+        usouStorageCss: !!storageResult.css_url,
+        usouStorageProject: !!(storageResult.project_data && storageResult.project_data.storage_url)
+      });
+
+      // Atualiza o layout no banco
+      const updatePayload: any = {};
+
+      if (storageResult.html_url) {
+        updatePayload.html = '';
+        updatePayload.html_url = storageResult.html_url;
+      } else {
+        updatePayload.html = storageResult.html;
+        updatePayload.html_url = null;
+      }
+
+      if (storageResult.css_url) {
+        updatePayload.css = '';
+        updatePayload.css_url = storageResult.css_url;
+      } else {
+        updatePayload.css = storageResult.css;
+        updatePayload.css_url = null;
+      }
+
+      // Salva layout_config (Project Data ou Referência Storage)
+      if (storageResult.project_data) {
+        updatePayload.layout_config = storageResult.project_data;
+      }
+
+      console.log('[builder] payload para banco:', {
+        htmlInline: !!updatePayload.html,
+        htmlUrl: !!updatePayload.html_url,
+        cssInline: !!updatePayload.css,
+        cssUrl: !!updatePayload.css_url
+      });
+
+      await this.customizationService.updateLayout(this.currentLayout.id, updatePayload);
+
       this.hasUnsavedChanges = false;
       this.lastSavedAt = new Date();
-      this.lastKnownHtml = data.html || '';
-      this.lastKnownCss = data.css || '';
+      this.lastKnownHtml = html;
+      this.lastKnownCss = css;
       this.clearDraft(this.currentLayout.id);
+
       if (!silent) {
-        this.popupService.alert('Layout salvo com sucesso!', { title: 'Sucesso', tone: 'info' });
+        const usedStorage = storageResult.html_url || storageResult.css_url;
+        this.popupService.alert(
+          usedStorage
+            ? 'Layout salvo com sucesso! (usando Storage para conteúdo grande)'
+            : 'Layout salvo com sucesso!',
+          { title: 'Sucesso', tone: 'info' }
+        );
       }
-    } catch (error) {
-      console.error('Error saving layout:', error);
-      this.popupService.alert('Erro ao salvar layout', { title: 'Aviso', tone: 'warning' });
+    } catch (error: any) {
+      console.error('[builder] Error saving layout:', {
+        error,
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code
+      });
+      this.popupService.alert(
+        `Erro ao salvar layout: ${error?.message || 'Erro desconhecido'}`,
+        { title: 'Erro', tone: 'warning' }
+      );
     } finally {
       this.saving = false;
     }
@@ -280,11 +373,11 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
     }, 800);
   }
 
-  private applyLayoutToEditor(html: string, css: string) {
+  private applyLayoutToEditor(html: string, css: string, projectData?: any) {
     if (this.grapesHost) {
-      this.grapesHost.load({ html, css });
+      this.grapesHost.load({ html, css, projectData });
     } else {
-      this.pendingProjectData = { html, css };
+      this.pendingProjectData = { html, css, projectData };
     }
   }
 

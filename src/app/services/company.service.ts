@@ -6,7 +6,7 @@ import { Company, HeaderConfig, FooterConfig } from '../models/company.model';
   providedIn: 'root'
 })
 export class CompanyService {
-  constructor(private supabase: SupabaseService) {}
+  constructor(private supabase: SupabaseService) { }
 
   async getById(id: string): Promise<Company | null> {
     try {
@@ -29,7 +29,7 @@ export class CompanyService {
       console.log('🟢 CompanyService.updateStoreSettings() chamado');
       console.log('🟢 Company ID:', companyId);
       console.log('🟢 Settings:', settings);
-      
+
       const { error } = await this.supabase
         .from('companies')
         .update({
@@ -42,7 +42,7 @@ export class CompanyService {
         console.error('🔴 Supabase error:', error);
         throw error;
       }
-      
+
       console.log('✅ Supabase update bem-sucedido!');
       return true;
     } catch (error) {
