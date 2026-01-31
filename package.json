@@ -4,7 +4,7 @@
   "description": "Multi-tenant Real Estate CRM SaaS Application",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --allowed-hosts all",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
