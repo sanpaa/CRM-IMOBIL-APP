@@ -323,15 +323,28 @@ export class PropertyListComponent implements OnInit {
     if (!this.formData.city || !this.formData.state) return;
 
     const cepClean = this.formData.zip_code?.replace(/\D/g, '');
+    const neighborhood = (this.formData.neighborhood || '').trim();
+    const street = (this.formData.street || '').trim();
+    const city = (this.formData.city || '').trim();
+    const state = (this.formData.state || '').trim();
 
     const strategies = [
-      this.formData.street && cepClean
-        ? `${this.formData.street}, ${cepClean}, ${this.formData.city}, ${this.formData.state}, Brasil`
+      street && neighborhood && cepClean
+        ? `${street}, ${neighborhood}, ${cepClean}, ${city}, ${state}, Brasil`
         : null,
-      this.formData.street
-        ? `${this.formData.street}, ${this.formData.city}, ${this.formData.state}, Brasil`
+      street && cepClean
+        ? `${street}, ${cepClean}, ${city}, ${state}, Brasil`
         : null,
-      `${this.formData.city}, ${this.formData.state}, Brasil`
+      street && neighborhood
+        ? `${street}, ${neighborhood}, ${city}, ${state}, Brasil`
+        : null,
+      street
+        ? `${street}, ${city}, ${state}, Brasil`
+        : null,
+      neighborhood
+        ? `${neighborhood}, ${city}, ${state}, Brasil`
+        : null,
+      `${city}, ${state}, Brasil`
     ].filter(Boolean) as string[];
 
     for (const address of strategies) {

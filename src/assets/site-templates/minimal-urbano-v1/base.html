@@ -1,0 +1,100 @@
+<div class="site minimal" style="--primary: {{primaryColor}}; --secondary: {{secondaryColor}}; --accent: {{accentColor}}; --background: {{backgroundColor}};">
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img class="logo" src="{{logo}}" alt="{{companyName}}" />
+        <span class="company">{{companyName}}</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/buscar">Buscar</a>
+        <a href="/sobre">Sobre</a>
+        <a href="/contato">Contato</a>
+      </nav>
+      <a class="cta" href="{{whatsappLink}}">WhatsApp</a>
+    </div>
+  </header>
+
+  <header class="hero" data-section="hero" id="hero">
+    <div class="container hero-split">
+      <div class="hero-copy">
+        <span class="eyebrow">Imobiliaria urbana</span>
+        <h1 class="hero-title">{{heroTitle}}</h1>
+        <p class="hero-text">{{heroText}}</p>
+        <div class="hero-actions">
+          <a class="cta" href="{{whatsappLink}}">Fale agora</a>
+          <a class="link" href="/buscar">Ver vitrine</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <strong>Atendimento direto</strong>
+        <p>Negociacao clara com dados do mercado local.</p>
+        <a class="cta ghost" href="{{whatsappLink}}">Quero consultoria</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="imoveis" data-section="imoveis" id="imoveis">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Selecao urbana</span>
+          <h2 class="section-title">Imoveis recentes</h2>
+        </div>
+        <a class="link" href="/buscar">Ver todos</a>
+      </div>
+      <div class="grid">
+        {{propertyCards}}
+      </div>
+    </div>
+  </section>
+
+  <section class="sobre" data-section="sobre" id="sobre">
+    <div class="container split">
+      <div>
+        <h2 class="section-title">Atendimento humano e direto</h2>
+        <p class="section-text">{{aboutText}}</p>
+      </div>
+      <div class="mini-card">
+        <span>Curadoria</span>
+        <strong>Imoveis com alta rotatividade</strong>
+        <p>Selecao enxuta para quem quer decidir rapido.</p>
+      </div>
+    </div>
+  </section>
+
+    <footer class="footer" data-section="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-row">
+          <img class="footer-logo" src="{{logo}}" alt="{{companyName}}" onerror="this.style.display='none'" />
+          <div>
+            <strong class="footer-name">{{companyName}}</strong>
+            <span class="footer-tag">{{footerTagline}}</span>
+          </div>
+        </div>
+        <p class="footer-desc">{{footerText}}</p>
+      </div>
+      <div class="footer-links">
+        <h4>{{footerLinksTitle}}</h4>
+        <a href="/">Home</a>
+        <a href="/buscar">Buscar</a>
+        <a href="{{whatsappLink}}">Contato</a>
+      </div>
+      <div class="footer-social">
+        <h4>Redes sociais</h4>
+        <div class="social-row">
+          <a class="social" href="{{instagram}}" target="_blank" rel="noopener">Instagram</a>
+          <a class="social" href="{{facebook}}" target="_blank" rel="noopener">Facebook</a>
+          <a class="social" href="{{youtube}}" target="_blank" rel="noopener">YouTube</a>
+          <a class="social" href="{{linkedin}}" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>{{companyName}}</span>
+      <span class="footer-badge">{{footerBadge}}</span>
+    </div>
+  </footer>
+</div>
+

@@ -1,0 +1,353 @@
+.site.luxury-prime {
+  font-family: var(--font-body, inherit);
+  background: var(--background);
+  color: var(--secondary);
+  min-height: 100vh;
+}
+
+.site.luxury-prime .container {
+  width: min(1080px, 92%);
+  margin: 0 auto;
+}
+
+.site.luxury-prime .site-header {
+  background: color-mix(in srgb, var(--background) 92%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--secondary) 10%, transparent);
+}
+
+.site.luxury-prime .header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 0;
+}
+
+.site.luxury-prime .brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.site.luxury-prime .logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--secondary) 18%, transparent);
+  padding: 6px;
+}
+
+.site.luxury-prime .company {
+  display: block;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.site.luxury-prime .tag {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+.site.luxury-prime .nav {
+  display: flex;
+  gap: 18px;
+}
+
+.site.luxury-prime .nav a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.site.luxury-prime .cta {
+  background: var(--accent);
+  color: var(--background);
+  padding: 12px 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.site.luxury-prime .cta.ghost,
+.site.luxury-prime .ghost {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--secondary) 18%, transparent);
+  color: inherit;
+}
+
+.site.luxury-prime .hero {
+  padding: 120px 0 90px;
+}
+
+.site.luxury-prime .hero-shell {
+  display: grid;
+  gap: 36px;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+}
+
+.site.luxury-prime .eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+.site.luxury-prime .hero h1 {
+  font-size: clamp(36px, 5vw, 64px);
+  margin: 12px 0;
+}
+
+.site.luxury-prime .hero-text {
+  max-width: 520px;
+  font-size: 16px;
+}
+
+.site.luxury-prime .hero-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+.site.luxury-prime .hero-card {
+  border: 1px solid color-mix(in srgb, var(--secondary) 15%, transparent);
+  border-radius: 22px;
+  padding: 28px;
+  background: color-mix(in srgb, var(--background) 96%, transparent);
+}
+
+.site.luxury-prime .card-line {
+  width: 120px;
+  height: 2px;
+  background: var(--accent);
+  margin-bottom: 14px;
+}
+
+.site.luxury-prime .hero-signature {
+  margin-top: 20px;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 55%, transparent);
+}
+
+.site.luxury-prime .imoveis {
+  padding: 80px 0 70px;
+}
+
+.site.luxury-prime .section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.site.luxury-prime .property-grid {
+  display: grid;
+  gap: 26px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.site.luxury-prime .card-link {
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+}
+
+.site.luxury-prime .card {
+  border: 1px solid color-mix(in srgb, var(--secondary) 18%, transparent);
+  border-radius: 22px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--background) 98%, transparent);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.site.luxury-prime .card-link:hover .card {
+  transform: translateY(-6px);
+  box-shadow: 0 30px 60px color-mix(in srgb, var(--secondary) 20%, transparent);
+}
+
+.site.luxury-prime .thumb {
+  height: 210px;
+  background: color-mix(in srgb, var(--secondary) 10%, transparent);
+}
+
+.site.luxury-prime .info {
+  padding: 18px;
+}
+
+.site.luxury-prime .price {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.site.luxury-prime .cta-section {
+  padding: 70px 0 100px;
+}
+
+.site.luxury-prime .cta-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid color-mix(in srgb, var(--secondary) 18%, transparent);
+  padding: 32px;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--background) 92%, transparent);
+}
+
+.site.luxury-prime .footer {
+  padding: 32px 0;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+}
+
+.site.luxury-prime .footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+@media (max-width: 980px) {
+  .site.luxury-prime .hero-shell { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  .site.luxury-prime .nav { display: none; }
+}
+
+@media (max-width: 768px) {
+  .site.luxury-prime .cta-shell { flex-direction: column; text-align: center; }
+}
+
+.site.luxury-prime .footer {
+  padding: 56px 0 24px;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 14%, transparent);
+  background: color-mix(in srgb, var(--background) 92%, transparent);
+}
+
+.site.luxury-prime .footer-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.site.luxury-prime .footer-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site.luxury-prime .footer-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 12px;
+  padding: 6px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.site.luxury-prime .footer-name {
+  display: block;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.site.luxury-prime .footer-tag {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+.site.luxury-prime .footer-desc {
+  margin: 12px 0 0;
+  max-width: 380px;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+  font-size: 14px;
+}
+
+.site.luxury-prime .footer-links h4,
+.site.luxury-prime .footer-social h4 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+}
+
+.site.luxury-prime .footer-links a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.85;
+  margin-bottom: 8px;
+}
+
+.site.luxury-prime .footer-links a:hover {
+  opacity: 1;
+}
+
+.site.luxury-prime .social-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.site.luxury-prime .social {
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid color-mix(in srgb, var(--secondary) 18%, transparent);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.site.luxury-prime .social:hover {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  color: var(--accent);
+}
+
+.site.luxury-prime .footer-bottom {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+  font-size: 12px;
+}
+
+.site.luxury-prime .footer-badge {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--secondary);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+@media (max-width: 900px) {
+  .site.luxury-prime .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .site.luxury-prime .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .site.luxury-prime .footer-brand-row {
+    align-items: flex-start;
+  }
+}

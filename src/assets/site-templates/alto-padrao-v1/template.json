@@ -1,0 +1,29 @@
+{
+  "id": "alto-padrao-v1",
+  "name": "Alto Padrao",
+  "preview": "/assets/site-templates/alto-padrao-v1/preview.svg",
+  "theme": {
+    "primary": "#C9A24D",
+    "secondary": "#0F172A",
+    "fontTitle": "Playfair Display",
+    "fontBody": "Source Sans 3"
+  },
+  "sections": [
+    { "type": "header", "variant": "luxo" },
+    { "type": "hero", "variant": "full-bleed" },
+    {
+      "type": "imoveis",
+      "variant": "carousel",
+      "config": {
+        "eyebrow": "Destaques",
+        "title": "Selecao exclusiva",
+        "ctaLabel": "Ver imoveis",
+        "ctaLink": "/buscar",
+        "showCarousel": true,
+        "limit": 6
+      }
+    },
+    { "type": "cta", "variant": "minimal" },
+    { "type": "footer", "variant": "luxo" }
+  ]
+}

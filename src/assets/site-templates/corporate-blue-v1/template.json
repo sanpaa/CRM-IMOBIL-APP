@@ -1,0 +1,20 @@
+﻿{
+  "id": "corporate-blue-v1",
+  "name": "Corporate Blue",
+  "preview": "/assets/site-templates/corporate-blue-v1/preview.svg",
+  "theme": {
+    "primary": "#2563EB",
+    "secondary": "#0F172A",
+    "accent": "#38BDF8",
+    "background": "#F8FAFC",
+    "fontTitle": "inherit",
+    "fontBody": "inherit"
+  },
+  "sections": [
+    { "type": "header" },
+    { "type": "hero" },
+    { "type": "imoveis" },
+    { "type": "cta" },
+    { "type": "footer" }
+  ]
+}

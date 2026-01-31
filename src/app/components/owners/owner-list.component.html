@@ -24,7 +24,7 @@
   </div>
 
   <!-- Modal Form -->
-  <div class="modal-overlay" *ngIf="showForm" (click)="closeModal()">
+  <div class="modal-overlay" *ngIf="showForm" (mousedown)="onOverlayMouseDown($event)">
     <div class="modal-content owner-modal" (click)="$event.stopPropagation()">
       <div class="owner-modal-header">
         <div class="owner-title">

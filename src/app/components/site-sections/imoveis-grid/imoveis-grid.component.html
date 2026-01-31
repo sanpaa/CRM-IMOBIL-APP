@@ -1,0 +1,22 @@
+<section class="section imoveis" [ngClass]="['variant-' + variant, useCarousel ? 'variant-carousel' : '']" id="imoveis" *ngIf="config">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">{{ eyebrow }}</span>
+        <h2 class="section-title">{{ title }}</h2>
+      </div>
+      <a *ngIf="showCta" class="link" [href]="ctaLink || (config.whatsappLink || '#')">{{ ctaLabel }}</a>
+    </div>
+
+    <div class="grid" [ngStyle]="gridStyle">
+      <a class="card-link" *ngFor="let card of cards" [href]="card.link || '#'"><article class="card">
+        <div class="thumb" [ngStyle]="card.image ? {'background-image': 'url(' + card.image + ')', 'background-size': 'cover', 'background-position': 'center'} : null"></div>
+        <div class="info">
+          <h3>{{ card.title }}</h3>
+          <p>{{ card.city }}</p>
+          <span class="price">{{ card.price }}</span>
+        </div>
+      </article></a>
+    </div>
+  </div>
+</section>

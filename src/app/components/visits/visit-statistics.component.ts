@@ -333,7 +333,8 @@ export class VisitStatisticsComponent implements OnInit, OnChanges {
     const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
     this.visits.forEach(visit => {
-      const visitDate = new Date(visit.visit_date);
+      const visitDate = this.parseVisitDateLocal(visit.visit_date);
+      if (!visitDate) return;
       
       // Today
       if (this.isSameDay(visitDate, today)) {
@@ -363,7 +364,8 @@ export class VisitStatisticsComponent implements OnInit, OnChanges {
     if (!this.currentDate) return this.visits;
 
     return this.visits.filter(visit => {
-      const visitDate = new Date(visit.visit_date);
+      const visitDate = this.parseVisitDateLocal(visit.visit_date);
+      if (!visitDate) return false;
       
       switch (this.filterView) {
         case 'day':
@@ -400,5 +402,13 @@ export class VisitStatisticsComponent implements OnInit, OnChanges {
   getEndOfWeek(date: Date): Date {
     const start = this.getStartOfWeek(date);
     return new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+  }
+
+  private parseVisitDateLocal(value?: string | null): Date | null {
+    if (!value) return null;
+    const parts = value.split('-').map(part => Number(part));
+    if (parts.length !== 3 || parts.some(part => Number.isNaN(part))) return null;
+    const [year, month, day] = parts;
+    return new Date(year, month - 1, day);
   }
 }

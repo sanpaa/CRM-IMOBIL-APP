@@ -163,6 +163,18 @@ import { PopupService } from '../../shared/services/popup.service';
                 </div>
 
                 <div class="form-row">
+                  <div class="form-group">
+                    <label>Horário da visita deste imóvel</label>
+                    <input type="text"
+                           [(ngModel)]="property.visit_time"
+                           [name]="'prop_time_' + i"
+                           inputmode="numeric"
+                           placeholder="hh:mm"
+                           (input)="onPropertyTimeInput($event, property)">
+                  </div>
+                </div>
+
+                <div class="form-row">
                   <div class="form-group" style="grid-column: 1 / -1;">
                     <label>Selecionar Imóvel Cadastrado (opcional)</label>
                     <select (change)="onPropertySelect(i, $any($event.target).value)" [name]="'select_prop_' + i" [class.invalid]="fieldErrors.property">
@@ -963,6 +975,7 @@ export class VisitFormComponent implements OnInit, OnChanges {
 
   addProperty() {
     this.properties.push({
+      visit_time: this.formData.visit_time || '',
       property_reference: '',
       full_address: '',
       development: '',
@@ -1048,6 +1061,16 @@ export class VisitFormComponent implements OnInit, OnChanges {
     try {
       if (!this.formData.visit_date || !this.formData.visit_time) {
         this.showError('Preencha data e horário da visita.');
+        return;
+      }
+      this.properties.forEach(property => {
+        if (!property.visit_time) {
+          property.visit_time = this.formData.visit_time || '';
+        }
+      });
+      const missingPropertyTime = this.properties.some(property => !property.visit_time);
+      if (missingPropertyTime) {
+        this.showError('Preencha o horário de cada imóvel visitado.');
         return;
       }
       this.resolvePrimaryPropertyId();
@@ -1203,6 +1226,27 @@ export class VisitFormComponent implements OnInit, OnChanges {
       this.formData.visit_time = formatted;
     } else {
       this.formData.visit_time = '';
+    }
+    this.properties.forEach(property => {
+      if (!property.visit_time) {
+        property.visit_time = this.formData.visit_time || '';
+      }
+    });
+    this.timeInvalid = false;
+  }
+
+  onPropertyTimeInput(event: Event, property: VisitProperty) {
+    const input = event.target as HTMLInputElement;
+    const digits = (input.value || '').replace(/\D/g, '').slice(0, 4);
+    let formatted = digits;
+    if (digits.length > 2) {
+      formatted = `${digits.slice(0, 2)}:${digits.slice(2)}`;
+    }
+    input.value = formatted;
+    if (digits.length === 4) {
+      property.visit_time = formatted;
+    } else {
+      property.visit_time = '';
     }
     this.timeInvalid = false;
   }

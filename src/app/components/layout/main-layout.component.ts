@@ -75,13 +75,9 @@ import { Company } from '../../models/company.model';
             <i class="bi bi-gear"></i>
             <span class="nav-label">Configurações</span>
           </a>
-          <a routerLink="/website-builder" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
+          <a routerLink="/public-site-settings" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
             <i class="bi bi-globe"></i>
             <span class="nav-label">Site Público</span>
-          </a>
-          <a routerLink="/website-templates" routerLinkActive="active" class="nav-item" *ngIf="isAdmin()" (click)="closeMobileMenu()">
-            <i class="bi bi-layers"></i>
-            <span class="nav-label">Templates</span>
           </a>
         </nav>
 

@@ -1,0 +1,374 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700&display=swap');
+
+.site.classico {
+  font-family: 'Inter', sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.site.classico .container {
+  width: min(1120px, 92%);
+  margin: 0 auto;
+}
+
+.site.classico .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(248, 250, 252, 0.92);
+  border-bottom: 1px solid #e2e8f0;
+  backdrop-filter: blur(10px);
+}
+
+.site.classico .header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.site.classico .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site.classico .logo-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site.classico .logo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.site.classico .company {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.site.classico .eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.site.classico .nav {
+  display: flex;
+  gap: 18px;
+}
+
+.site.classico .nav a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.site.classico .hero {
+  padding: 88px 0 72px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(16, 185, 129, 0.08));
+}
+
+.site.classico .hero-inner {
+  display: grid;
+  gap: 32px;
+}
+
+.site.classico .hero-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(34px, 5vw, 52px);
+  margin: 12px 0 10px;
+}
+
+.site.classico .hero-text {
+  max-width: 560px;
+  color: #475569;
+}
+
+.site.classico .hero-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.site.classico .cta {
+  background: var(--primary, #2563eb);
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.site.classico .cta.ghost {
+  background: transparent;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  color: #1e3a8a;
+}
+
+.site.classico .link {
+  color: #1e40af;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.site.classico .hero-stats {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.site.classico .stat {
+  background: #ffffff;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+.site.classico .section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.site.classico .imoveis {
+  padding: 64px 0;
+}
+
+.site.classico .grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.site.classico .card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+}
+
+.site.classico .card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.site.classico .thumb {
+  height: 180px;
+  background: #e2e8f0;
+}
+
+.site.classico .info {
+  padding: 16px;
+}
+
+.site.classico .price {
+  color: var(--primary, #2563eb);
+  font-weight: 700;
+}
+
+.site.classico .sobre,
+.site.classico .contato {
+  padding: 64px 0;
+}
+
+.site.classico .split {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  align-items: center;
+}
+
+.site.classico .bullets {
+  padding-left: 18px;
+  color: #475569;
+}
+
+.site.classico .feature-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 16px 28px rgba(15, 23, 42, 0.08);
+}
+
+.site.classico .cta.small {
+  padding: 10px 16px;
+  font-size: 13px;
+}
+
+.site.classico .contact-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 28px;
+  border-radius: 20px;
+  background: #eff6ff;
+}
+
+.site.classico .footer {
+  padding: 28px 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.site.classico .footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  color: #64748b;
+}
+
+@media (max-width: 900px) {
+  .site.classico .nav {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .site.classico .contact-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.site.classico .footer {
+  padding: 56px 0 24px;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 14%, transparent);
+  background: color-mix(in srgb, var(--background) 92%, transparent);
+}
+
+.site.classico .footer-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.site.classico .footer-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site.classico .footer-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 12px;
+  padding: 6px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.site.classico .footer-name {
+  display: block;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.site.classico .footer-tag {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+.site.classico .footer-desc {
+  margin: 12px 0 0;
+  max-width: 380px;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+  font-size: 14px;
+}
+
+.site.classico .footer-links h4,
+.site.classico .footer-social h4 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+}
+
+.site.classico .footer-links a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.85;
+  margin-bottom: 8px;
+}
+
+.site.classico .footer-links a:hover {
+  opacity: 1;
+}
+
+.site.classico .social-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.site.classico .social {
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid color-mix(in srgb, var(--secondary) 18%, transparent);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.site.classico .social:hover {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  color: var(--accent);
+}
+
+.site.classico .footer-bottom {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+  font-size: 12px;
+}
+
+.site.classico .footer-badge {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--secondary);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+@media (max-width: 900px) {
+  .site.classico .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .site.classico .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .site.classico .footer-brand-row {
+    align-items: flex-start;
+  }
+}

@@ -738,7 +738,8 @@ export class VisitCalendarComponent implements OnInit, OnChanges {
     const holidayName = this.holidays[dateStr];
     
     const dayVisits = this.visits.filter(visit => {
-      const visitDate = new Date(visit.visit_date);
+      const visitDate = this.parseVisitDateLocal(visit.visit_date);
+      if (!visitDate) return false;
       return visitDate.toDateString() === date.toDateString();
     });
     
@@ -795,7 +796,8 @@ export class VisitCalendarComponent implements OnInit, OnChanges {
 
   getTodayVisits(): Visit[] {
     return this.visits.filter(visit => {
-      const visitDate = new Date(visit.visit_date);
+      const visitDate = this.parseVisitDateLocal(visit.visit_date);
+      if (!visitDate) return false;
       return visitDate.toDateString() === this.currentDate.toDateString();
     });
   }
@@ -808,5 +810,13 @@ export class VisitCalendarComponent implements OnInit, OnChanges {
     ];
     
     return `${days[this.currentDate.getDay()]}, ${this.currentDate.getDate()} de ${months[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
+  }
+
+  private parseVisitDateLocal(value?: string | null): Date | null {
+    if (!value) return null;
+    const parts = value.split('-').map(part => Number(part));
+    if (parts.length !== 3 || parts.some(part => Number.isNaN(part))) return null;
+    const [year, month, day] = parts;
+    return new Date(year, month - 1, day);
   }
 }

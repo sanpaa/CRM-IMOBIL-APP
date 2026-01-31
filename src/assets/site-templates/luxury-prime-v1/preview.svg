@@ -1,0 +1,11 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="480" height="300" viewBox="0 0 480 300">
+  <rect width="480" height="300" fill="#f4f1ec" />
+  <rect x="28" y="24" width="424" height="26" rx="6" fill="#e0d7cc" />
+  <rect x="80" y="70" width="320" height="90" rx="16" fill="#efe8df" />
+  <rect x="28" y="175" width="424" height="80" rx="16" fill="#f9f6f1" stroke="#d7c9b8" />
+  <rect x="40" y="190" width="120" height="50" rx="12" fill="#e7ddcf" />
+  <rect x="180" y="190" width="120" height="50" rx="12" fill="#e7ddcf" />
+  <rect x="320" y="190" width="120" height="50" rx="12" fill="#e7ddcf" />
+  <rect x="360" y="28" width="72" height="18" rx="9" fill="#d4af37" />
+  <text x="32" y="292" font-family="Arial" font-size="14" fill="#7c6a58">Luxury Prime</text>
+</svg>

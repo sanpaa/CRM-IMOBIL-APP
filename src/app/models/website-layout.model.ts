@@ -1,3 +1,5 @@
+import { SimpleSiteLayoutConfig } from './site-config.model';
+
 export interface WebsiteLayout {
   id: string;
   company_id: string;
@@ -6,13 +8,13 @@ export interface WebsiteLayout {
   slug?: string;
   is_active: boolean;
   is_default: boolean;
-  layout_config: LayoutConfig;
+  layout_config: LayoutConfig | SimpleSiteLayoutConfig;
   html?: string;
   css?: string;
   /** URL do Storage para HTML grande (quando html está vazio) */
-  html_url?: string;
+  html_url?: string | null;
   /** URL do Storage para CSS grande (quando css está vazio) */
-  css_url?: string;
+  css_url?: string | null;
   meta_title?: string;
   meta_description?: string;
   meta_keywords?: string;

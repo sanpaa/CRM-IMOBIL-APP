@@ -1,0 +1,36 @@
+﻿:host .footer {
+  padding: 28px 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+:host .container {
+  width: min(1120px, 92%);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+:host .muted {
+  color: #64748b;
+}
+
+:host .variant-modern {
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+}
+
+:host .variant-luxo {
+  border-top: 1px solid rgba(201, 162, 77, 0.2);
+  color: #9ca3af;
+}
+
+:host .variant-tropical {
+  border-top: 1px solid rgba(14, 165, 164, 0.2);
+}
+
+:host-context(.tpl-moderno-dark-v1) .variant-default {
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+}

@@ -1,0 +1,341 @@
+.site.portfolio-broker {
+  font-family: var(--font-body, inherit);
+  background: var(--background);
+  color: var(--secondary);
+}
+
+.site.portfolio-broker .container {
+  width: min(1120px, 92%);
+  margin: 0 auto;
+}
+
+.site.portfolio-broker .site-header {
+  border-bottom: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+  background: color-mix(in srgb, var(--background) 90%, transparent);
+}
+
+.site.portfolio-broker .header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+}
+
+.site.portfolio-broker .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site.portfolio-broker .logo {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  padding: 6px;
+}
+
+.site.portfolio-broker .company {
+  display: block;
+  font-weight: 700;
+}
+
+.site.portfolio-broker .tag {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+.site.portfolio-broker .nav {
+  display: flex;
+  gap: 18px;
+}
+
+.site.portfolio-broker .nav a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 600;
+}
+
+.site.portfolio-broker .cta {
+  background: var(--primary);
+  color: var(--background);
+  padding: 12px 20px;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.site.portfolio-broker .ghost {
+  border: 1px solid color-mix(in srgb, var(--secondary) 18%, transparent);
+  background: transparent;
+  color: inherit;
+  padding: 12px 20px;
+  border-radius: 16px;
+  text-decoration: none;
+}
+
+.site.portfolio-broker .hero {
+  padding: 90px 0 70px;
+}
+
+.site.portfolio-broker .hero-grid {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: 0.8fr 1.2fr;
+  align-items: center;
+}
+
+.site.portfolio-broker .profile-card {
+  background: color-mix(in srgb, var(--background) 95%, transparent);
+  border: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+  border-radius: 24px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 30px 60px color-mix(in srgb, var(--secondary) 15%, transparent);
+}
+
+.site.portfolio-broker .profile-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.site.portfolio-broker .profile-tags span {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  font-size: 12px;
+}
+
+.site.portfolio-broker .eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+.site.portfolio-broker .hero h1 {
+  font-size: clamp(34px, 5vw, 56px);
+  margin: 12px 0;
+}
+
+.site.portfolio-broker .hero-text {
+  max-width: 560px;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+}
+
+.site.portfolio-broker .hero-sub {
+  margin-top: 12px;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+.site.portfolio-broker .hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.site.portfolio-broker .imoveis { padding: 70px 0; }
+
+.site.portfolio-broker .section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.site.portfolio-broker .property-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.site.portfolio-broker .card-link { text-decoration: none; color: inherit; }
+
+.site.portfolio-broker .card {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+  background: var(--background);
+  transition: transform 0.3s ease;
+}
+
+.site.portfolio-broker .card-link:hover .card { transform: translateY(-6px); }
+
+.site.portfolio-broker .thumb {
+  height: 190px;
+  background: color-mix(in srgb, var(--secondary) 10%, transparent);
+}
+
+.site.portfolio-broker .info { padding: 16px; }
+
+.site.portfolio-broker .price { color: var(--primary); font-weight: 700; }
+
+.site.portfolio-broker .cta-section { padding: 60px 0 90px; }
+
+.site.portfolio-broker .cta-stack {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 28px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.site.portfolio-broker .footer {
+  padding: 28px 0;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+}
+
+.site.portfolio-broker .footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+@media (max-width: 980px) {
+  .site.portfolio-broker .hero-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  .site.portfolio-broker .nav { display: none; }
+}
+
+@media (max-width: 768px) {
+  .site.portfolio-broker .cta-stack { flex-direction: column; text-align: center; }
+}
+
+.site.portfolio-broker .footer {
+  padding: 56px 0 24px;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 14%, transparent);
+  background: color-mix(in srgb, var(--background) 92%, transparent);
+}
+
+.site.portfolio-broker .footer-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.site.portfolio-broker .footer-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site.portfolio-broker .footer-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 12px;
+  padding: 6px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.site.portfolio-broker .footer-name {
+  display: block;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.site.portfolio-broker .footer-tag {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+.site.portfolio-broker .footer-desc {
+  margin: 12px 0 0;
+  max-width: 380px;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+  font-size: 14px;
+}
+
+.site.portfolio-broker .footer-links h4,
+.site.portfolio-broker .footer-social h4 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+}
+
+.site.portfolio-broker .footer-links a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.85;
+  margin-bottom: 8px;
+}
+
+.site.portfolio-broker .footer-links a:hover {
+  opacity: 1;
+}
+
+.site.portfolio-broker .social-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.site.portfolio-broker .social {
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid color-mix(in srgb, var(--secondary) 18%, transparent);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.site.portfolio-broker .social:hover {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  color: var(--accent);
+}
+
+.site.portfolio-broker .footer-bottom {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+  font-size: 12px;
+}
+
+.site.portfolio-broker .footer-badge {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--secondary);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+@media (max-width: 900px) {
+  .site.portfolio-broker .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .site.portfolio-broker .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .site.portfolio-broker .footer-brand-row {
+    align-items: flex-start;
+  }
+}

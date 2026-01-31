@@ -1,0 +1,7 @@
+﻿<section class="contato" data-section="contato" *ngIf="config">
+  <div class="container">
+    <h2 class="section-title">Contato</h2>
+    <p class="section-text">{{ config.contactText }}</p>
+    <a class="cta" [href]="config.whatsappLink || '#'">Falar no WhatsApp</a>
+  </div>
+</section>

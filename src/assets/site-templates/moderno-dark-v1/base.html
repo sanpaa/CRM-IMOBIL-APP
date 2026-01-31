@@ -1,0 +1,140 @@
+<div class="site moderno" style="--primary: {{primaryColor}}; --secondary: {{secondaryColor}}; --accent: {{accentColor}}; --background: {{backgroundColor}};">
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img class="logo" src="{{logo}}" alt="{{companyName}}" />
+        <span class="company">{{companyName}}</span>
+      </div>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/buscar">Buscar</a>
+        <a href="/sobre">Sobre</a>
+        <a href="/contato">Contato</a>
+      </nav>
+      <a class="cta" href="{{whatsappLink}}">WhatsApp</a>
+    </div>
+  </header>
+
+  <header class="hero" data-section="hero" id="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <div class="brand">
+          <img class="logo" src="{{logo}}" alt="{{companyName}}" />
+          <span class="company">{{companyName}}</span>
+        </div>
+        <span class="pill">Imoveis selecionados</span>
+        <h1 class="hero-title">{{heroTitle}}</h1>
+        <p class="hero-text">{{heroText}}</p>
+        <div class="hero-actions">
+          <a class="cta" href="{{whatsappLink}}">Falar no WhatsApp</a>
+          <a class="link" href="/buscar">Explorar vitrine</a>
+        </div>
+        <div class="hero-metrics">
+          <div>
+            <strong>+320</strong>
+            <span>Visitas mensais</span>
+          </div>
+          <div>
+            <strong>48h</strong>
+            <span>Tempo medio</span>
+          </div>
+          <div>
+            <strong>4.9</strong>
+            <span>Avaliacao</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-panel">
+        <div class="panel-card">
+          <h3>Atendimento digital</h3>
+          <p>Consultoria sem burocracia com assinatura online.</p>
+          <a class="cta ghost" href="{{whatsappLink}}">Quero consultoria</a>
+        </div>
+        <div class="panel-gradient"></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="imoveis" data-section="imoveis" id="imoveis">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="pill">Curadoria</span>
+          <h2 class="section-title">Destaques da semana</h2>
+        </div>
+        <a class="cta small" href="/buscar">Ver imoveis</a>
+      </div>
+      <div class="grid carousel">
+        {{propertyCards}}
+      </div>
+    </div>
+  </section>
+
+  <section class="sobre" data-section="sobre" id="sobre">
+    <div class="container split">
+      <div>
+        <h2 class="section-title">Equipe moderna, resultados rapidos</h2>
+        <p class="section-text">{{aboutText}}</p>
+      </div>
+      <div class="feature-list">
+        <div class="feature">
+          <strong>Dados de mercado</strong>
+          <span>Analise diaria de precos</span>
+        </div>
+        <div class="feature">
+          <strong>Tour virtual</strong>
+          <span>Visitas digitais em minutos</span>
+        </div>
+        <div class="feature">
+          <strong>Negociacao agil</strong>
+          <span>Documentacao simplificada</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contato" data-section="contato" id="contato">
+    <div class="container contact">
+      <div>
+        <h2 class="section-title">Fale com um especialista</h2>
+        <p class="section-text">{{contactText}}</p>
+      </div>
+      <a class="cta" href="{{whatsappLink}}">Iniciar conversa</a>
+    </div>
+  </section>
+
+    <footer class="footer" data-section="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-row">
+          <img class="footer-logo" src="{{logo}}" alt="{{companyName}}" onerror="this.style.display='none'" />
+          <div>
+            <strong class="footer-name">{{companyName}}</strong>
+            <span class="footer-tag">{{footerTagline}}</span>
+          </div>
+        </div>
+        <p class="footer-desc">{{footerText}}</p>
+      </div>
+      <div class="footer-links">
+        <h4>{{footerLinksTitle}}</h4>
+        <a href="/">Home</a>
+        <a href="/buscar">Buscar</a>
+        <a href="{{whatsappLink}}">Contato</a>
+      </div>
+      <div class="footer-social">
+        <h4>Redes sociais</h4>
+        <div class="social-row">
+          <a class="social" href="{{instagram}}" target="_blank" rel="noopener">Instagram</a>
+          <a class="social" href="{{facebook}}" target="_blank" rel="noopener">Facebook</a>
+          <a class="social" href="{{youtube}}" target="_blank" rel="noopener">YouTube</a>
+          <a class="social" href="{{linkedin}}" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>{{companyName}}</span>
+      <span class="footer-badge">{{footerBadge}}</span>
+    </div>
+  </footer>
+</div>
+

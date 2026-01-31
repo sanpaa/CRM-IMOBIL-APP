@@ -4,7 +4,7 @@ import { ComponentMetadata } from '../../shared/website-components/component-bas
 
 @Injectable({ providedIn: 'root' })
 export class GrapesBlocksRegistry {
-  constructor(private registry: ComponentRegistryService) {}
+  constructor(private registry: ComponentRegistryService) { }
 
   registerAll(editor: any) {
     this.registerCustomTypes(editor);
@@ -41,6 +41,69 @@ export class GrapesBlocksRegistry {
     switch (type) {
       case 'header':
         return `
+          <style>
+            .header-container {
+              background-color: rgb(17, 64, 88);
+              border: 0px dotted rgb(23, 4, 113);
+              color: #ffffff;
+              padding: 12px 32px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 1.5rem;
+            }
+            .brand {
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+            }
+            .brand img {
+              height: 40px;
+              width: auto;
+            }
+            .brand-text {
+              font-weight: 700;
+              font-size: 1.25rem;
+              letter-spacing: -0.025em;
+            }
+            .nav {
+              display: flex;
+              gap: 1.5rem;
+              align-items: center;
+            }
+            .nav a {
+              color: rgba(255, 255, 255, 0.9);
+              text-decoration: none;
+              font-size: 0.95rem;
+              font-weight: 500;
+              transition: color 0.2s;
+            }
+            .nav a:hover {
+              color: #ffffff;
+            }
+            .nav a.cta {
+              background-color: #3b82f6;
+              color: white;
+              padding: 0.5rem 1.25rem;
+              border-radius: 0.5rem;
+              font-weight: 600;
+            }
+            .nav a.cta:hover {
+              background-color: #2563eb;
+            }
+            .menu-toggle {
+              display: none;
+              background: none;
+              border: none;
+              color: white;
+              font-size: 1.5rem;
+              cursor: pointer;
+            }
+            @media (max-width: 768px) {
+              .nav { display: none; }
+              .menu-toggle { display: block; }
+            }
+          </style>
           <header class="site-header">
             <div class="header-container">
               <div class="brand">

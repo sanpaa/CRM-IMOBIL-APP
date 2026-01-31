@@ -1,0 +1,12 @@
+﻿<section class="section cta" [ngClass]="'variant-' + variant" *ngIf="config">
+  <div class="container">
+    <div class="cta-card">
+      <div>
+        <span class="eyebrow">Atendimento imediato</span>
+        <h2>{{ title }}</h2>
+        <p>{{ text }}</p>
+      </div>
+      <a class="cta-button" [href]="config.whatsappLink || '#'">Falar com especialista</a>
+    </div>
+  </div>
+</section>

@@ -110,8 +110,8 @@ export class LayoutStorageService {
     async loadLayoutContent(layout: {
         html?: string;
         css?: string;
-        html_url?: string;
-        css_url?: string;
+        html_url?: string | null;
+        css_url?: string | null;
         layout_config?: any;
     }): Promise<{ html: string; css: string; projectData?: any }> {
         let html = layout.html || '';

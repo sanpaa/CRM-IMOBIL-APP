@@ -79,7 +79,8 @@ export const routes: Routes = [
       },
       {
         path: 'website-templates',
-        loadComponent: () => import('./components/website-templates/website-templates.component').then(m => m.WebsiteTemplatesComponent)
+        redirectTo: 'public-site-settings',
+        pathMatch: 'full'
       }
     ]
   },

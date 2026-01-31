@@ -1,0 +1,48 @@
+﻿:host .features {
+  padding: 56px 0;
+}
+
+:host .container {
+  width: min(1120px, 92%);
+  margin: 0 auto;
+}
+
+:host .feature-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+:host .feature-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 18px;
+}
+
+:host .feature-card h3 {
+  margin: 0 0 8px;
+}
+
+:host .variant-modern .feature-card {
+  background: #111827;
+  border-color: rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+}
+
+:host .variant-luxo .feature-card {
+  background: #141414;
+  border-color: rgba(201, 162, 77, 0.3);
+  color: #f8fafc;
+}
+
+:host .variant-tropical .feature-card {
+  background: #ffffff;
+  border-color: rgba(14, 165, 164, 0.2);
+}
+
+:host-context(.tpl-moderno-dark-v1) .variant-default .feature-card {
+  background: #111827;
+  border-color: rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+}

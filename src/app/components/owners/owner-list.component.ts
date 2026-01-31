@@ -107,6 +107,12 @@ export class OwnerListComponent implements OnInit {
     this.resetForm();
   }
 
+  onOverlayMouseDown(event: MouseEvent) {
+    if (event.target === event.currentTarget) {
+      this.closeModal();
+    }
+  }
+
   onCpfInput(event: Event) {
     const input = event.target as HTMLInputElement;
     const digits = (input.value || '').replace(/\D/g, '').slice(0, 11);

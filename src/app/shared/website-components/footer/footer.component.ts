@@ -10,8 +10,8 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
   imports: [CommonModule, RouterLink],
   template: `
     <div class="footer-container" 
-         [style.background-color]="config.backgroundColor || '#1a1a1a'"
-         [style.color]="config.textColor || '#ffffff'">
+         [style.background-color]="config.backgroundColor || 'var(--background)'"
+         [style.color]="config.textColor || 'var(--secondary)'">
       <div class="footer-content">
         
         <div class="footer-grid">
@@ -49,8 +49,18 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
               </a>
             </div>
           </div>
+
+          <!-- Coluna 2: Navegação -->
+          <div class="footer-column nav-links">
+            <h4>Navegação</h4>
+            <ul>
+              <li><a routerLink="/">Home</a></li>
+              <li><a routerLink="/buscar">Buscar</a></li>
+              <li><a routerLink="/contato">Contato</a></li>
+            </ul>
+          </div>
           
-          <!-- Coluna 2: Links Rápidos -->
+          <!-- Coluna 3: Links Rápidos -->
           <div class="footer-column" *ngIf="config.quickLinks && config.quickLinks.length > 0">
             <h4>Links Rápidos</h4>
             <ul>
@@ -75,7 +85,7 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
             </ul>
           </div>
           
-          <!-- Coluna 3: Serviços -->
+          <!-- Coluna 4: Serviços -->
           <div class="footer-column" *ngIf="config.services && config.services.length > 0">
             <h4>Serviços</h4>
             <ul>
@@ -100,10 +110,17 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
             </ul>
           </div>
         </div>
+
+        <div class="footer-trust">
+          <span class="trust-badge">Imobiliária Premium</span>
+          <span class="trust-badge">Atendimento Digital</span>
+          <span class="trust-badge">Curadoria de Imóveis</span>
+        </div>
         
         <!-- Copyright -->
         <div class="footer-bottom" *ngIf="config.showCopyright">
           <p>© {{ currentYear }} {{ config.companyName }}. Todos os direitos reservados.</p>
+          <span class="template-badge">Template ativo</span>
         </div>
       </div>
       
@@ -121,7 +138,9 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
     
     .footer-container { 
       position: relative; 
-      padding: 3rem 2rem 1rem; 
+      padding: 3rem 2rem 1.5rem; 
+      border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+      backdrop-filter: blur(12px);
     }
     
     .footer-content { 
@@ -131,9 +150,9 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
     
     .footer-grid {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 3rem;
-      margin-bottom: 2rem;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+      margin-bottom: 1.5rem;
     }
     
     @media (max-width: 768px) {
@@ -146,8 +165,10 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
     .footer-column {
       h4 { 
         margin: 0 0 1rem 0; 
-        font-size: 1.1rem;
+        font-size: 1rem;
         font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
       
       ul { 
@@ -168,6 +189,7 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
         
         &:hover { 
           opacity: 1; 
+          color: var(--primary);
         }
         
         &.edit-mode-link { 
@@ -228,23 +250,39 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: rgba(255,255,255,0.1);
+        background: color-mix(in srgb, var(--accent) 15%, transparent);
         font-size: 1.2rem;
         transition: all 0.2s;
         text-decoration: none;
         
         &:hover {
-          background: rgba(255,255,255,0.2);
+          background: color-mix(in srgb, var(--accent) 25%, transparent);
           transform: translateY(-2px);
         }
       }
     }
     
+    .footer-trust {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin: 0 0 2rem 0;
+    }
+
+    .trust-badge {
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--accent) 18%, transparent);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
     .footer-bottom { 
-      border-top: 1px solid rgba(255,255,255,0.2); 
+      border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent); 
       padding-top: 1rem; 
       text-align: center;
-      margin-top: 2rem;
+      margin-top: 1.5rem;
       
       p {
         margin: 0;
@@ -252,17 +290,30 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
         font-size: 0.9rem;
       }
     }
+
+    .template-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.75rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--secondary) 18%, transparent);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
     
     /* Edit Mode */
     :host.edit-mode .footer-container { 
-      border: 2px dashed #004AAD; 
+      border: 2px dashed var(--primary); 
     }
     
     :host.edit-mode .footer-container::after { 
       content: ''; 
       position: absolute; 
       inset: 0; 
-      background: rgba(0,74,173,0.05); 
+      background: color-mix(in srgb, var(--primary) 8%, transparent); 
       pointer-events: none; 
     }
     
@@ -276,8 +327,8 @@ import { WebsiteComponentBase, ComponentStyle } from '../component-base.interfac
     
     .edit-badge { 
       display: inline-block; 
-      background: #004AAD; 
-      color: white; 
+      background: var(--primary); 
+      color: var(--background); 
       padding: 0.25rem 0.75rem; 
       font-size: 0.75rem; 
       font-weight: 600; 

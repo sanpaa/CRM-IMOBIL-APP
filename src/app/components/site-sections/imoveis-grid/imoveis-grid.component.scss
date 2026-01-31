@@ -1,0 +1,129 @@
+﻿:host .imoveis {
+  padding: 64px 0;
+}
+
+:host .container {
+  width: min(1120px, 92%);
+  margin: 0 auto;
+}
+
+:host .section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+:host .eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+:host .section-title {
+  font-family: var(--font-title, 'Inter');
+  margin: 6px 0 0;
+}
+
+:host .link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+:host .grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  align-items: stretch;
+}
+
+:host .card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+:host .card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+:host .thumb {
+  height: 180px;
+  background: #e2e8f0;
+  background-size: cover;
+  background-position: center;
+}
+
+:host .info {
+  padding: 16px;
+}
+
+:host .price {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+:host .variant-modern .card {
+  background: #111827;
+  border-color: rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+}
+
+:host .variant-luxo .card {
+  background: #141414;
+  border-color: rgba(201, 162, 77, 0.3);
+  color: #f8fafc;
+}
+
+:host .variant-tropical .card {
+  border-color: rgba(14, 165, 164, 0.2);
+}
+
+:host .variant-carousel .grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 1fr);
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 8px;
+  align-items: stretch;
+}
+
+:host .variant-carousel .card-link {
+  scroll-snap-align: start;
+  width: 100%;
+}
+
+:host .variant-carousel .card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+:host-context(.tpl-moderno-dark-v1) .variant-carousel .card {
+  background: #111827;
+  border-color: rgba(148, 163, 184, 0.2);
+  color: #e2e8f0;
+}
+
+:host-context(.tpl-alto-padrao-v1) .variant-carousel .card {
+  background: #141414;
+  border-color: rgba(201, 162, 77, 0.3);
+  color: #f8fafc;
+}
+
+:host-context(.tpl-moderno-dark-v1) .thumb {
+  background: #0f172a;
+}
+
+:host-context(.tpl-alto-padrao-v1) .thumb {
+  background: #1a1a1a;
+}

@@ -1,19 +1,27 @@
-import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subject, takeUntil } from 'rxjs';
 import { WebsiteCustomizationService } from '../../services/website-customization.service';
 import { CompanyService } from '../../services/company.service';
 import { PublicSiteConfigService } from '../../services/public-site-config.service';
 import { AuthService } from '../../services/auth.service';
 import { Property } from '../../models/property.model';
+import { SiteTemplateService } from '../../services/site-template.service';
+import { SimpleSiteConfigService } from '../../services/simple-site-config.service';
+import { TemplateDefinition } from '../../models/template-definition.model';
+import { SiteConfig } from '../../models/site-config.model';
+import { SiteRendererComponent } from '../site-renderer/site-renderer.component';
+import { LayoutStorageService } from '../../services/layout-storage.service';
 
 @Component({
   selector: 'app-public-website',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SiteRendererComponent],
   templateUrl: './public-website.component.html',
-  styleUrls: ['./public-website.component.scss']
+  styleUrls: ['./public-website.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class PublicWebsiteComponent implements OnInit, OnDestroy {
   properties: Property[] = [];
@@ -22,6 +30,11 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
   whatsappNumber: string | null = null;
   layoutHtml = '';
   layoutCss = '';
+  safeLayoutHtml: SafeHtml = '';
+  simpleTemplate: TemplateDefinition | null = null;
+  simpleConfig: SiteConfig | null = null;
+  useSimpleRenderer = false;
+
   private modalEl: HTMLElement | null = null;
   private currentFilters: {
     term?: string;
@@ -36,8 +49,12 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
     private companyService: CompanyService,
     private publicSiteConfig: PublicSiteConfigService,
     private authService: AuthService,
-    private host: ElementRef<HTMLElement>
-  ) {}
+    private host: ElementRef<HTMLElement>,
+    private sanitizer: DomSanitizer,
+    private templateService: SiteTemplateService,
+    private simpleSiteConfig: SimpleSiteConfigService,
+    private layoutStorage: LayoutStorageService
+  ) { }
 
   async ngOnInit() {
     // companyId pode ser determinado do domínio ou query param
@@ -88,16 +105,67 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
       });
 
       const layout = await this.customizationService.getLayoutByPageType(this.companyId, 'home');
-      const html = layout?.html ?? (layout?.layout_config as any)?.html ?? '';
-      const css = layout?.css ?? (layout?.layout_config as any)?.css ?? '';
-      this.layoutHtml = html || '';
-      this.layoutCss = css || '';
+      const simpleConfig = this.simpleSiteConfig.extractSimpleConfig(layout);
+      if (simpleConfig) {
+        const fallbackLogo =
+          company.logo_url ||
+          company.footer_config?.logoUrl ||
+          company.header_config?.logoUrl ||
+          '';
+        const fallbackWhatsapp =
+          company.footer_config?.whatsapp ||
+          company.whatsapp ||
+          company.phone ||
+          '';
+        this.simpleTemplate = await this.templateService.loadTemplate(simpleConfig.templateId);
+        const theme = this.simpleTemplate?.theme;
+        const mergedConfig: SiteConfig = {
+          ...simpleConfig.config,
+          companyName: simpleConfig.config.companyName || company.name || '',
+          logo: simpleConfig.config.logo || fallbackLogo,
+          whatsapp: simpleConfig.config.whatsapp || fallbackWhatsapp,
+          primaryColor: simpleConfig.config.primaryColor || theme?.primary || '',
+          secondaryColor: simpleConfig.config.secondaryColor || theme?.secondary || theme?.primary || '',
+          accentColor: simpleConfig.config.accentColor || theme?.accent || theme?.primary || '',
+          backgroundColor: simpleConfig.config.backgroundColor || theme?.background || theme?.secondary || theme?.primary || ''
+        };
+        this.simpleConfig = mergedConfig;
+        this.whatsappNumber = mergedConfig.whatsapp || this.whatsappNumber;
+        this.useSimpleRenderer = true;
+        return;
+      }
+      if (layout) {
+        const content = await this.layoutStorage.loadLayoutContent(layout);
+        this.layoutHtml = content.html || '';
+        this.layoutCss = content.css || '';
+      } else {
+        this.layoutHtml = '';
+        this.layoutCss = '';
+      }
+      this.useSimpleRenderer = false;
       console.log('[public-site] layout loaded', {
         hasHtml: !!this.layoutHtml,
         htmlLength: this.layoutHtml?.length ?? 0,
         hasCss: !!this.layoutCss,
         cssLength: this.layoutCss?.length ?? 0
       });
+
+      // Carregar CSS base inline para garantir aplicação sem delay/erros de rede
+      let externalCss = '';
+      try {
+        const resp = await fetch('/assets/website-components.css');
+        if (resp.ok) {
+          externalCss = await resp.text();
+          console.log('[public-site] Base CSS loaded inline:', externalCss.length);
+        }
+      } catch (e) {
+        console.warn('[public-site] Failed to inline base CSS:', e);
+      }
+
+      // Sanitização Segura para permitir CSS global do GrapesJS + Base CSS
+      const fullContent = `<style>${externalCss}\n${this.layoutCss}</style>${this.layoutHtml}`;
+      this.safeLayoutHtml = this.sanitizer.bypassSecurityTrustHtml(fullContent);
+
       this.ensureHeadAssets();
       setTimeout(() => {
         console.log('[public-site] hydrating interactive blocks');
@@ -111,9 +179,12 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
   }
 
   getWhatsappLink(): string {
-    const raw = this.whatsappNumber || '';
-    const normalized = raw.replace(/\D/g, '');
-    return normalized ? `https://wa.me/${normalized}` : '#';
+    let normalized = (this.whatsappNumber || '').replace(/\D/g, '');
+    if (!normalized) return '#';
+    if (normalized.length <= 11 && !normalized.startsWith('55')) {
+      normalized = `55${normalized}`;
+    }
+    return `https://wa.me/${normalized}`;
   }
 
   private ensureHeadAssets() {
@@ -184,10 +255,10 @@ export class PublicWebsiteComponent implements OnInit, OnDestroy {
       const navigation = Array.isArray(config.navigation) && config.navigation.length
         ? config.navigation
         : [
-            { label: 'Imoveis', link: '#imoveis' },
-            { label: 'Sobre', link: '#sobre' },
-            { label: 'Contato', link: '#contato' }
-          ];
+          { label: 'Imoveis', link: '#imoveis' },
+          { label: 'Sobre', link: '#sobre' },
+          { label: 'Contato', link: '#contato' }
+        ];
 
       nav.innerHTML = '';
       navigation.forEach((item: any) => {

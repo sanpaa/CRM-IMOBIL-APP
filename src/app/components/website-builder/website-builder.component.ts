@@ -145,7 +145,8 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
         );
         if (confirmed) {
           // Rascunhos antigos podem não ter projectData, mas ok
-          this.applyLayoutToEditor(draft.html || '', draft.css || '');
+          // Agora passamos draft.projectData para garantir restauração fiel
+          this.applyLayoutToEditor(draft.html || '', draft.css || '', draft.projectData);
         } else {
           this.clearDraft(layout.id);
           this.applyLayoutToEditor(html, css, projectData);
@@ -219,11 +220,26 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
       // Debug logging
       const htmlSize = new Blob([html]).size;
       const cssSize = new Blob([css]).size;
+
+      // Diagnóstico de Header
+      const hasHeaderTag = html.includes('<header');
+      const hasNavTag = html.includes('<nav');
+      const hasNavbarClass = html.includes('navbar');
+      const headerPreview = hasHeaderTag
+        ? html.substring(html.indexOf('<header'), html.indexOf('</header>') + 9).substring(0, 100) + '...'
+        : 'Sem tag <header>';
+
       console.log('[builder] saveLayout - dados a salvar:', {
         layoutId: this.currentLayout.id,
         htmlSize: `${(htmlSize / 1024).toFixed(2)} KB`,
         cssSize: `${(cssSize / 1024).toFixed(2)} KB`,
-        hasProjectData: !!projectData
+        hasProjectData: !!projectData,
+        headerCheck: {
+          hasHeaderTag,
+          hasNavTag,
+          hasNavbarClass,
+          preview: headerPreview
+        }
       });
 
       if (this.isBlank(html) && this.isBlank(css) && !this.isBlank(this.lastKnownHtml)) {
@@ -387,18 +403,23 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
     }
     this.draftSaveTimer = setTimeout(() => {
       if (!this.currentLayout) return;
-      const html = this.grapesHost?.getHtml() || '';
-      const css = this.grapesHost?.getCss() || '';
+      // Agora salvamos o projectData também para fidelidade total
+      const saveResult = this.grapesHost?.save();
+      if (!saveResult) return;
+
+      const { html, css, projectData } = saveResult;
+
       if (this.isBlank(html) && this.isBlank(css)) return;
-      this.saveDraft(this.currentLayout.id, html, css);
-    }, 600);
+      this.saveDraft(this.currentLayout.id, html, css, projectData);
+    }, 1000); // Aumentei um pouco o debounce para evitar pesar com JSON grande
   }
 
-  private saveDraft(layoutId: string, html: string, css: string) {
+  private saveDraft(layoutId: string, html: string, css: string, projectData?: any) {
     try {
       const payload = {
         html,
         css,
+        projectData, // Incluindo dados do projeto
         updatedAt: new Date().toISOString()
       };
       localStorage.setItem(this.getDraftKey(layoutId), JSON.stringify(payload));
@@ -407,7 +428,7 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private getDraft(layoutId: string): { html: string; css: string; updatedAt: string } | null {
+  private getDraft(layoutId: string): { html: string; css: string; projectData?: any; updatedAt: string } | null {
     try {
       const raw = localStorage.getItem(this.getDraftKey(layoutId));
       if (!raw) return null;
@@ -416,6 +437,7 @@ export class WebsiteBuilderComponent implements OnInit, AfterViewInit {
       return {
         html: typeof parsed.html === 'string' ? parsed.html : '',
         css: typeof parsed.css === 'string' ? parsed.css : '',
+        projectData: parsed.projectData, // Recuperando dados do projeto
         updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : ''
       };
     } catch (error) {

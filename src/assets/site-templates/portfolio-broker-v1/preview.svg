@@ -1,0 +1,8 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="480" height="300" viewBox="0 0 480 300">
+  <rect width="480" height="300" fill="#f9fafb" />
+  <rect x="24" y="24" width="432" height="26" rx="8" fill="#e5e7eb" />
+  <rect x="24" y="70" width="160" height="120" rx="20" fill="#ede9fe" />
+  <rect x="200" y="70" width="256" height="120" rx="12" fill="#f3f4f6" />
+  <rect x="24" y="205" width="432" height="70" rx="16" fill="#f5f3ff" />
+  <text x="32" y="292" font-family="Arial" font-size="14" fill="#6d28d9">Portfolio Broker</text>
+</svg>

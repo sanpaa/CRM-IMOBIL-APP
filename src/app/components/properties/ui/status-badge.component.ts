@@ -38,6 +38,12 @@ import { Component, Input } from '@angular/core';
       color: #f43f5e;
       border-color: rgba(244, 63, 94, 0.2);
     }
+
+    .status-inactive {
+      background: rgba(148, 163, 184, 0.2);
+      color: #64748b;
+      border-color: rgba(148, 163, 184, 0.35);
+    }
   `]
 })
 export class StatusBadgeComponent {
@@ -47,6 +53,7 @@ export class StatusBadgeComponent {
   get label(): string {
     const normalized = (this.status || '').toLowerCase();
     if (this.sold || normalized === 'vendido') return 'Vendido';
+    if (normalized === 'inativo') return 'Inativo';
     if (normalized.includes('reserv')) return 'Reservado';
     return 'Disponível';
   }
@@ -54,6 +61,7 @@ export class StatusBadgeComponent {
   get toneClass(): string {
     const normalized = (this.status || '').toLowerCase();
     if (this.sold || normalized === 'vendido') return 'status-sold';
+    if (normalized === 'inativo') return 'status-inactive';
     if (normalized.includes('reserv')) return 'status-reserved';
     return 'status-available';
   }

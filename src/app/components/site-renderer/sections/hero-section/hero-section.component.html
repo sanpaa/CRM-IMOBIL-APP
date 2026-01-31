@@ -1,0 +1,11 @@
+﻿<header class="hero" data-section="hero" *ngIf="config">
+  <div class="container">
+    <div class="brand">
+      <img class="logo" *ngIf="config.logo" [src]="config.logo" [alt]="config.companyName" />
+      <span class="company">{{ config.companyName }}</span>
+    </div>
+    <h1 class="hero-title">{{ config.heroTitle }}</h1>
+    <p class="hero-text">{{ config.heroText }}</p>
+    <a class="cta" [href]="config.whatsappLink || '#'">Fale no WhatsApp</a>
+  </div>
+</header>

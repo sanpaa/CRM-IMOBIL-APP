@@ -1,0 +1,20 @@
+﻿{
+  "id": "luxury-prime-v1",
+  "name": "Luxury Prime",
+  "preview": "/assets/site-templates/luxury-prime-v1/preview.svg",
+  "theme": {
+    "primary": "#C4A062",
+    "secondary": "#1F2937",
+    "accent": "#D4AF37",
+    "background": "#F9F6F1",
+    "fontTitle": "inherit",
+    "fontBody": "inherit"
+  },
+  "sections": [
+    { "type": "header" },
+    { "type": "hero" },
+    { "type": "imoveis" },
+    { "type": "cta" },
+    { "type": "footer" }
+  ]
+}

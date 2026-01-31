@@ -1,0 +1,10 @@
+﻿.site {
+  min-height: 100vh;
+  background: var(--background, var(--bg, #ffffff));
+  color: var(--secondary, #0f172a);
+  font-family: var(--font-body, 'Inter');
+}
+
+.site .section {
+  width: 100%;
+}

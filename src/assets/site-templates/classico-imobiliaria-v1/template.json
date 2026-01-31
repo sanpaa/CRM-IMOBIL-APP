@@ -1,0 +1,29 @@
+{
+  "id": "classico-imobiliaria-v1",
+  "name": "Classic Imobiliaria",
+  "preview": "/assets/site-templates/classico-imobiliaria-v1/preview.svg",
+  "theme": {
+    "primary": "#0E7490",
+    "secondary": "#0F172A",
+    "fontTitle": "Merriweather",
+    "fontBody": "Inter"
+  },
+  "sections": [
+    { "type": "header" },
+    { "type": "hero" },
+    {
+      "type": "imoveis",
+      "variant": "grid",
+      "config": {
+        "eyebrow": "Selecao da semana",
+        "title": "Imoveis em destaque",
+        "ctaLabel": "Ver todos os imoveis",
+        "ctaLink": "/buscar",
+        "columns": 3,
+        "limit": 6
+      }
+    },
+    { "type": "cta" },
+    { "type": "footer" }
+  ]
+}

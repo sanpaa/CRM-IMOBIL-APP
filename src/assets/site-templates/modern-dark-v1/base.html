@@ -1,0 +1,108 @@
+<div class="site modern-dark" style="--primary: {{primaryColor}}; --secondary: {{secondaryColor}}; --accent: {{accentColor}}; --background: {{backgroundColor}};">
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img class="logo" src="{{logo}}" alt="{{companyName}}" />
+        <div>
+          <span class="company">{{companyName}}</span>
+          <span class="tag">Real Estate Tech</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#hero">Home</a>
+        <a href="#imoveis">Imoveis</a>
+        <a href="/buscar">Buscar</a>
+        <a href="#contato">Contato</a>
+      </nav>
+      <a class="cta" href="{{whatsappLink}}">WhatsApp</a>
+    </div>
+  </header>
+
+  <section class="hero" id="hero" data-section="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow">Startup imobiliaria</span>
+        <h1>{{heroTitle}}</h1>
+        <p class="hero-text">{{heroText}}</p>
+        <div class="hero-actions">
+          <a class="cta" href="{{whatsappLink}}">Agendar visita</a>
+          <a class="ghost" href="/buscar">Ver vitrine</a>
+        </div>
+        <div class="hero-metrics">
+          <div><strong>+540</strong><span>Leads/mes</span></div>
+          <div><strong>48h</strong><span>Resposta media</span></div>
+          <div><strong>4.9</strong><span>Satisfacao</span></div>
+        </div>
+      </div>
+      <div class="hero-panel">
+        <div class="glass-card">
+          <span class="chip">Atendimento digital</span>
+          <h3>Consultoria inteligente</h3>
+          <p>{{aboutText}}</p>
+          <a class="cta ghost" href="{{whatsappLink}}">Quero consultoria</a>
+        </div>
+        <div class="glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="imoveis" id="imoveis" data-section="imoveis">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Destaques</span>
+          <h2>Imoveis em alta</h2>
+        </div>
+        <a class="cta ghost" href="/buscar">Explorar</a>
+      </div>
+      <div class="property-grid">
+        {{propertyCards}}
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section" id="contato" data-section="contato">
+    <div class="container cta-card">
+      <div>
+        <h2>Atendimento instantaneo</h2>
+        <p>{{contactText}}</p>
+      </div>
+      <a class="cta" href="{{whatsappLink}}">Falar agora</a>
+    </div>
+  </section>
+
+    <footer class="footer" data-section="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-row">
+          <img class="footer-logo" src="{{logo}}" alt="{{companyName}}" onerror="this.style.display='none'" />
+          <div>
+            <strong class="footer-name">{{companyName}}</strong>
+            <span class="footer-tag">{{footerTagline}}</span>
+          </div>
+        </div>
+        <p class="footer-desc">{{footerText}}</p>
+      </div>
+      <div class="footer-links">
+        <h4>{{footerLinksTitle}}</h4>
+        <a href="/">Home</a>
+        <a href="/buscar">Buscar</a>
+        <a href="{{whatsappLink}}">Contato</a>
+      </div>
+      <div class="footer-social">
+        <h4>Redes sociais</h4>
+        <div class="social-row">
+          <a class="social" href="{{instagram}}" target="_blank" rel="noopener">Instagram</a>
+          <a class="social" href="{{facebook}}" target="_blank" rel="noopener">Facebook</a>
+          <a class="social" href="{{youtube}}" target="_blank" rel="noopener">YouTube</a>
+          <a class="social" href="{{linkedin}}" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>{{companyName}}</span>
+      <span class="footer-badge">{{footerBadge}}</span>
+    </div>
+  </footer>
+</div>
+

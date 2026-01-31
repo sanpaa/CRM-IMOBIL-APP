@@ -1,0 +1,20 @@
+﻿{
+  "id": "portfolio-broker-v1",
+  "name": "Portfolio Broker",
+  "preview": "/assets/site-templates/portfolio-broker-v1/preview.svg",
+  "theme": {
+    "primary": "#8B5CF6",
+    "secondary": "#1F2937",
+    "accent": "#F472B6",
+    "background": "#F9FAFB",
+    "fontTitle": "inherit",
+    "fontBody": "inherit"
+  },
+  "sections": [
+    { "type": "header" },
+    { "type": "hero" },
+    { "type": "imoveis" },
+    { "type": "cta" },
+    { "type": "footer" }
+  ]
+}

@@ -1,0 +1,128 @@
+﻿:host .hero {
+  padding: 80px 0 64px;
+}
+
+:host .container {
+  width: min(1120px, 92%);
+  margin: 0 auto;
+}
+
+:host .hero-grid {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  align-items: center;
+}
+
+:host .eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+:host .hero-title {
+  font-family: var(--font-title, 'Inter');
+  font-size: clamp(32px, 5vw, 56px);
+  margin: 12px 0;
+}
+
+:host .hero-text {
+  max-width: 560px;
+  color: #475569;
+}
+
+:host .actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+:host .cta {
+  background: var(--primary);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+:host .cta.ghost {
+  background: transparent;
+  border: 1px solid #cbd5e1;
+  color: inherit;
+}
+
+:host .hero-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+:host .chip {
+  display: inline-flex;
+  margin-top: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(14, 116, 144, 0.12);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+:host .variant-modern {
+  background: radial-gradient(circle at 10% 10%, rgba(34, 211, 238, 0.2), transparent 45%), #0b1120;
+  color: #e2e8f0;
+}
+
+:host .variant-modern .hero-text {
+  color: #cbd5f5;
+}
+
+:host .variant-modern .hero-card {
+  background: #111827;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+:host .variant-luxo {
+  background: linear-gradient(120deg, #0a0a0a 0%, #151515 60%);
+  color: #f8fafc;
+}
+
+:host .variant-luxo .hero-text {
+  color: #d1d5db;
+}
+
+:host .variant-luxo .hero-card {
+  background: #141414;
+  border-color: rgba(201, 162, 77, 0.3);
+}
+
+:host .variant-full-bleed {
+  padding: 120px 0 88px;
+  background: linear-gradient(120deg, #0a0a0a 0%, #151515 60%);
+  color: #f8fafc;
+}
+
+:host .variant-split {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+:host-context(.tpl-moderno-dark-v1) .variant-split {
+  background: radial-gradient(circle at 10% 10%, rgba(34, 211, 238, 0.2), transparent 45%), #0b1120;
+  color: #e2e8f0;
+}
+
+:host .variant-minimal {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+:host .variant-tropical {
+  background: linear-gradient(120deg, #ecfeff 0%, #fef9c3 60%);
+  color: #0f172a;
+}

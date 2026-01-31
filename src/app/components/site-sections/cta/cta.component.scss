@@ -1,0 +1,83 @@
+﻿:host .cta {
+  padding: 64px 0;
+}
+
+:host .container {
+  width: min(1120px, 92%);
+  margin: 0 auto;
+}
+
+:host .cta-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 28px;
+  border-radius: 20px;
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+:host .eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+:host .cta-card h2 {
+  margin: 8px 0 8px;
+  font-family: var(--font-title, 'Inter');
+}
+
+:host .cta-button {
+  background: var(--primary);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+:host .variant-modern .cta-card {
+  background: #111827;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+:host .variant-luxo .cta-card {
+  background: transparent;
+  border: 1px solid rgba(201, 162, 77, 0.4);
+}
+
+:host .variant-luxo .cta-button {
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+}
+
+:host .variant-minimal .cta-card {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+}
+
+:host .variant-minimal .cta-button {
+  background: #111827;
+}
+
+:host .variant-tropical .cta-card {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid rgba(14, 165, 164, 0.2);
+}
+
+:host .variant-tropical .cta-button {
+  background: #0ea5a4;
+}
+
+@media (max-width: 768px) {
+  :host .cta-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}

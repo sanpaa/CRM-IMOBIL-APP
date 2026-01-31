@@ -64,7 +64,7 @@ import { PageHeaderComponent } from '../../shared/components/page-header.compone
             </thead>
             <tbody>
               <tr *ngFor="let visit of filteredVisits">
-                <td>{{ visit.visit_date | date:'dd MMM yyyy' }}</td>
+                <td>{{ formatVisitDate(visit.visit_date) }}</td>
                 <td>{{ visit.visit_time }}</td>
                 <td>
                   <div class="visit-main">{{ visit.notes || 'Visita agendada' }}</div>
@@ -423,13 +423,14 @@ export class VisitListComponent implements OnInit {
 
     this.filteredVisits = (baseFiltered || [])
       .filter(visit => {
-        const visitDate = new Date(visit.visit_date);
-        if (Number.isNaN(visitDate.getTime())) return false;
+        const visitDate = this.parseVisitDateLocal(visit.visit_date);
+        if (!visitDate) return false;
         return visitDate >= start && visitDate <= end;
       })
       .sort((a, b) => {
-        const aDate = new Date(a.visit_date);
-        const bDate = new Date(b.visit_date);
+        const aDate = this.parseVisitDateLocal(a.visit_date);
+        const bDate = this.parseVisitDateLocal(b.visit_date);
+        if (!aDate || !bDate) return 0;
         const dateDiff = aDate.getTime() - bDate.getTime();
         if (dateDiff !== 0) return dateDiff;
         return String(a.visit_time || '').localeCompare(String(b.visit_time || ''));
@@ -484,5 +485,23 @@ export class VisitListComponent implements OnInit {
     const start = new Date(base.getFullYear(), base.getMonth(), 1, 0, 0, 0, 0);
     const end = new Date(base.getFullYear(), base.getMonth() + 1, 0, 23, 59, 59, 999);
     return { start, end };
+  }
+
+  formatVisitDate(value?: string | null): string {
+    const parsed = this.parseVisitDateLocal(value);
+    if (!parsed) return '-';
+    return parsed.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  }
+
+  private parseVisitDateLocal(value?: string | null): Date | null {
+    if (!value) return null;
+    const parts = value.split('-').map(part => Number(part));
+    if (parts.length !== 3 || parts.some(part => Number.isNaN(part))) return null;
+    const [year, month, day] = parts;
+    return new Date(year, month - 1, day);
   }
 }

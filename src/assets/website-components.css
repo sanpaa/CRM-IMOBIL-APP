@@ -1,20 +1,14 @@
-/* Website component styles for GrapesJS canvas preview */
-:root {
-  --primary: #1f6aff;
-  --dark: #0f172a;
-  --light: #ffffff;
-  --border: rgba(255, 255, 255, 0.1);
-}
+﻿/* Website component styles for GrapesJS canvas preview */
 
 /* Header (novo) */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 999;
-  background: var(--header-bg, rgba(15, 23, 42, 0.85));
-  color: var(--header-text, #ffffff);
+  background: var(--header-bg, color-mix(in srgb, var(--background) 88%, transparent));
+  color: var(--header-text, var(--secondary));
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
 }
 
 .header-container {
@@ -40,7 +34,7 @@
 .brand-text {
   font-size: 18px;
   font-weight: 600;
-  color: var(--header-text, var(--light));
+  color: var(--header-text, var(--secondary));
 }
 
 .nav {
@@ -51,7 +45,7 @@
 
 .nav a {
   text-decoration: none;
-  color: #e5e7eb;
+  color: var(--secondary);
   font-weight: 500;
   position: relative;
 }
@@ -73,7 +67,7 @@
 
 .cta {
   background: var(--primary);
-  color: #ffffff;
+  color: var(--background);
   border: none;
   padding: 10px 18px;
   border-radius: 10px;
@@ -92,7 +86,7 @@
   background: none;
   border: none;
   font-size: 26px;
-  color: #ffffff;
+  color: var(--secondary);
   cursor: pointer;
 }
 
@@ -102,9 +96,9 @@
     position: absolute;
     top: 100%;
     right: 16px;
-    background: rgba(15, 23, 42, 0.95);
-    border: 1px solid var(--border);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    background: color-mix(in srgb, var(--background) 92%, transparent);
+    border: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--secondary) 18%, transparent);
     border-radius: 12px;
     padding: 0.75rem 1rem;
     flex-direction: column;
@@ -131,8 +125,9 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--secondary) 16%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
 }
 
 .navbar {
@@ -147,7 +142,7 @@
 .navbar-brand h1 {
   margin: 0;
   font-size: 1.5rem;
-  color: #004AAD;
+  color: var(--secondary);
 }
 
 .navbar-nav {
@@ -160,13 +155,13 @@
 
 .navbar-nav a {
   text-decoration: none;
-  color: #333333;
+  color: var(--secondary);
   font-weight: 500;
   transition: color 0.3s;
 }
 
 .navbar-nav a:hover {
-  color: #004AAD;
+  color: var(--primary);
 }
 
 .component-hero {
@@ -176,8 +171,8 @@
   justify-content: center;
   background-size: cover;
   background-position: center;
-  background-color: #004AAD;
-  color: #ffffff;
+  background-color: var(--primary);
+  color: var(--background);
   text-align: center;
 }
 
@@ -204,17 +199,18 @@
 .hero-button {
   display: inline-block;
   padding: 1rem 2rem;
-  background: #ffffff;
-  color: #004AAD;
+  background: var(--background);
+  color: var(--primary);
   text-decoration: none;
-  border-radius: 6px;
+  border-radius: 10px;
   font-weight: 600;
   transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--secondary) 18%, transparent);
 }
 
 .hero-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--secondary) 24%, transparent);
 }
 
 .component-property-grid {
@@ -226,19 +222,21 @@
 .properties-container {
   display: grid;
   gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .property-card {
-  background: #ffffff;
-  border-radius: 8px;
+  background: color-mix(in srgb, var(--background) 94%, transparent);
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+  box-shadow: 0 16px 32px color-mix(in srgb, var(--secondary) 12%, transparent);
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .property-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 22px 40px color-mix(in srgb, var(--secondary) 18%, transparent);
 }
 
 .property-image {
@@ -248,6 +246,13 @@
   position: relative;
 }
 
+.property-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, color-mix(in srgb, var(--background) 90%, transparent));
+}
+
 .property-info {
   padding: 1.5rem;
 }
@@ -255,18 +260,18 @@
 .property-info h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1.2rem;
-  color: #333333;
+  color: var(--secondary);
 }
 
 .property-location {
-  color: #666666;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
   margin: 0 0 1rem 0;
 }
 
 .property-price {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #004AAD;
+  color: var(--accent);
   margin: 0;
 }
 
@@ -279,7 +284,7 @@
 .text-content h2 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #333333;
+  color: var(--secondary);
 }
 
 .component-stats {
@@ -301,20 +306,20 @@
 .stat-value {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #004AAD;
+  color: var(--primary);
   margin-bottom: 0.5rem;
 }
 
 .stat-label {
   font-size: 1rem;
-  color: #666666;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .component-divider hr {
   border: none;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
 }
 
 .component-spacer {
@@ -322,9 +327,11 @@
 }
 
 .component-footer {
-  background: #1a1a1a;
-  color: #ffffff;
+  background: color-mix(in srgb, var(--background) 92%, transparent);
+  color: var(--secondary);
   padding: 3rem 0 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+  backdrop-filter: blur(12px);
 }
 
 .footer-content {
@@ -343,7 +350,7 @@
 .footer-column h4 {
   margin-top: 0;
   margin-bottom: 1rem;
-  color: #ffffff;
+  color: var(--secondary);
 }
 
 .footer-column ul {
@@ -357,20 +364,37 @@
 }
 
 .footer-column a {
-  color: rgba(255,255,255,0.7);
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .footer-column a:hover {
-  color: #ffffff;
+  color: var(--primary);
+}
+
+.footer-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.footer-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--secondary);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .footer-bottom {
   text-align: center;
   padding-top: 2rem;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.6);
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+  color: color-mix(in srgb, var(--secondary) 65%, transparent);
 }
 
 @media (max-width: 768px) {
@@ -386,11 +410,11 @@
   display: grid;
   place-items: center;
   min-height: 220px;
-  border: 2px dashed rgba(59, 130, 246, 0.4);
+  border: 2px dashed color-mix(in srgb, var(--primary) 40%, transparent);
   border-radius: 16px;
-  background: rgba(248, 250, 252, 0.8);
-  color: #0f172a;
-  font-family: Inter, sans-serif;
+  background: color-mix(in srgb, var(--background) 85%, transparent);
+  color: var(--secondary);
+  font-family: var(--font-body, inherit);
   text-align: center;
   gap: 0.35rem;
 }
@@ -401,5 +425,5 @@
 
 .component-placeholder span {
   font-size: 0.85rem;
-  color: #64748b;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
 }

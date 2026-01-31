@@ -112,15 +112,32 @@ export class GrapesEditorHostComponent implements AfterViewInit, OnDestroy {
       this.editor.refresh();
     }
 
+    // IMPORTANTE: Desbloquear após carregar via applyPendingLayout
+    this.unlockAllComponents();
+
     this.pendingLayout = null;
   }
 
   save(): any {
     if (!this.editor) return null;
+
+    // Força a limpeza de componentes vazios ou estados temporários
+    this.editor.refresh();
+
+    const html = this.editor.getHtml();
+    const css = this.editor.getCss({ avoidProtected: true }) || '';
+    const projectData = this.editor.getProjectData();
+
+    console.log('[gjs] save() extracting data', {
+      htmlLength: html.length,
+      cssLength: css.length,
+      hasProjectData: !!projectData
+    });
+
     return {
-      html: this.editor.getHtml(),
-      css: this.editor.getCss() || '',
-      projectData: this.editor.getProjectData() // Importante: salva o estado completo
+      html,
+      css,
+      projectData
     };
   }
 
@@ -184,16 +201,47 @@ export class GrapesEditorHostComponent implements AfterViewInit, OnDestroy {
       this.isLoaded = true;
       console.log('[gjs] canvas frame loaded');
 
+
+
       if (this.pendingLayout) {
-        console.log('[gjs] applying pending layout on frame load', {
-          htmlLength: this.pendingLayout.html?.length ?? 0,
-          cssLength: this.pendingLayout.css?.length ?? 0
-        });
-        this.editor.setComponents(this.pendingLayout.html);
-        this.editor.setStyle(this.pendingLayout.css);
-        this.editor.refresh();
+        // PREVENÇÃO DE LOOP INFINITO:
+        // Capturamos o layout e limpamos a flag ANTES de carregar.
+        const layoutToLoad = this.pendingLayout;
         this.pendingLayout = null;
+
+        console.log('[gjs] applying pending layout on frame load', {
+          htmlLength: layoutToLoad.html?.length ?? 0,
+          cssLength: layoutToLoad.css?.length ?? 0,
+          hasProjectData: !!layoutToLoad.projectData
+        });
+
+        if (layoutToLoad.projectData) {
+          try {
+            this.editor.loadProjectData(layoutToLoad.projectData);
+            this.editor.refresh();
+          } catch (e) {
+            console.error('[gjs] Error loading project data', e);
+            this.editor.setComponents(layoutToLoad.html);
+            this.editor.setStyle(layoutToLoad.css);
+          }
+        } else {
+          this.editor.setComponents(layoutToLoad.html);
+          this.editor.setStyle(layoutToLoad.css);
+          this.editor.refresh();
+        }
+
+        // EXECUTA DESBLOQUEIO APÓS CARREGAR TUDO
+        // EXECUTA DESBLOQUEIO APÓS CARREGAR TUDO
+        this.unlockAllComponents();
       }
+
+      // FIX: Corrige o posicionamento da toolbar flutuante
+      this.fixToolbarPositioning();
+
+      // Listener para novos componentes (arrastados do painel)
+      this.editor.on('component:add', (component: any) => {
+        this.unlockComponent(component);
+      });
     });
 
     this.editor.on('component:update styleManager:change', () => {
@@ -201,5 +249,60 @@ export class GrapesEditorHostComponent implements AfterViewInit, OnDestroy {
     });
   }
 
+  private fixToolbarPositioning() {
+    // Observa mudanças no DOM para detectar quando a toolbar é criada
+    const observer = new MutationObserver(() => {
+      const toolbar = document.querySelector('.gjs-toolbar') as HTMLElement;
+      if (toolbar) {
+        // Verifica se a toolbar está com posicionamento negativo (bug)
+        const left = parseFloat(toolbar.style.left);
+        const top = parseFloat(toolbar.style.top);
+
+        if (left < 0 || top < 0 || isNaN(left) || isNaN(top)) {
+          console.log('[gjs] Fixing toolbar position from', { left, top });
+          // Reposiciona a toolbar para uma posição visível próxima ao elemento
+          toolbar.style.position = 'absolute';
+          toolbar.style.left = '50%';
+          toolbar.style.top = '50%';
+          toolbar.style.transform = 'translate(-50%, -50%)';
+          toolbar.style.zIndex = '999999';
+        }
+      }
+    });
+
+    // Observa o container do editor
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style']
+    });
+  }
+
+  private unlockAllComponents() {
+    console.log('[gjs] Unlocking all components...');
+    this.editor.getComponents().each((cmp: any) => this.unlockComponent(cmp));
+  }
+
+  private unlockComponent(component: any) {
+    if (!component) return;
+    component.set({
+      removable: true,
+      draggable: true,
+      droppable: true,
+      badgable: true,
+      hoverable: true,
+      selectable: true,
+      editable: true,
+      highlightable: true,
+      layerable: true,
+      copyable: true
+    });
+    // Recursivo para filhos
+    const children = component.get('components');
+    if (children) {
+      children.each((child: any) => this.unlockComponent(child));
+    }
+  }
 
 }

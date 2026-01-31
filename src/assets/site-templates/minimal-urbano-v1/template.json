@@ -1,0 +1,28 @@
+{
+  "id": "minimal-urbano-v1",
+  "name": "Minimal Urbano",
+  "preview": "/assets/site-templates/minimal-urbano-v1/preview.svg",
+  "theme": {
+    "primary": "#2563EB",
+    "secondary": "#0F172A",
+    "fontTitle": "Inter",
+    "fontBody": "IBM Plex Sans"
+  },
+  "sections": [
+    { "type": "header" },
+    { "type": "hero", "variant": "split" },
+    {
+      "type": "imoveis",
+      "variant": "grid",
+      "config": {
+        "eyebrow": "Selecao urbana",
+        "title": "Imoveis recentes",
+        "ctaLabel": "Ver todos",
+        "ctaLink": "/buscar",
+        "columns": 2,
+        "limit": 4
+      }
+    },
+    { "type": "footer" }
+  ]
+}

@@ -771,7 +771,7 @@ export class VisitPdfService {
   }
 
   private generateVisitDataSection(visit: VisitWithDetails): string {
-    const visitDate = visit.visit_date ? new Date(visit.visit_date).toLocaleDateString('pt-BR') : '-';
+    const visitDate = this.formatVisitDate(visit.visit_date);
     const visitTime = visit.visit_time || '-';
     const status = this.formatStatus(visit.status);
     const statusBadge = this.getStatusBadgeHtml(status);
@@ -1119,6 +1119,20 @@ export class VisitPdfService {
   </tr>
 </table>
     `;
+  }
+
+  private formatVisitDate(value?: string | null): string {
+    const parsed = this.parseVisitDateLocal(value);
+    if (!parsed) return '-';
+    return parsed.toLocaleDateString('pt-BR');
+  }
+
+  private parseVisitDateLocal(value?: string | null): Date | null {
+    if (!value) return null;
+    const parts = value.split('-').map(part => Number(part));
+    if (parts.length !== 3 || parts.some(part => Number.isNaN(part))) return null;
+    const [year, month, day] = parts;
+    return new Date(year, month - 1, day);
   }
 
   private generateFooter(): string {

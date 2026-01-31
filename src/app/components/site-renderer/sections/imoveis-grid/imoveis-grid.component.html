@@ -1,0 +1,15 @@
+﻿<section class="imoveis" data-section="imoveis" *ngIf="config">
+  <div class="container">
+    <h2 class="section-title">Imoveis em destaque</h2>
+    <div class="grid">
+      <article class="card" *ngFor="let card of cards">
+        <div class="thumb" [ngStyle]="card.image ? {'background-image': 'url(' + card.image + ')', 'background-size': 'cover', 'background-position': 'center'} : null"></div>
+        <div class="info">
+          <h3>{{ card.title }}</h3>
+          <p>{{ card.city }}</p>
+          <span class="price">{{ card.price }}</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

@@ -117,7 +117,12 @@ import { PopupService } from '../../shared/services/popup.service';
         <div class="form-row">
           <div class="form-group">
             <label>Status</label>
-            <input type="text" [(ngModel)]="formData.status" name="status" class="form-control" placeholder="pronto">
+            <select [(ngModel)]="formData.status" name="status" class="form-control">
+              <option value="pronto">Pronto para morar</option>
+              <option value="planta">Na planta</option>
+              <option value="obras">Em obras</option>
+              <option value="inativo">Inativo</option>
+            </select>
           </div>
           <div class="form-group">
             <label>Andar</label>
@@ -722,20 +727,36 @@ export class PropertyFormComponent implements OnInit {
     
     // Try multiple strategies to find coordinates
     const cepClean = this.formData.zip_code?.replace(/\D/g, '');
+    const neighborhood = (this.formData.neighborhood || '').trim();
+    const street = (this.formData.street || '').trim();
+    const city = (this.formData.city || '').trim();
+    const state = (this.formData.state || '').trim();
 
     const strategies = [
       // Mais precisa
-      this.formData.street && cepClean
-        ? `${this.formData.street}, ${cepClean}, ${this.formData.city}, ${this.formData.state}, Brasil`
+      street && neighborhood && cepClean
+        ? `${street}, ${neighborhood}, ${cepClean}, ${city}, ${state}, Brasil`
+        : null,
+
+      street && cepClean
+        ? `${street}, ${cepClean}, ${city}, ${state}, Brasil`
         : null,
 
       // Fallback
-      this.formData.street
-        ? `${this.formData.street}, ${this.formData.city}, ${this.formData.state}, Brasil`
+      street && neighborhood
+        ? `${street}, ${neighborhood}, ${city}, ${state}, Brasil`
+        : null,
+
+      street
+        ? `${street}, ${city}, ${state}, Brasil`
         : null,
 
       // Último recurso
-      `${this.formData.city}, ${this.formData.state}, Brasil`
+      neighborhood
+        ? `${neighborhood}, ${city}, ${state}, Brasil`
+        : null,
+
+      `${city}, ${state}, Brasil`
     ].filter(Boolean);
     
     for (const address of strategies) {

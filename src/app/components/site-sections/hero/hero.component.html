@@ -1,0 +1,18 @@
+﻿<section class="section hero" [ngClass]="'variant-' + variant" id="hero" *ngIf="config">
+  <div class="container hero-grid">
+    <div class="copy">
+      <span class="eyebrow">{{ eyebrow }}</span>
+      <h1 class="hero-title">{{ config.heroTitle }}</h1>
+      <p class="hero-text">{{ config.heroSubtitle || config.heroText }}</p>
+      <div class="actions">
+        <a class="cta" [href]="config.whatsappLink || '#'">Falar no WhatsApp</a>
+        <a class="cta ghost" href="/buscar">Ver imoveis</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <h3>{{ cardTitle }}</h3>
+      <p>{{ cardText }}</p>
+      <span class="chip">Atendimento 24h</span>
+    </div>
+  </div>
+</section>

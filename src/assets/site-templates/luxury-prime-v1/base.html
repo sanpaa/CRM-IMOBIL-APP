@@ -1,0 +1,98 @@
+<div class="site luxury-prime" style="--primary: {{primaryColor}}; --secondary: {{secondaryColor}}; --accent: {{accentColor}}; --background: {{backgroundColor}};">
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img class="logo" src="{{logo}}" alt="{{companyName}}" />
+        <div>
+          <span class="company">{{companyName}}</span>
+          <span class="tag">Alto padrao</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#hero">Home</a>
+        <a href="#imoveis">Colecao</a>
+        <a href="#contato">Concierge</a>
+      </nav>
+      <a class="cta" href="{{whatsappLink}}">Agendar visita</a>
+    </div>
+  </header>
+
+  <section class="hero" id="hero" data-section="hero">
+    <div class="container hero-shell">
+      <div class="hero-copy">
+        <span class="eyebrow">Colecao exclusiva</span>
+        <h1>{{heroTitle}}</h1>
+        <p class="hero-text">{{heroText}}</p>
+        <div class="hero-actions">
+          <a class="cta" href="{{whatsappLink}}">Quero conhecer</a>
+          <a class="ghost" href="/buscar">Ver vitrine</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="card-line"></div>
+        <p>{{aboutText}}</p>
+        <div class="hero-signature">Atendimento sob medida</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="imoveis" id="imoveis" data-section="imoveis">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Selecao privada</span>
+          <h2>Imoveis premium</h2>
+        </div>
+        <a class="ghost" href="/buscar">Ver todos</a>
+      </div>
+      <div class="property-grid">
+        {{propertyCards}}
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section" id="contato" data-section="contato">
+    <div class="container cta-shell">
+      <div>
+        <h2>Concierge particular</h2>
+        <p>{{contactText}}</p>
+      </div>
+      <a class="cta" href="{{whatsappLink}}">Falar com especialista</a>
+    </div>
+  </section>
+
+    <footer class="footer" data-section="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="footer-brand-row">
+          <img class="footer-logo" src="{{logo}}" alt="{{companyName}}" onerror="this.style.display='none'" />
+          <div>
+            <strong class="footer-name">{{companyName}}</strong>
+            <span class="footer-tag">{{footerTagline}}</span>
+          </div>
+        </div>
+        <p class="footer-desc">{{footerText}}</p>
+      </div>
+      <div class="footer-links">
+        <h4>{{footerLinksTitle}}</h4>
+        <a href="/">Home</a>
+        <a href="/buscar">Buscar</a>
+        <a href="{{whatsappLink}}">Contato</a>
+      </div>
+      <div class="footer-social">
+        <h4>Redes sociais</h4>
+        <div class="social-row">
+          <a class="social" href="{{instagram}}" target="_blank" rel="noopener">Instagram</a>
+          <a class="social" href="{{facebook}}" target="_blank" rel="noopener">Facebook</a>
+          <a class="social" href="{{youtube}}" target="_blank" rel="noopener">YouTube</a>
+          <a class="social" href="{{linkedin}}" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>{{companyName}}</span>
+      <span class="footer-badge">{{footerBadge}}</span>
+    </div>
+  </footer>
+</div>
+

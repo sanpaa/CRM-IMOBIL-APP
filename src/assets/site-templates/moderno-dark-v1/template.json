@@ -1,0 +1,29 @@
+{
+  "id": "moderno-dark-v1",
+  "name": "Moderno Dark",
+  "preview": "/assets/site-templates/moderno-dark-v1/preview.svg",
+  "theme": {
+    "primary": "#22D3EE",
+    "secondary": "#E2E8F0",
+    "fontTitle": "Space Grotesk",
+    "fontBody": "Inter"
+  },
+  "sections": [
+    { "type": "header" },
+    { "type": "hero", "variant": "split" },
+    { "type": "features" },
+    {
+      "type": "imoveis",
+      "variant": "carousel",
+      "config": {
+        "eyebrow": "Curadoria",
+        "title": "Destaques da semana",
+        "ctaLabel": "Ver imoveis",
+        "ctaLink": "/buscar",
+        "showCarousel": true,
+        "limit": 8
+      }
+    },
+    { "type": "footer" }
+  ]
+}

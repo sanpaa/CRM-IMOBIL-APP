@@ -6,8 +6,10 @@
 
 -- 1. Garantir bucket
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-VALUES ('website-layouts', 'website-layouts', true, 10485760, ARRAY['text/html', 'text/css'])
-ON CONFLICT (id) DO UPDATE SET public = true;
+VALUES ('website-layouts', 'website-layouts', true, 10485760, ARRAY['text/html', 'text/css', 'application/json'])
+ON CONFLICT (id) DO UPDATE SET 
+    public = true,
+    allowed_mime_types = ARRAY['text/html', 'text/css', 'application/json'];
 
 -- 2. Limpeza total de políticas
 DROP POLICY IF EXISTS "Authenticated users can upload layouts" ON storage.objects;

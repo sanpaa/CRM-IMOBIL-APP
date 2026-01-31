@@ -1,13 +1,16 @@
 <div class="public-website" *ngIf="!loading">
-  <style [innerHTML]="layoutCss"></style>
-  <div class="grapes-output" [innerHTML]="layoutHtml"></div>
+  <app-site-renderer
+    *ngIf="useSimpleRenderer && simpleTemplate && simpleConfig"
+    [template]="simpleTemplate"
+    [config]="simpleConfig"
+    [properties]="properties"
+  ></app-site-renderer>
 
-  <a *ngIf="whatsappNumber"
-     class="whatsapp-float"
-     [href]="getWhatsappLink()"
-     target="_blank"
-     rel="noopener noreferrer"
-     aria-label="Fale no WhatsApp">
+  <!-- CSS e HTML unificados e sanitizados para garantir renderização correta sem encapsulamento -->
+  <div class="grapes-output" *ngIf="!useSimpleRenderer" [innerHTML]="safeLayoutHtml"></div>
+
+  <a *ngIf="whatsappNumber" class="whatsapp-float" [href]="getWhatsappLink()" target="_blank" rel="noopener noreferrer"
+    aria-label="Fale no WhatsApp">
     💬 WhatsApp
   </a>
 </div>
@@ -16,4 +19,3 @@
   <div class="spinner"></div>
   <p>Carregando...</p>
 </div>
-

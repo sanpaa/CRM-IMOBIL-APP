@@ -1,0 +1,52 @@
+﻿[
+  {
+    "id": "modern-dark-v1",
+    "name": "Modern Dark",
+    "preview": "/assets/site-templates/modern-dark-v1/preview.svg"
+  },
+  {
+    "id": "luxury-prime-v1",
+    "name": "Luxury Prime",
+    "preview": "/assets/site-templates/luxury-prime-v1/preview.svg"
+  },
+  {
+    "id": "minimal-clean-v1",
+    "name": "Minimal Clean",
+    "preview": "/assets/site-templates/minimal-clean-v1/preview.svg"
+  },
+  {
+    "id": "urban-grid-v1",
+    "name": "Urban Grid",
+    "preview": "/assets/site-templates/urban-grid-v1/preview.svg"
+  },
+  {
+    "id": "tropical-coast-v1",
+    "name": "Tropical Coast",
+    "preview": "/assets/site-templates/tropical-coast-v1/preview.svg"
+  },
+  {
+    "id": "corporate-blue-v1",
+    "name": "Corporate Blue",
+    "preview": "/assets/site-templates/corporate-blue-v1/preview.svg"
+  },
+  {
+    "id": "portfolio-broker-v1",
+    "name": "Portfolio Broker",
+    "preview": "/assets/site-templates/portfolio-broker-v1/preview.svg"
+  },
+  {
+    "id": "marketplace-pro-v1",
+    "name": "Marketplace Pro",
+    "preview": "/assets/site-templates/marketplace-pro-v1/preview.svg"
+  },
+  {
+    "id": "launch-landing-v1",
+    "name": "Launch Landing",
+    "preview": "/assets/site-templates/launch-landing-v1/preview.svg"
+  },
+  {
+    "id": "high-conversion-v1",
+    "name": "High Conversion",
+    "preview": "/assets/site-templates/high-conversion-v1/preview.svg"
+  }
+]

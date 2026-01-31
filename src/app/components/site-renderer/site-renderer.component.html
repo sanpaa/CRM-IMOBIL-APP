@@ -1,0 +1,11 @@
+﻿<div
+  class="site"
+  *ngIf="template && mergedConfig"
+  [ngClass]="['tpl-' + template.id]"
+>
+  <ng-container *ngFor="let section of template.sections; trackBy: trackBySection">
+    <ng-container
+      *ngComponentOutlet="getSectionComponent(section); inputs: { config: mergedConfig, theme: template.theme, section: section, properties: properties }"
+    ></ng-container>
+  </ng-container>
+</div>

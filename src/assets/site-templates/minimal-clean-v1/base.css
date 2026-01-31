@@ -1,0 +1,320 @@
+.site.minimal-clean {
+  font-family: var(--font-body, inherit);
+  background: var(--background);
+  color: var(--secondary);
+}
+
+.site.minimal-clean .container {
+  width: min(1040px, 92%);
+  margin: 0 auto;
+}
+
+.site.minimal-clean .site-header {
+  background: var(--background);
+  border-bottom: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+}
+
+.site.minimal-clean .header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+}
+
+.site.minimal-clean .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.site.minimal-clean .logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--secondary) 15%, transparent);
+  padding: 4px;
+}
+
+.site.minimal-clean .company {
+  font-weight: 700;
+}
+
+.site.minimal-clean .nav {
+  display: flex;
+  gap: 16px;
+}
+
+.site.minimal-clean .nav a {
+  text-decoration: none;
+  color: inherit;
+  font-size: 14px;
+}
+
+.site.minimal-clean .cta {
+  background: var(--primary);
+  color: var(--background);
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.site.minimal-clean .ghost {
+  border: 1px solid color-mix(in srgb, var(--secondary) 20%, transparent);
+  color: inherit;
+  background: transparent;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.site.minimal-clean .hero {
+  padding: 90px 0 70px;
+}
+
+.site.minimal-clean .hero-grid {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  align-items: center;
+}
+
+.site.minimal-clean .eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+.site.minimal-clean .hero h1 {
+  font-size: clamp(32px, 4vw, 52px);
+  margin: 12px 0;
+}
+
+.site.minimal-clean .hero-text {
+  max-width: 520px;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+}
+
+.site.minimal-clean .hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.site.minimal-clean .hero-note {
+  border-left: 2px solid var(--accent);
+  padding-left: 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.site.minimal-clean .note-line {
+  width: 70px;
+  height: 2px;
+  background: var(--accent);
+}
+
+.site.minimal-clean .imoveis {
+  padding: 60px 0;
+}
+
+.site.minimal-clean .section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.site.minimal-clean .property-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.site.minimal-clean .card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.site.minimal-clean .card {
+  border: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--background);
+  transition: transform 0.3s ease;
+}
+
+.site.minimal-clean .card-link:hover .card { transform: translateY(-4px); }
+
+.site.minimal-clean .thumb {
+  height: 160px;
+  background: color-mix(in srgb, var(--secondary) 10%, transparent);
+}
+
+.site.minimal-clean .info { padding: 14px; }
+
+.site.minimal-clean .price {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.site.minimal-clean .cta-section { padding: 60px 0 80px; }
+
+.site.minimal-clean .cta-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+  padding-top: 24px;
+}
+
+.site.minimal-clean .footer {
+  padding: 24px 0;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+}
+
+.site.minimal-clean .footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+@media (max-width: 900px) {
+  .site.minimal-clean .nav { display: none; }
+}
+
+@media (max-width: 768px) {
+  .site.minimal-clean .cta-inner { flex-direction: column; text-align: center; }
+}
+
+.site.minimal-clean .footer {
+  padding: 56px 0 24px;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 14%, transparent);
+  background: color-mix(in srgb, var(--background) 92%, transparent);
+}
+
+.site.minimal-clean .footer-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.site.minimal-clean .footer-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site.minimal-clean .footer-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 12px;
+  padding: 6px;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.site.minimal-clean .footer-name {
+  display: block;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.site.minimal-clean .footer-tag {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 60%, transparent);
+}
+
+.site.minimal-clean .footer-desc {
+  margin: 12px 0 0;
+  max-width: 380px;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+  font-size: 14px;
+}
+
+.site.minimal-clean .footer-links h4,
+.site.minimal-clean .footer-social h4 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+}
+
+.site.minimal-clean .footer-links a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.85;
+  margin-bottom: 8px;
+}
+
+.site.minimal-clean .footer-links a:hover {
+  opacity: 1;
+}
+
+.site.minimal-clean .social-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.site.minimal-clean .social {
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid color-mix(in srgb, var(--secondary) 18%, transparent);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.site.minimal-clean .social:hover {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  color: var(--accent);
+}
+
+.site.minimal-clean .footer-bottom {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--secondary) 12%, transparent);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: color-mix(in srgb, var(--secondary) 70%, transparent);
+  font-size: 12px;
+}
+
+.site.minimal-clean .footer-badge {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--secondary);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+@media (max-width: 900px) {
+  .site.minimal-clean .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .site.minimal-clean .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .site.minimal-clean .footer-brand-row {
+    align-items: flex-start;
+  }
+}

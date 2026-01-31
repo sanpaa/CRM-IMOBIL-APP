@@ -1,0 +1,20 @@
+﻿{
+  "id": "modern-dark-v1",
+  "name": "Modern Dark",
+  "preview": "/assets/site-templates/modern-dark-v1/preview.svg",
+  "theme": {
+    "primary": "#0EA5E9",
+    "secondary": "#E2E8F0",
+    "accent": "#22D3EE",
+    "background": "#0B1120",
+    "fontTitle": "inherit",
+    "fontBody": "inherit"
+  },
+  "sections": [
+    { "type": "header" },
+    { "type": "hero" },
+    { "type": "imoveis" },
+    { "type": "cta" },
+    { "type": "footer" }
+  ]
+}

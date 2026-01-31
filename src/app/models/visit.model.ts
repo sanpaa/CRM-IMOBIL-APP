@@ -16,6 +16,7 @@ export interface Visit {
 export interface VisitProperty {
   id?: string;
   visit_id?: string;
+  visit_time?: string;
   property_reference?: string;
   full_address?: string;
   development?: string;
